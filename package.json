@@ -1,0 +1,7 @@
+{
+  "name": "saemanga-rust",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Liby Lee <liby99@icloud.com>",
+  "license": "MIT"
+}

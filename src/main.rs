@@ -4,13 +4,12 @@
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
 
-use rocket::Request;
 use rocket::response::Redirect;
 use rocket::http::{Cookies, Cookie};
-use rocket_contrib::templates::{Template, handlebars};
+use rocket_contrib::templates::{Template};
 use rocket_contrib::databases::mongodb;
-use mongodb::{Bson, bson, doc};
-use mongodb::{Client, ThreadedClient};
+use mongodb::{bson, doc};
+use mongodb::{ThreadedClient};
 use mongodb::db::ThreadedDatabase;
 
 #[database("mongodb")]
@@ -54,6 +53,17 @@ fn db_fetch_test(conn: SaemangaDatabase) -> &'static str {
   }
 }
 
+#[get("/db-insert")]
+fn db_insert_test(conn: SaemangaDatabase) -> String {
+  let coll = &conn.client.db("saemanga").collection("test");
+  coll.insert_one(doc! {
+    "a": 1,
+    "b": 3.0,
+    "name": "Liby"
+  }, None).unwrap();
+  String::from("Inserted...?")
+}
+
 #[get("/set-cookie-zero")]
 fn set_cookie_zero(mut cookies: Cookies) -> String {
   cookies.add(Cookie::build("counter", "0").path("/").finish());
@@ -73,9 +83,9 @@ fn cookie_add_one(mut cookies: Cookies) -> String {
   match cookies.get("counter") {
     Some(c) => {
       let old_int_value: i32 = c.value().parse::<i32>().unwrap();
-      let new_int_value: i32 = oldIntValue + 1;
-      cookies.add(Cookie::build("counter", newIntValue.to_string()).path("/").finish());
-      format!("Incrementing counter {} to {}", oldIntValue, newIntValue)
+      let new_int_value: i32 = old_int_value + 1;
+      cookies.add(Cookie::build("counter", new_int_value.to_string()).path("/").finish());
+      format!("Incrementing counter {} to {}", old_int_value, new_int_value)
     },
     _ => {
       cookies.add(Cookie::build("counter", "1").path("/").finish());
@@ -90,7 +100,13 @@ fn main() {
     .attach(SaemangaDatabase::fairing())
     .mount("/", routes![root])
     .mount("/index", routes![index])
-    .mount("/test", routes![db_fetch_test, get_counter, set_cookie_zero, cookie_add_one])
+    .mount("/test", routes![
+      db_fetch_test,
+      db_insert_test,
+      get_counter, 
+      set_cookie_zero, 
+      cookie_add_one
+    ])
     .mount("/hello-world", routes![hello_world])
     .launch();
 }

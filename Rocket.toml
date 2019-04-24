@@ -3,3 +3,6 @@ template_dir = "assets/templates"
 
 [production]
 template_dir = "assets/templates"
+
+[global.databases.mongodb]
+url = "mongodb://localhost:27017/saemanga"

@@ -85,10 +85,18 @@ fn get_counter(cookies: Cookies) -> String {
 fn cookie_add_one(mut cookies: Cookies) -> String {
   match cookies.get("counter") {
     Some(c) => {
-      let old_int_value: i32 = c.value().parse::<i32>().unwrap();
-      let new_int_value: i32 = old_int_value + 1;
-      cookies.add(Cookie::build("counter", new_int_value.to_string()).path("/").finish());
-      format!("Incrementing counter {} to {}", old_int_value, new_int_value)
+      let v = c.value().to_string();
+      match v.parse::<i32>() {
+        Ok(old_int_value) => {
+          let new_int_value: i32 = old_int_value + 1;
+          cookies.add(Cookie::build("counter", new_int_value.to_string()).path("/").finish());
+          format!("Incrementing counter {} to {}", old_int_value, new_int_value)
+        },
+        _ => {
+          cookies.add(Cookie::new("counter", "1"));
+          format!("Invalid counter {}. Setting it to 1", v)
+        }
+      }
     },
     _ => {
       cookies.add(Cookie::build("counter", "1").path("/").finish());

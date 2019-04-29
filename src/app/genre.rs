@@ -1,3 +1,6 @@
+use lazy_static::lazy_static;
+use regex::Regex;
+
 #[derive(Debug, PartialEq)]
 pub struct Genre {
   id: &'static str,
@@ -89,24 +92,47 @@ pub static OTHER : Genre = Genre {
   dmk_directory: "comic22",
 };
 
+static ALL_GENRES : [&'static Genre; 14] = [
+  &COMBAT,
+  &MAGIC,
+  &DETECTIVE,
+  &SPORT,
+  &HORROR,
+  &SENGOKU,
+  &MAGEN,
+  &ADV,
+  &GAKUEN,
+  &COMEDY,
+  &SHOJO,
+  &SHONEN,
+  &SCIFI,
+  &OTHER,
+];
+
 impl Genre {
   pub fn for_id(id: &str) -> Option<&'static Genre> {
-    match id {
-      "adv" => Some(&ADV),
-      "combat" => Some(&COMBAT),
-      "comedy" => Some(&COMEDY),
-      "detective" => Some(&DETECTIVE),
-      "gakuen" => Some(&GAKUEN),
-      "horror" => Some(&HORROR),
-      "magen" => Some(&MAGEN),
-      "magic" => Some(&MAGIC),
-      "other" => Some(&OTHER),
-      "scifi" => Some(&SCIFI),
-      "sengoku" => Some(&SENGOKU),
-      "shojo" => Some(&SHOJO),
-      "shonen" => Some(&SHONEN),
-      "sport" => Some(&SPORT),
-      _ => None
+    for genre in ALL_GENRES.iter() {
+      if genre.id == id {
+        return Some(&genre);
+      }
+    }
+    None
+  }
+
+  pub fn for_dmk_directory(dir: &str) -> Option<&'static Genre> {
+    for genre in ALL_GENRES.iter() {
+      if genre.dmk_directory == dir {
+        return Some(&genre);
+      }
+    }
+    None
+  }
+
+  pub fn from_dmk_genre_url(url: &str) -> Option<&'static Genre> {
+    lazy_static! { static ref DMK_GENRE_RE : Regex = Regex::new(r"^/(comic\d{2}).html$").unwrap(); }
+    match DMK_GENRE_RE.captures(url) {
+      Some(cap) => Self::for_dmk_directory(&cap[1]),
+      None => None
     }
   }
 

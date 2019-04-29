@@ -5,6 +5,11 @@ use regex::Regex;
 
 use super::genre::*;
 
+pub fn is_valid_dmk_id(dmk_id: &String) -> bool {
+  lazy_static! { static ref DMK_ID_RE : Regex = Regex::new(r"\d{4}").unwrap(); }
+  return DMK_ID_RE.is_match(dmk_id);
+}
+
 #[derive(Debug)]
 pub enum MangaStatus {
   Ended,

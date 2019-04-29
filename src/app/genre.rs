@@ -1,6 +1,4 @@
-use std::cmp::Ordering;
-
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Genre {
   id: &'static str,
   name: &'static str,
@@ -91,55 +89,24 @@ pub static OTHER : Genre = Genre {
   dmk_directory: "comic22",
 };
 
-static GENRE_IDS_SORTED: [&'static str; 14] = [
-  "adv",
-  "combat",
-  "comedy",
-  "detective",
-  "gakuen",
-  "horror",
-  "magen",
-  "magic",
-  "other",
-  "scifi",
-  "sengoku",
-  "shojo",
-  "shonen",
-  "sport",
-];
-
-static GENRES_IN_ID_SORT: [&'static Genre; 14] = [
-  &ADV,
-  &COMBAT,
-  &COMEDY,
-  &DETECTIVE,
-  &GAKUEN,
-  &HORROR,
-  &MAGEN,
-  &MAGIC,
-  &OTHER,
-  &SCIFI,
-  &SENGOKU,
-  &SHOJO,
-  &SHONEN,
-  &SPORT,
-];
-
 impl Genre {
   pub fn for_id(id: &str) -> Option<&'static Genre> {
-    let candidate = id.as_bytes();
-    match GENRE_IDS_SORTED.binary_search_by(|probe| {
-      let bytes = probe.as_bytes();
-      let c = bytes.len().cmp(&candidate.len());
-      if c != Ordering::Equal {
-        return c;
-      }
-      let probe_iter = bytes.iter().rev();
-      let candidate_iter = candidate.iter().rev();
-      probe_iter.cmp(candidate_iter)
-    }) {
-      Ok(i) => Some(GENRES_IN_ID_SORT[i]),
-      Err(_) => None,
+    match id {
+      "adv" => Some(&ADV),
+      "combat" => Some(&COMBAT),
+      "comedy" => Some(&COMEDY),
+      "detective" => Some(&DETECTIVE),
+      "gakuen" => Some(&GAKUEN),
+      "horror" => Some(&HORROR),
+      "magen" => Some(&MAGEN),
+      "magic" => Some(&MAGIC),
+      "other" => Some(&OTHER),
+      "scifi" => Some(&SCIFI),
+      "sengoku" => Some(&SENGOKU),
+      "shojo" => Some(&SHOJO),
+      "shonen" => Some(&SHONEN),
+      "sport" => Some(&SPORT),
+      _ => None
     }
   }
 

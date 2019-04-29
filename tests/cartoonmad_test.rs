@@ -1,6 +1,6 @@
 use scraper::{Selector, Html};
 // use reqwest::Response;
-// use encoding_rs::{Encoding, BIG5};
+use encoding_rs::{Encoding, BIG5};
 // use std::result::Result;
 
 // extern crate hyper;
@@ -51,16 +51,8 @@ fn test_cartoonmad_manga_info() {
   let res = reqwest::get("https://cartoonmad.com/comic/6312.html");
   match res {
     Ok(mut sth) => {
-      // let mut cloned_response = sth.clone();
-      unsafe {
-        sth.headers().insert(reqwest::header::CONTENT_TYPE, "text/html; charset=big5".parse().unwrap());
-      }
-      match sth.text() {
+      match sth.text_with_charset(BIG5) {
         Ok(html_txt) => {
-          // match BIG5_2003.decode(html_txt.as_bytes(), DecoderTrap::Ignore) {
-          //   Ok(decoded) => println!("{:?}", decoded),
-          //   Err(_) => println!("Decode text from big5 error")
-          // }
           let document = Html::parse_document(&html_txt);
           let selector = Selector::parse("body > table > tbody > tr:first-child > td:nth-child(2) > table > tbody").unwrap();
           let ps = document.select(&selector).next().unwrap();
@@ -72,10 +64,6 @@ fn test_cartoonmad_manga_info() {
           println!("Raw Title: {}", title_inner);
           println!("Length: {}", title_inner.len());
           println!("{:X?}", title_inner.as_bytes());
-          // match BIG5_2003.decode(title.as_bytes(), DecoderTrap::Ignore) {
-          //   Ok(decoded) => println!("{:?}", decoded),
-          //   Err(_) => println!("Decode text from big5 error")
-          // }
         },
         Err(_) => println!("Parse text error")
       }

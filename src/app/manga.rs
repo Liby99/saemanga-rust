@@ -18,14 +18,14 @@ impl MangaStatus {
 }
 
 pub struct MangaEpisode {
-  index: u32,
+  index: usize,
   is_book: bool,
   episode: u32,
   num_pages: u32,
 }
 
 impl MangaEpisode {
-  pub fn new(index: u32, is_book: bool, episode: u32, num_pages: u32) -> MangaEpisode {
+  pub fn new(index: usize, is_book: bool, episode: u32, num_pages: u32) -> MangaEpisode {
     MangaEpisode { 
       index: index,
       is_book: is_book,
@@ -34,7 +34,7 @@ impl MangaEpisode {
     }
   }
 
-  pub fn index(&self) -> u32 {
+  pub fn index(&self) -> usize {
     self.index
   }
 
@@ -137,9 +137,23 @@ impl Manga {
     self.episodes.iter().find(|&e| e.episode == epi)
   }
 
-  // pub fn next_episode_of(&self, epi: &MangaEpisoe) -> Option<&MangaEpisode>
+  pub fn next_episode_of(&self, epi: &MangaEpisode) -> Option<&MangaEpisode> {
+    assert!(epi.index < self.episodes.len());
+    if epi.index == self.episodes.len() - 1 {
+      None
+    } else {
+      Some(&self.episodes[epi.index + 1])
+    }
+  }
 
-  // pub fn prev_episode_of(&self, epi: &MangaEpisoe) -> Option<&MangaEpisode>
+  pub fn prev_episode_of(&self, epi: &MangaEpisode) -> Option<&MangaEpisode> {
+    assert!(epi.index < self.episodes.len());
+    if epi.index == 0 {
+      None
+    } else {
+      Some(&self.episodes[epi.index - 1])
+    }
+  }
 
   pub fn saemanga_url(&self) -> String {
     format!("http://saemanga.com/manga/{}", self.dmk_id)

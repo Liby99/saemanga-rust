@@ -1,5 +1,4 @@
 use scraper::{Selector, Html};
-use encoding_rs::{BIG5};
 
 use crate::app::manga::*;
 use crate::app::genre::*;
@@ -16,7 +15,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<(), String> {
   // Check the response
   match res_wrp {
     Ok(mut res) => {
-      match res.text_with_charset(BIG5) {
+      match res.text_with_charset("big5") {
         Ok(html_text) => {
           // Now the response is turned into valid Utf-8 Html Text
 
@@ -32,7 +31,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<(), String> {
           };
 
           println!("Title: {:?}", title);
-          
+
           // Then go to the info section
           let info_td_selector = Selector::parse("tr:nth-child(4) > td > table > tbody > tr:nth-child(2) > td:nth-child(2)").unwrap();
           let info_td = main_tbody.select(&info_td_selector).next().unwrap();
@@ -41,7 +40,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<(), String> {
           let (genre, author) = {
             let info_tbody_selector = Selector::parse("table:first-child > tbody").unwrap();
             let info_tbody = info_td.select(&info_tbody_selector).next().unwrap();
-            
+
             // Extract the genre information
             let genre = {
               let sel = Selector::parse("tr:nth-child(3) > td > a").unwrap();

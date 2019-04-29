@@ -1,12 +1,11 @@
 use scraper::{Selector, Html};
-use encoding_rs::{BIG5};
 
 #[test]
 fn test_cartoonmad_homepage() {
   let res = reqwest::get("https://cartoonmad.com");
   match res {
     Ok(mut sth) => {
-      match sth.text_with_charset(BIG5) {
+      match sth.text_with_charset("big5") {
         Ok(html_txt) => {
           let document = Html::parse_document(&html_txt);
           let selector = Selector::parse("body > table > tbody > tr:first-child > td:nth-child(2) > table > tbody > tr:nth-child(4) > td > table > tbody > tr:nth-child(2) > td:nth-child(2) > table > tbody").unwrap();
@@ -36,7 +35,7 @@ fn test_cartoonmad_manga_info() {
   let res = reqwest::get("https://cartoonmad.com/comic/6312.html");
   match res {
     Ok(mut sth) => {
-      match sth.text_with_charset(BIG5) {
+      match sth.text_with_charset("big5") {
         Ok(html_txt) => {
           let document = Html::parse_document(&html_txt);
           let selector = Selector::parse("body > table > tbody > tr:first-child > td:nth-child(2) > table > tbody").unwrap();

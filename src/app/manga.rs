@@ -1,5 +1,7 @@
+use lazy_static::lazy_static;
 use chrono::prelude::*;
 use mongodb::oid::ObjectId;
+use regex::Regex;
 
 use super::genre::*;
 
@@ -51,6 +53,7 @@ impl MangaEpisode {
   }
 }
 
+#[derive(Debug)]
 pub enum MangaDmkIdBase {
   V10 { dmk_id_web: String, dmk_id_home: String },
   V09 { dmk_id_home: String },
@@ -60,7 +63,75 @@ pub enum MangaDmkIdBase {
   V05 { dmk_id_web: String, dmk_id_gen: String },
 }
 
+fn parse_v10_image_url(url: &String) -> Option<MangaDmkIdBase> {
+  lazy_static! { static ref IMG_RE_10 : Regex = Regex::new(r"(web\d+)\.cartoonmad.com\/(home\d+)\/(\d+)\/\d+\/\d+\.jpg").unwrap(); }
+  match IMG_RE_10.captures(url.as_str()) {
+    Some(cap) => Some(MangaDmkIdBase::V10 { dmk_id_web: cap[1].to_string(), dmk_id_home: cap[2].to_string() }),
+    None => None
+  }
+}
+
+fn parse_v09_image_url(url: &String) -> Option<MangaDmkIdBase> {
+  lazy_static! { static ref IMG_RE_09 : Regex = Regex::new(r"(home\d+)\/(\d+)\/\d+\/\d+\.jpg").unwrap(); }
+  match IMG_RE_09.captures(url.as_str()) {
+    Some(cap) => Some(MangaDmkIdBase::V09 { dmk_id_home: cap[1].to_string() }),
+    None => None
+  }
+}
+
+fn parse_v08_image_url(url: &String) -> Option<MangaDmkIdBase> {
+  lazy_static! { static ref IMG_RE_08 : Regex = Regex::new(r"^\/([\w\d]+)\/(\d+)\/\d+\/\d+\.jpg$").unwrap(); }
+  match IMG_RE_08.captures(url.as_str()) {
+    Some(cap) => Some(MangaDmkIdBase::V08 { dmk_id_home: cap[1].to_string() }),
+    None => None
+  }
+}
+
+fn parse_v07_image_url(url: &String) -> Option<MangaDmkIdBase> {
+  lazy_static! { static ref IMG_RE_07 : Regex = Regex::new(r"^\/home1\/([\d\w]+)\/(\d+)\/\d+\/\d+\.jpg$").unwrap(); }
+  match IMG_RE_07.captures(url.as_str()) {
+    Some(cap) => Some(MangaDmkIdBase::V07 { dmk_id_gen: cap[1].to_string() }),
+    None => None
+  }
+}
+
+fn parse_v06_image_url(url: &String) -> Option<MangaDmkIdBase> {
+  lazy_static! { static ref IMG_RE_06 : Regex = Regex::new(r"^\/cartoonimg\/([\d\w]+)\/(\d+)\/\d+\/\d+\.jpg$").unwrap(); }
+  match IMG_RE_06.captures(url.as_str()) {
+    Some(cap) => Some(MangaDmkIdBase::V06 { dmk_id_gen: cap[1].to_string() }),
+    None => None
+  }
+}
+
+fn parse_v05_image_url(url: &String) -> Option<MangaDmkIdBase> {
+  lazy_static! { static ref IMG_RE_05 : Regex = Regex::new(r"^https?:\/\/(web\d?)\.cartoonmad\.com\/([\w|\d]+)\/").unwrap(); }
+  match IMG_RE_05.captures(url.as_str()) {
+    Some(cap) => Some(MangaDmkIdBase::V05 { dmk_id_web: cap[1].to_string(), dmk_id_gen: cap[2].to_string() }),
+    None => None
+  }
+}
+
 impl MangaDmkIdBase {
+  pub fn from_dmk_image_url(url: &String) -> Option<MangaDmkIdBase> {
+    let functions : Vec<&Fn(&String) -> Option<MangaDmkIdBase>> = vec![
+      &parse_v10_image_url,
+      &parse_v09_image_url,
+      &parse_v08_image_url,
+      &parse_v07_image_url,
+      &parse_v06_image_url,
+      &parse_v05_image_url,
+    ];
+    for f in functions {
+      match f(url) {
+        Some(res) => {
+          return Some(res);
+        },
+        _ => ()
+      }
+    }
+    None
+  }
+
   pub fn dmk_image_url_base(&self) -> String {
     match self {
       MangaDmkIdBase::V10 { dmk_id_web, dmk_id_home } => format!("http://{}.cartoonmad.com/{}", dmk_id_web, dmk_id_home),

@@ -1,5 +1,5 @@
 [package]
-name = "saemanga-rust"
+name = "saemanga"
 version = "0.1.0"
 authors = ["Liby Lee <liby99@icloud.com>"]
 edition = "2018"
@@ -10,10 +10,11 @@ serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
 scraper = "0.10.0"
-# reqwest = "0.9.15"
 hyper = "0.12"
 encoding_rs = "0.8"
 encoding = "0.2"
+chrono = "0.4"
+# reqwest = "0.9.15"
 reqwest = { git = "https://github.com/liby99/reqwest" }
 
 [dependencies.rocket_contrib]

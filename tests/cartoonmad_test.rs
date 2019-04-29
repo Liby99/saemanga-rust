@@ -1,13 +1,5 @@
 use scraper::{Selector, Html};
-// use reqwest::Response;
 use encoding_rs::{BIG5};
-// use std::result::Result;
-
-// extern crate hyper;
-
-// use std::io::{self, Write};
-// use hyper::Client;
-// use hyper::rt::{self, Future, Stream};
 
 #[test]
 fn test_cartoonmad_homepage() {

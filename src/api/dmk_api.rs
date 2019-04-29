@@ -37,45 +37,64 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<(), String> {
           let info_td = main_tbody.select(&info_td_selector).next().unwrap();
 
           // Extract these information
-          let (genre, author) = {
+          let (genre, author, tags, ended) = {
             let info_tbody_selector = Selector::parse("table:first-child > tbody").unwrap();
             let info_tbody = info_td.select(&info_tbody_selector).next().unwrap();
 
             // Extract the genre information
-            let genre = {
+            let genre : &'static Genre = {
               let sel = Selector::parse("tr:nth-child(3) > td > a").unwrap();
               match info_tbody.select(&sel).next().unwrap().value().attr("href") {
                 Some(href) => match Genre::from_dmk_genre_url(href) {
                   Some(genre) => genre,
-                  None => {
-                    return Err(format!("Cannot extract genre information from url {}", href));
-                  },
+                  None => { return Err(format!("Cannot extract genre information from url {}", href)); },
                 },
-                None => {
-                  return Err(format!("Genre information doesn't exist"));
-                }
+                None => { return Err(format!("Genre information doesn't exist")); }
               }
             };
 
             // Extract the author information
-            let author = {
+            let author : String = {
               let sel = Selector::parse("tr:nth-child(5) > td").unwrap();
               let text = info_tbody.select(&sel).next().unwrap().text().collect::<Vec<_>>();
               let mut iter = text[0].trim().split_whitespace();
               iter.next();
-              match iter.next() {
-                Some(s) => s.to_string(),
-                None => {
-                  return Err(format!("Cannot extract author information for manga {}", dmk_id));
-                }
+              String::from(iter.next().unwrap())
+            };
+
+            // Extract tag information
+            let tags : Vec<String> = {
+              let sel = Selector::parse("tr:nth-child(14) > td > a").unwrap();
+              info_tbody.select(&sel).map(|e| String::from(e.inner_html())).collect::<Vec<_>>()
+            };
+
+            // Extract ended information
+            let ended : MangaStatus = {
+              let sel = Selector::parse("tr:nth-child(7) > td > img:last-child").unwrap();
+              let img_src = info_tbody.select(&sel).next().unwrap().value().attr("src").unwrap();
+              match img_src.find('9') {
+                Some(_) => MangaStatus::Ended,
+                None => MangaStatus::Updating
               }
             };
 
-            (genre, author)
+            // Get back the basic informations
+            (genre, author, tags, ended)
           };
+
+          // Extract descriptions
+          let description : String = {
+            let sel = Selector::parse("table:nth-child(2) > tbody > tr > td > fieldset > table > tbody > tr > td").unwrap();
+            info_td.select(&sel).next().unwrap().text().collect::<Vec<_>>().join(" ").trim().to_string()
+          };
+
+          // Extract book and episode information
 
           println!("Genre: {:?}", genre);
           println!("Author: {:?}", author);
+          println!("Tags: {:?}", tags);
+          println!("Ended: {:?}", ended);
+          println!("Description: {:?}", description);
 
           Ok(())
         },

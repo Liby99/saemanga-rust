@@ -35,10 +35,10 @@ pub struct MangaEpisode {
 
 impl MangaEpisode {
   pub fn new(index: usize, is_book: bool, episode: u32, num_pages: u32) -> MangaEpisode {
-    MangaEpisode { 
+    MangaEpisode {
       index: index,
       is_book: is_book,
-      episode: episode, 
+      episode: episode,
       num_pages: num_pages,
     }
   }
@@ -163,7 +163,7 @@ pub struct Manga {
   description: String,
   author: String,
   tags: Vec<String>,
-  genre: Genre,
+  genre: &'static Genre,
   status: MangaStatus,
 
   // Episode Information

@@ -20,8 +20,8 @@ fn test_big5_decode() {
   println!("{:X?}", BIG5_2003.decode(&arr, DecoderTrap::Ignore));
 }
 
-// #[test]
-// fn test_big5_decode_2() {
-//   let arr : [u8; 6] = [0xC6, 0x7B, 0xB4, 0x65, 0xB6, 0xBA];
-//   println!("{:X?}", BIG5_2003.decode(&arr, DecoderTrap::Ignore));
-// }
+#[test]
+fn test_big5_decode_2() {
+  let arr : [u8; 16] = [0xB4, 0xF6, 0xB7, 0x6E, 0xB2, 0xF8, 0xAA, 0xBA, 0xAB, 0xD5, 0xA9, 0x60, 0xA6, 0x50, 0xBE, 0xC7];
+  println!("{:X?}", BIG5_2003.decode(&arr, DecoderTrap::Ignore));
+}

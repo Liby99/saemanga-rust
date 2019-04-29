@@ -1,6 +1,6 @@
 use scraper::{Selector, Html};
 // use reqwest::Response;
-use encoding_rs::{Encoding, BIG5};
+use encoding_rs::{BIG5};
 // use std::result::Result;
 
 // extern crate hyper;
@@ -11,39 +11,32 @@ use encoding_rs::{Encoding, BIG5};
 
 #[test]
 fn test_cartoonmad_homepage() {
-  // let res = reqwest::get("https://cartoonmad.com");
-  // match res {
-  //   Ok(mut sth) => {
-  //     match sth.text() {
-  //       Ok(html_txt) => {
-  //         let document = Html::parse_document(&html_txt);
-  //         let selector = Selector::parse("body > table > tbody > tr:first-child > td:nth-child(2) > table > tbody > tr:nth-child(4) > td > table > tbody > tr:nth-child(2) > td:nth-child(2) > table > tbody").unwrap();
-  //         let tbody_rows = document.select(&selector).next().unwrap();
-  //         let snd_row_selector = Selector::parse("tr:nth-child(3) > td > a").unwrap();
-  //         let snd_row = tbody_rows.select(&snd_row_selector);
-  //         for element in snd_row {
-  //           println!("{:?}", element.value().attr("href"));
-  //         }
-  //         let forth_row_selector = Selector::parse("tr:nth-child(5) > td > a").unwrap();
-  //         let forth_row = tbody_rows.select(&forth_row_selector);
-  //         for element in forth_row {
-  //           println!("{:?}", element.value().attr("href"));
-  //         }
-  //         // for element in rows[4] {
-  //         //   println!("{:?}", element.html());
-  //         // }
-  //         // match BIG5_2003.decode(html_txt.as_bytes(), DecoderTrap::Ignore) {
-  //         //   Ok(decoded) => println!("{:?}", decoded),
-  //         //   Err(_) => println!("Decode text to big5 error")
-  //         // }
-  //       },
-  //       Err(_) => println!("Parse text error")
-  //     }
-  //   },
-  //   Err(_) => {
-  //     println!("Get error")
-  //   }
-  // }
+  let res = reqwest::get("https://cartoonmad.com");
+  match res {
+    Ok(mut sth) => {
+      match sth.text_with_charset(BIG5) {
+        Ok(html_txt) => {
+          let document = Html::parse_document(&html_txt);
+          let selector = Selector::parse("body > table > tbody > tr:first-child > td:nth-child(2) > table > tbody > tr:nth-child(4) > td > table > tbody > tr:nth-child(2) > td:nth-child(2) > table > tbody").unwrap();
+          let tbody_rows = document.select(&selector).next().unwrap();
+          let snd_row_selector = Selector::parse("tr:nth-child(3) > td > a").unwrap();
+          let snd_row = tbody_rows.select(&snd_row_selector);
+          for element in snd_row {
+            println!("{:?}", element.value().attr("href"));
+          }
+          let forth_row_selector = Selector::parse("tr:nth-child(5) > td > a").unwrap();
+          let forth_row = tbody_rows.select(&forth_row_selector);
+          for element in forth_row {
+            println!("{:?}", element.value().attr("href"));
+          }
+        },
+        Err(_) => println!("Parse text error")
+      }
+    },
+    Err(_) => {
+      println!("Get error")
+    }
+  }
 }
 
 #[test]

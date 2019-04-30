@@ -6,11 +6,11 @@
     <p style="margin-top: 0px;">
       <span>
         {{#if logged_in}}
-        <span>欢迎回来，</span>
-        <a href="javascript:void(0);">{{username}}</a>
+          <span>欢迎回来，</span>
+          <a href="javascript:void(0);">{{user.username}}</a>
         {{else}}
-        <span>欢迎光临，</span>
-        <a href="javascript:void(0);" onclick="User.showLogin()">点此登陆</a>
+          <span>欢迎光临，</span>
+          <a href="javascript:void(0);" onclick="User.showLogin()">点此登陆</a>
         {{/if}}
       </span>
     </p>
@@ -47,7 +47,7 @@
       <div id="index-discover-tags-holder" class="scroll x flex right hide-scrollbar">
         <div id="index-discover-tags" class="flex">
           {{#each genres}}
-          <a class="btn rounded tag" id="{{dmk_directory}}" href="javascript:void(0);">{{name}}</a>
+            <a class="btn rounded tag" id="{{dmk_directory}}" href="javascript:void(0);">{{name}}</a>
           {{/each}}
         </div>
       </div>
@@ -56,13 +56,12 @@
   </div>
   <div id="index-discover-outer" class="scroll x wrapper no-top">
     <div id="index-discover-content" class="flex">
-      {{!-- <% latests.forEach(function (manga, i) { %>
-          <a class="manga discover" href="<%= manga.getSaemangaUrl() %>" id="<%= manga.dmkId() %>">
-            <div class="cover" style="background-image:
-                          url('<%= manga.getCoverUrl() %>')"></div>
-            <h4 class="title"><%= manga.title() %></h4>
-          </a>
-          <% }); %> --}}
+      {{#each latests}}
+        <a class="manga discover" href="{{saemanga_url}}" id="{{dmk_id}}">
+          <div class="cover" style="background-image: url('{{cover_url}}')"></div>
+          <h4 class="title">{{title}}</h4>
+        </a>
+      {{/each}}
     </div>
   </div>
 </section>
@@ -73,86 +72,84 @@
       <div id="index-following-header-inner" class="flex wrapper">
         <h3>正在追的</h3>
         {{#if logged_in}}
-        <div id="index-following-menu" class="flex-fill flex right">
-          <a id="index-following-manage" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
-            <span>管理</span>
-            <i class="fa-rotation-toggle">
-              <i class="fa fa-pencil"></i>
-              <i class="fa fa-check"></i>
-            </i>
-          </a>
-          <a id="index-following-only-liked" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
-            <span>仅喜爱</span>
-            <i class="fa-rotation-toggle">
-              <i class="fa fa-heart-o"></i>
-              <i class="fa fa-heart"></i>
-            </i>
-          </a>
-        </div>
+          <div id="index-following-menu" class="flex-fill flex right">
+            <a id="index-following-manage" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
+              <span>管理</span>
+              <i class="fa-rotation-toggle">
+                <i class="fa fa-pencil"></i>
+                <i class="fa fa-check"></i>
+              </i>
+            </a>
+            <a id="index-following-only-liked" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
+              <span>仅喜爱</span>
+              <i class="fa-rotation-toggle">
+                <i class="fa fa-heart-o"></i>
+                <i class="fa fa-heart"></i>
+              </i>
+            </a>
+          </div>
         {{/if}}
       </div>
     </div>
   </div>
   <div id="index-following-list" class="flex wrap wrapper no-top">
-    {{!-- <% if (loggedIn) { %>
-        <% if (follows.length) { %>
-        <% follows.forEach(function (follow, i) { %>
-        <a class="mix manga following<%= follow.liked ? " liked" : "" %>" id="<%= follow.manga.id() %>"
-          href="<%= follow.manga.getSaemangaUrl() %>">
-          <div class="cover" style="background-image:
-                              url('<%= follow.manga.getCoverUrl() %>')">
-            <span class="badge <%= follow.showBadge ? '' : 'hidden' %>"></span>
-            <span class="remove btn circle grey solid">
-              <i class="fa fa-times"></i>
-            </span>
-            <% if (follow.liked) { %>
-            <span class="like">
-              <i class="fa fa-heart"></i>
-            </span>
-            <% } %>
-          </div>
-          <center>
-            <p class="episode">
-              已读<%= follow.max_episode %>话，
-              <% if (follow.manga.ended()) { %>
-              共<%= follow.lastEpisode %>话，已完结
-              <% } else if (follow.hasUpdate) { %>
-              更新至<%= follow.lastEpisode %>话
-              <% } else { %>
-              未更新
-              <% } %>
-            </p>
-            <h4 class="title"><%= follow.manga.title() %></h4>
-          </center>
-        </a>
-        <% }); %>
-        <% } else { %>
+    {{#if logged_in}}
+      {{#if user.has_follows}}
+        {{#each user.follows}}
+          <a class="mix manga following{{#if liked}} liked{{/if}}" href="{{manga.saemanga_url}}">
+            <div class="cover" style="background-image: url('{{manga.cover_url}}')">
+              <span class="badge <%= follow.showBadge ? '' : 'hidden' %>"></span>
+              <span class="remove btn circle grey solid">
+                <i class="fa fa-times"></i>
+              </span>
+              {{#if liked}}
+                <span class="like">
+                  <i class="fa fa-heart"></i>
+                </span>
+              {{/if}}
+            </div>
+            <center>
+              <p class="episode">
+                已读{{max_read_episode}}话，
+                {{#if manga.ended}}
+                  共{{manga.last_episode}}话，已完结
+                {{else}}
+                  {{#if has_update}}
+                    更新至{{manga.last_episode}}{{#if manga.last_episode_is_book}}卷{{else}}话{{/if}}
+                  {{else}}
+                    未更新
+                  {{/if}}
+                {{/if}}
+              </p>
+              <h4 class="title">{{manga.title}}</h4>
+            </center>
+          </a>
+        {{/each}}
+      {{else}}
         <div class="flex-fill wrapper">
           <center>
-            <p>
-              您还没有关注任何漫画呢！
-            </p>
+            <p>您还没有关注任何漫画呢！</p>
           </center>
         </div>
-        <% } %>
-        <% } else { %>
-        <div class="flex-fill wrapper">
-          <center id="index-follow-login-holder">
-            <p>
-              请登陆已有账户或注册一个新账户，以开启 <strong>储存您正在关注的漫画</strong> 的功能～详情请见<a href="javascript:void(0);"
-                onclick="$.panel.show('help')">帮助</a>。
-            </p>
-            <p>
-              <a class="btn solid rounded big" href="javascript:void(0);" onclick="User.showLogin()">登录已有账户</a>
-              <span style="margin: 0 5px">或</span>
-              <a class="btn rounded big" href="javascript:void(0);" onclick="User.showRegister()">注册新账户</a>
-            </p>
-          </center>
-        </div>
-        <% } %> --}}
+      {{/if}}
+    {{else}}
+      <div class="flex-fill wrapper">
+        <center id="index-follow-login-holder">
+          <p>
+            请登陆已有账户或注册一个新账户，以开启 <strong>储存您正在关注的漫画</strong> 的功能～详情请见<a href="javascript:void(0);"
+              onclick="$.panel.show('help')">帮助</a>。
+          </p>
+          <p>
+            <a class="btn solid rounded big" href="javascript:void(0);" onclick="User.showLogin()">登录已有账户</a>
+            <span style="margin: 0 5px">或</span>
+            <a class="btn rounded big" href="javascript:void(0);" onclick="User.showRegister()">注册新账户</a>
+          </p>
+        </center>
+      </div>
+    {{/if}}
   </div>
 </section>
 
 {{/inline}}
 
-{{~> layout/layout sidebar="partials/index_sidebar" ~}}
+{{~> layout/layout title="冴え漫画" sidebar="partials/index_sidebar" ~}}

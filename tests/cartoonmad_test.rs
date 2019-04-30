@@ -1,6 +1,7 @@
 use scraper::{Selector, Html};
 
 #[test]
+#[ignore]
 fn test_cartoonmad_homepage() {
   let res = reqwest::get("https://cartoonmad.com");
   match res {
@@ -31,6 +32,7 @@ fn test_cartoonmad_homepage() {
 }
 
 #[test]
+#[ignore]
 fn test_cartoonmad_manga_info() {
   let res = reqwest::get("https://cartoonmad.com/comic/6312.html");
   match res {

@@ -1,12 +1,11 @@
 use rocket::{Route, Catcher};
 
-#[get("/")]
-fn hello_world() -> &'static str {
-  "Hello, world!"
-}
+mod index;
 
 pub fn routes() -> Vec<Route> {
-  routes![]
+  routes![
+    index::index,
+  ]
 }
 
 pub fn catchers() -> Vec<Catcher> {

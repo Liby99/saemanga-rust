@@ -23,4 +23,4 @@ reqwest = { git = "https://github.com/liby99/reqwest" }
 [dependencies.rocket_contrib]
 version = "*"
 default-features = false
-features = ["handlebars_templates", "mongodb_pool"]
+features = ["handlebars_templates", "mongodb_pool", "serve"]

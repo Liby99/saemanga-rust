@@ -1,0 +1,17 @@
+<nav>
+  <a id="sidebar-toggle" class="black" href="javascript:void(0);" onclick="Sidebar.toggle()">
+    <i class="fa-rotation-toggle">
+      <i class="fa fa-bars"></i>
+      <i class="fa fa-angle-right"></i>
+    </i>
+  </a>
+  <div id="sidebar-mask" class="mask" hidden="hidden" onclick="Sidebar.hide()"></div>
+  <div id="sidebar" class="scroll y drop-shadow">
+    <div class="wrapper">
+      <section class="wrapper">
+        <h4>菜单</h4>
+      </section>
+      {{content}}
+    </div>
+  </div>
+</nav>

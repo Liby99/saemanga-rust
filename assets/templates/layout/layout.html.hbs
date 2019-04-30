@@ -9,10 +9,12 @@
 </head>
 
 <body>
+  {{> (sidebar)}}
   <main>
     {{~> page}}
-    {{> layout/footer}}
+    {{> partials/footer}}
   </main>
+  {{> partials/panels}}
   <script src="js/main.js"></script>
 </body>
 

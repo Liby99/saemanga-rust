@@ -1,4 +1,7 @@
-let words: Array<string> = ['Hello', 'World'];
-for (let word of words) {
-  console.log(word);
-}
+'use strict';
+
+import $ = require('jquery');
+
+$(() => {
+  $("main").append("Hello World");
+});

@@ -8,7 +8,7 @@ pub fn is_valid_dmk_id(dmk_id: &String) -> bool {
   return DMK_ID_RE.is_match(dmk_id);
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum MangaStatus {
   Ended,
   Updating,
@@ -34,13 +34,7 @@ pub struct MangaEpisode {
 
 impl MangaEpisode {
   pub fn new(index: usize, is_book: bool, episode: u32, num_pages: u32, dmk_directory: String) -> MangaEpisode {
-    MangaEpisode {
-      index: index,
-      is_book: is_book,
-      episode: episode,
-      num_pages: num_pages,
-      dmk_directory: dmk_directory
-    }
+    MangaEpisode { index, is_book, episode, num_pages, dmk_directory }
   }
 
   pub fn index(&self) -> usize {
@@ -65,7 +59,7 @@ impl MangaEpisode {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum MangaDmkIdBase {
+pub enum DmkIdBase {
   V10 { dmk_id_web: String, dmk_id_home: String },
   V09 { dmk_id_home: String },
   V08 { dmk_id_home: String },
@@ -74,113 +68,102 @@ pub enum MangaDmkIdBase {
   V05 { dmk_id_web: String, dmk_id_gen: String },
 }
 
-fn parse_v10_image_url(url: &String) -> Option<MangaDmkIdBase> {
+fn parse_v10_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_10 : Regex = Regex::new(r"(web\d+)\.cartoonmad\.com/(home\d+)/(\d+)/\d+/\d+\.jpg").unwrap(); }
   match IMG_RE_10.captures(url.as_str()) {
-    Some(cap) => Some(MangaDmkIdBase::V10 { dmk_id_web: cap[1].to_string(), dmk_id_home: cap[2].to_string() }),
+    Some(cap) => Some(DmkIdBase::V10 { dmk_id_web: cap[1].to_string(), dmk_id_home: cap[2].to_string() }),
     None => None
   }
 }
 
-fn parse_v09_image_url(url: &String) -> Option<MangaDmkIdBase> {
+fn parse_v09_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_09 : Regex = Regex::new(r"(home\d+)/(\d+)/\d+/\d+\.jpg").unwrap(); }
   match IMG_RE_09.captures(url.as_str()) {
-    Some(cap) => Some(MangaDmkIdBase::V09 { dmk_id_home: cap[1].to_string() }),
+    Some(cap) => Some(DmkIdBase::V09 { dmk_id_home: cap[1].to_string() }),
     None => None
   }
 }
 
-fn parse_v08_image_url(url: &String) -> Option<MangaDmkIdBase> {
+fn parse_v08_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_08 : Regex = Regex::new(r"^/([\w\d]+)/(\d+)/\d+/\d+\.jpg$").unwrap(); }
   match IMG_RE_08.captures(url.as_str()) {
-    Some(cap) => Some(MangaDmkIdBase::V08 { dmk_id_home: cap[1].to_string() }),
+    Some(cap) => Some(DmkIdBase::V08 { dmk_id_home: cap[1].to_string() }),
     None => None
   }
 }
 
-fn parse_v07_image_url(url: &String) -> Option<MangaDmkIdBase> {
+fn parse_v07_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_07 : Regex = Regex::new(r"^/home1/([\d\w]+)/(\d+)/\d+/\d+\.jpg$").unwrap(); }
   match IMG_RE_07.captures(url.as_str()) {
-    Some(cap) => Some(MangaDmkIdBase::V07 { dmk_id_gen: cap[1].to_string() }),
+    Some(cap) => Some(DmkIdBase::V07 { dmk_id_gen: cap[1].to_string() }),
     None => None
   }
 }
 
-fn parse_v06_image_url(url: &String) -> Option<MangaDmkIdBase> {
+fn parse_v06_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_06 : Regex = Regex::new(r"^/cartoonimg/([\d\w]+)/(\d+)/\d+/\d+\.jpg$").unwrap(); }
   match IMG_RE_06.captures(url.as_str()) {
-    Some(cap) => Some(MangaDmkIdBase::V06 { dmk_id_gen: cap[1].to_string() }),
+    Some(cap) => Some(DmkIdBase::V06 { dmk_id_gen: cap[1].to_string() }),
     None => None
   }
 }
 
-fn parse_v05_image_url(url: &String) -> Option<MangaDmkIdBase> {
+fn parse_v05_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_05 : Regex = Regex::new(r"^https?://(web\d?)\.cartoonmad\.com/([\w|\d]+)/").unwrap(); }
   match IMG_RE_05.captures(url.as_str()) {
-    Some(cap) => Some(MangaDmkIdBase::V05 { dmk_id_web: cap[1].to_string(), dmk_id_gen: cap[2].to_string() }),
+    Some(cap) => Some(DmkIdBase::V05 { dmk_id_web: cap[1].to_string(), dmk_id_gen: cap[2].to_string() }),
     None => None
   }
 }
 
-impl MangaDmkIdBase {
-  pub fn from_dmk_image_url(url: &String) -> Option<MangaDmkIdBase> {
-    let functions : Vec<&Fn(&String) -> Option<MangaDmkIdBase>> = vec![
-      &parse_v10_image_url,
-      &parse_v09_image_url,
-      &parse_v08_image_url,
-      &parse_v07_image_url,
-      &parse_v06_image_url,
-      &parse_v05_image_url,
+impl DmkIdBase {
+  pub fn from_dmk_image_url(url: &String) -> Option<Self> {
+    let functions : Vec<&Fn(&String) -> Option<Self>> = vec![
+      &parse_v10_image_url, &parse_v09_image_url, &parse_v08_image_url,
+      &parse_v07_image_url, &parse_v06_image_url, &parse_v05_image_url,
     ];
     for f in functions {
-      match f(url) {
-        Some(res) => {
-          return Some(res);
-        },
-        _ => ()
-      }
+      match f(url) { Some(res) => { return Some(res); }, _ => () }
     }
     None
   }
 
   pub fn dmk_image_url_base(&self) -> String {
     match self {
-      MangaDmkIdBase::V10 { dmk_id_web, dmk_id_home } => format!("http://{}.cartoonmad.com/{}", dmk_id_web, dmk_id_home),
-      MangaDmkIdBase::V09 { dmk_id_home } => format!("http://cartoonmad.com/{}", dmk_id_home),
-      MangaDmkIdBase::V08 { dmk_id_home } => format!("http://cartoonmad.com/{}", dmk_id_home),
-      MangaDmkIdBase::V07 { dmk_id_gen } => format!("http://www.cartoonmad.com/home1/{}", dmk_id_gen),
-      MangaDmkIdBase::V06 { dmk_id_gen } => format!("http://www.cartoonmad.com/cartoonimg/{}", dmk_id_gen),
-      MangaDmkIdBase::V05 { dmk_id_web, dmk_id_gen } => format!("http://{}.cartoonmad.com/{}", dmk_id_web, dmk_id_gen),
+      DmkIdBase::V10 { dmk_id_web, dmk_id_home } => format!("http://{}.cartoonmad.com/{}", dmk_id_web, dmk_id_home),
+      DmkIdBase::V09 { dmk_id_home } => format!("http://cartoonmad.com/{}", dmk_id_home),
+      DmkIdBase::V08 { dmk_id_home } => format!("http://cartoonmad.com/{}", dmk_id_home),
+      DmkIdBase::V07 { dmk_id_gen } => format!("http://www.cartoonmad.com/home1/{}", dmk_id_gen),
+      DmkIdBase::V06 { dmk_id_gen } => format!("http://www.cartoonmad.com/cartoonimg/{}", dmk_id_gen),
+      DmkIdBase::V05 { dmk_id_web, dmk_id_gen } => format!("http://{}.cartoonmad.com/{}", dmk_id_web, dmk_id_gen),
     }
   }
 }
 
 #[derive(Debug)]
 pub struct Manga {
-
-  // dmk information
   dmk_id: String,
-  dmk_id_base: MangaDmkIdBase,
-
-  // Information of the manga
+  dmk_id_base: DmkIdBase,
   title: String,
   description: String,
   author: String,
   tags: Vec<String>,
   genre: &'static Genre,
   status: MangaStatus,
-
-  // Episode Information
   episodes: Vec<MangaEpisode>,
 }
 
 impl Manga {
   pub fn new(
-    dmk_id: String, dmk_id_base: MangaDmkIdBase,
+    dmk_id: String, dmk_id_base: DmkIdBase,
     title: String, description: String, author: String, tags: Vec<String>,
     genre: &'static Genre, status: MangaStatus, episodes: Vec<MangaEpisode>,
   ) -> Self {
     Self { dmk_id, dmk_id_base, title, description, author, tags, genre, status, episodes }
+  }
+
+  pub fn dmk_id(&self) -> &String {
+    &self.dmk_id
   }
 
   pub fn title(&self) -> &String {
@@ -239,6 +222,18 @@ impl Manga {
     } else {
       Some(&self.episodes[epi.index - 1])
     }
+  }
+
+  pub fn first_episode(&self) -> &MangaEpisode {
+    &self.episodes[0]
+  }
+
+  pub fn latest_episode(&self) -> &MangaEpisode {
+    &self.episodes[self.episodes.len() - 1]
+  }
+
+  pub fn num_episodes(&self) -> usize {
+    self.episodes.len()
   }
 
   pub fn saemanga_url(&self) -> String {

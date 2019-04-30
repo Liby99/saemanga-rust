@@ -9,47 +9,45 @@ use std::option::NoneError;
 use crate::app::manga::*;
 use crate::app::genre::*;
 
-pub struct DmkScrapeError {
-  msg: String,
-}
+pub struct DmkScrapeError(String);
 
 impl DmkScrapeError {
   fn new(msg: String) -> Self {
-    DmkScrapeError { msg: msg }
+    DmkScrapeError(msg)
+  }
+}
+
+impl std::fmt::Display for DmkScrapeError {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "Scraper Error: {}", self.0)
   }
 }
 
 impl From<NoneError> for DmkScrapeError {
   fn from(error: NoneError) -> Self {
-    Self::new(String::from("Unwrapping none error"))
+    Self::new(format!("Unwrapping none error: {:?}", error))
   }
 }
 
 impl From<reqwest::Error> for DmkScrapeError {
   fn from(error: reqwest::Error) -> Self {
-    Self::new(String::from("Fetching webpage error"))
+    Self::new(format!("Reqwesting webpage error: {:?}", error))
   }
 }
 
-fn extract_num_pages(font: &String) -> Result<u32, String> {
+fn extract_num_pages(font: &String) -> Option<u32> {
   lazy_static! { static ref NUM_PAGES_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
   match NUM_PAGES_RE.captures(font) {
-    Some(cap) => match String::from(&cap[1]).parse::<u32>() {
-      Ok(i) => Ok(i),
-      Err(_) => Err(format!("Error when parsing num pages from {}", &cap[1]))
-    },
-    None => Err(format!("Error extracting num pages data from {}", font))
+    Some(cap) => match String::from(&cap[1]).parse::<u32>() { Ok(i) => Some(i), Err(_) => None },
+    None => None,
   }
 }
 
-fn extract_episode(a: &String) -> Result<(u32, bool), String> {
+fn extract_episode(a: &String) -> Option<(u32, bool)> {
   lazy_static! { static ref EPISODE_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
   match EPISODE_RE.captures(a) {
-    Some(cap) => match String::from(&cap[1]).parse::<u32>() {
-      Ok(i) => Ok((i, a.contains("卷"))),
-      Err(_) => Err(format!("Error when parsing episode from {}", &cap[1]))
-    },
-    None => Err(format!("Error extracting episode data from {}", a))
+    Some(cap) => match String::from(&cap[1]).parse::<u32>() { Ok(i) => Some((i, a.contains("卷"))), Err(_) => None },
+    None => None
   }
 }
 
@@ -64,7 +62,7 @@ fn extract_episodes(trs: Select, start_index: usize) -> Vec<MangaEpisode> {
         Some(a_elem) => {
           let index = index_count;
           let (episode, is_book) = extract_episode(&a_elem.inner_html()).unwrap();
-          let num_pages = extract_num_pages(&td.select(&font_sel).next().unwrap().inner_html()).unwrap();
+          let num_pages = extract_num_pages(&td.select(&font_sel).next()?.inner_html()).unwrap();
           let href = a_elem.value().attr("href").unwrap().to_string();
           index_count += 1;
           Some(MangaEpisode::new(index, is_book, episode, num_pages, href))
@@ -173,7 +171,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkScrapeError> {
   };
 
   // Get the image information
-  let dmk_id_base : MangaDmkIdBase = {
+  let dmk_id_base : DmkIdBase = {
 
     // Get episode webpage
     let epi_url = format!("https://www.cartoonmad.com{}", &episodes[0].dmk_directory());
@@ -193,7 +191,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkScrapeError> {
       Ok(s) => {
         // Finally convert the true location into dmk id base
         let true_img_loc = String::from(s);
-        MangaDmkIdBase::from_dmk_image_url(&true_img_loc)?
+        DmkIdBase::from_dmk_image_url(&true_img_loc)?
       },
       Err(_) => {
         return Err(DmkScrapeError::new(String::from("Not able to fetch real image location")))
@@ -201,5 +199,6 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkScrapeError> {
     }
   };
 
+  // Return the finally extracted Manga object
   Ok(Manga::new(dmk_id.clone(), dmk_id_base, title, description, author, tags, genre, status, episodes))
 }

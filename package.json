@@ -2,12 +2,11 @@
   "name": "saemanga-rust",
   "version": "1.0.0",
   "description": "My manga website finally comes with a rust implementation. This is not in production yet but will be soon integrated. So, I'm happy to announce that this is the 4.0 version of saemanga.com!",
-  "main": "gulpfile.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx webpack"
   },
   "repository": {
     "type": "git",
@@ -23,9 +22,6 @@
   "devDependencies": {
     "@types/jquery": "^3.3.29",
     "css-loader": "^2.1.1",
-    "del": "^4.1.1",
-    "gulp": "^4.0.1",
-    "gulp-stream": "0.0.2",
     "jquery": "^3.4.0",
     "mini-css-extract-plugin": "^0.6.0",
     "node-sass": "^4.12.0",

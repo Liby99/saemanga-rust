@@ -1,0 +1,404 @@
+@import "color.scss";
+
+html {
+  height: auto;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;
+  font-family: "SimHei", sans-serif;
+  font-size: 13px;
+  background-color: $white;
+}
+
+main {
+  max-width: 768px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+section:not(.no-border) {
+  border-bottom: 1px solid $line;
+}
+
+::selection {
+  background: $pink-20;
+}
+
+a, a:visited {
+  text-decoration: none;
+  color: $pink;
+}
+
+a.black {
+  color: $deep-text;
+}
+
+a.red {
+  color: $red;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  color: $deep-text;
+}
+
+h3, h4, h5, h6 {
+  line-height: 22px;
+}
+
+p {
+  font-size: 12px;
+  color: $grey-text;
+}
+
+input, textarea {
+  outline: none;
+}
+
+hr {
+  height: 1px;
+  border: none;
+  background-color: $line;
+}
+
+form {
+  margin: 0;
+}
+
+blockquote {
+  border-left: 2px solid $pink;
+  background-color: $pink-10;
+  padding: 10px 15px;
+  margin: 15px 0;
+  color: $pink;
+}
+
+/* -------------------- inputs -------------------- */
+
+input, textarea {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  transition: all 0.2s;
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+  padding: 6px 15px;
+  line-height: 18px;
+  background-color: transparent;
+  border: 1px solid $line;
+}
+
+textarea {
+  border-radius: 4px;
+}
+
+input {
+  border-radius: 9999px;
+
+  :hover {
+    border: 1px solid $pink-80;
+  }
+
+  :focus, :active {
+    border: 1px solid $pink;
+  }
+}
+
+/* -------------------- color related items -------------------- */
+
+.pink {
+  color: $pink;
+}
+
+/* -------------------- coordinating element styles -------------------- */
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.wrapper {
+  padding: 15px;
+
+  &.no-top {
+    padding-top: 0;
+  }
+
+  &.no-bottom {
+    padding-bottom: 0;
+  }
+}
+
+.center {
+  text-align: center;
+}
+
+.scroll {
+  -webkit-overflow-scrolling: touch;
+
+  &.x {
+    overflow-x: scroll;
+  }
+
+  &.y {
+    overflow-y: scroll;
+  }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* -------------------- flex related styles -------------------- */
+
+.flex {
+  display: flex !important;
+
+  &.wrap {
+    flex-wrap: wrap;
+  }
+
+  &.full {
+    flex-grow: 1;
+
+    > * {
+      flex-shrink: 0;
+    }
+  }
+
+  &.right {
+    flex-direction: row-reverse;
+  }
+}
+
+.flex-fill {
+  width: 0;
+  flex: 1;
+}
+
+/* -------------------- buttons -------------------- */
+
+.btn,
+.select {
+  transition: all 0.2s;
+  color: $pink;
+  border: 1px solid $pink;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+button.btn {
+  background-color: transparent;
+  width: 100%;
+  cursor: pointer;
+}
+
+.btn {
+  padding: 0 10px;
+
+  &.circle {
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+
+  &.grey {
+    border: 1px solid $light-text;
+    color: $light-text;
+  }
+
+  &.solid {
+    border: 0;
+    background-color: $pink;
+    color: $white;
+
+    &.grey {
+      background-color: $light-text;
+    }
+  }
+
+  &.full {
+    display: block;
+  }
+
+  &.big {
+    display: inline-block;
+    line-height: 26px;
+    padding: 0 20px;
+  }
+
+  &.large {
+    line-height: 35px;
+  }
+
+  &.rounded {
+    border-radius: 9999px;
+  }
+}
+
+.btn:hover,
+.select a:hover,
+.zoom a:hover {
+  background-color: $pink-10;
+}
+
+.btn.solid:hover {
+  background-color: $hover-pink;
+}
+
+.btn.solid:active {
+  background-color: $active-pink;
+}
+
+.btn:active,
+.select a:active,
+.zoom a:active {
+  background-color: $pink-20;
+}
+
+.btn.active,
+.select a.active,
+.zoom a.active {
+  background-color: $pink;
+  color: $white;
+}
+
+.btn.disabled,
+.select a.disabled,
+.zoom a.disabled {
+  background-color: $active-white;
+  color: $grey-text;
+  border-color: $grey-text;
+  cursor: not-allowed;
+}
+
+.select, .zoom {
+  display: flex;
+  overflow: hidden;
+  align-items: stretch;
+  line-height: 24px;
+}
+
+.select a, .zoom > * {
+  transition: all 0.2s;
+  display: block;
+  text-align: center;
+}
+
+.select a {
+  width: 50%;
+}
+
+.zoom {
+  transition: all 0.2s;
+  color: $pink;
+  white-space: nowrap;
+  font-size: 12px;
+
+  .minus, .plus {
+    width: 16px;
+    padding: 0 4px;
+    font-size: 10px;
+  }
+
+  > * > i {
+    line-height: 24px;
+  }
+
+  .data {
+    border-top: 1px solid $pink;
+    border-bottom: 1px solid $pink;
+    flex-grow: 1;
+
+    &:before {
+      content: "缩放：";
+    }
+
+    &:after {
+      content: "%";
+    }
+  }
+
+  .minus {
+    border-radius: 4px 0 0 4px;
+    border: 1px solid $pink;
+  }
+
+  .plus {
+    border-radius: 0 4px 4px 0;
+    border: 1px solid $pink;
+  }
+}
+
+/* -------------------- shadows -------------------- */
+
+.drop-shadow {
+  box-shadow: 0 0 10px $shadow;
+}
+
+.text-drop-shadow {
+  text-shadow: 0 0 5px $shadow;
+
+  &.pink {
+    text-shadow: 0 0 5px $pink-50;
+  }
+}
+
+/* -------------------- rotation toggle -------------------- */
+
+.fa-rotation-toggle {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  line-height: 22px;
+
+  > i {
+    display: block;
+    transition: all 0.4s;
+    left: 0;
+    top: 0;
+    position: relative;
+    width: inherit;
+    height: inherit;
+    transform: rotate(0);
+    opacity: 1;
+    line-height: inherit;
+
+    + i {
+      opacity: 0;
+      transform: rotate(-180deg);
+      margin-left: -22px;
+    }
+  }
+
+  &.active {
+    > i {
+      opacity: 0;
+      transform: rotate(180deg);
+
+      + i {
+        opacity: 1;
+        transform: rotate(0);
+      }
+    }
+  }
+}
+
+/* -------------------- mask -------------------- */
+
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $mask;
+}

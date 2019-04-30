@@ -2,6 +2,6 @@
 /target
 **/*.rs.bk
 
-# Typescript related
-/build
+# Webpack, JavaScript related
+/public
 node_modules

@@ -1,0 +1,132 @@
+#manga-header-section {
+  padding-top: 45px;
+}
+
+.book-list,
+.episode-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 5px 0;
+  width: calc(100% + 10px);
+  padding: 0;
+}
+
+.book-list li,
+.episode-list li {
+  margin-bottom: 10px;
+}
+
+.book-list li {
+  width: 33.3333%;
+}
+
+.episode-list li {
+  width: 25%;
+}
+
+.book-list li a,
+.episode-list li a {
+  display: block;
+  margin-right: 10px;
+  text-align: center;
+  line-height: 20px;
+}
+
+#manga-body-section img {
+  display: block;
+  width: 100%;
+}
+
+#manga-body-section img + img {
+  margin-top: 5px;
+}
+
+#manga-navigation-section a {
+  transition: all 0.2s;
+  line-height: 60px;
+}
+
+#manga-navigation-section a.disabled {
+  cursor: default;
+}
+
+#manga-navigation-section a:not(.disabled):hover {
+  background-color: $hover-white;
+}
+
+#manga-navigation-section a:not(.disabled):active {
+  background-color: $active-white;
+}
+
+#manga-navigation-section a i {
+  margin: 0 10px;
+  font-size: 16px;
+}
+
+#manga-panel-body {
+  display: flex;
+  flex-flow: row;
+}
+
+#manga-panel-cover {
+  width: 160px;
+}
+
+#manga-panel-ended {
+  margin-left: 10px;
+}
+
+#share-url-input {
+  /* Hide the input but not disabling it */
+  position: fixed;
+  top: -100px;
+  left: -100px;
+}
+
+#copied-tag {
+  opacity: 1;
+}
+
+#copied-tag .tag {
+  background-color: $black-background;
+  border-radius: 5px;
+  line-height: 24px;
+  padding: 0 12px;
+  margin: 8px 20px 8px 12px;
+  color: $white;
+}
+
+#copied-tag .tag i {
+  position: absolute;
+  display: inline-block;
+  color: $black-background;
+  margin-left: 12px;
+  line-height: 24px;
+  font-size: 16px;
+}
+
+#copied-tag.hidden {
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.manga-info-item label {
+  min-width: 50px;
+}
+
+@media (max-width: 748px) {
+  #manga-panel-body {
+    flex-flow: column;
+  }
+
+  #manga-panel-body > div {
+    width: auto !important;
+  }
+}
+
+@media (max-width: 540px) {
+  #manga-header-section {
+    padding-top: 15px;
+  }
+}

@@ -1,0 +1,140 @@
+@import "color.scss";
+
+#sidebar-toggle {
+  transition: all 0.3s;
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  font-size: 16px;
+  text-align: center;
+  z-index: 129;
+}
+
+body.left #sidebar-toggle {
+  transition: all 0.4s;
+  left: 20px;
+  right: auto;
+}
+
+body.left nav.active #sidebar-toggle {
+  top: 20px !important;
+  left: 244px !important;
+}
+
+body.left #sidebar-toggle .fa-angle-right {
+  transform: rotate(180deg);
+}
+
+body.left #sidebar-toggle.active .fa-angle-right {
+  transform: rotate(0);
+}
+
+body.night #sidebar-toggle {
+  border-radius: 5px;
+  background-color: rgba(30, 30, 30, 0.3);
+}
+
+body.full-width #sidebar-toggle.stick {
+  top: 8px;
+}
+
+nav.active #sidebar-toggle {
+  right: 20px !important;
+  top: 20px !important;
+}
+
+#sidebar-toggle .fa-rotation-toggle {
+  margin: 7px;
+}
+
+#sidebar-toggle .fa-rotation-toggle i.fa-angle-right {
+  font-size: 20px;
+}
+
+#sidebar {
+  position: fixed;
+  transition: all 0.4s;
+  height: 100%;
+  top: 0;
+  right: -310px;
+  width: 300px;
+  background-color: $white-background;
+  z-index: 128;
+}
+
+body.left #sidebar {
+  right: auto;
+  left: -310px;
+}
+
+#sidebar.active {
+  right: 0;
+}
+
+body.left #sidebar.active {
+  right: auto;
+  left: 0;
+}
+
+#sidebar-mask {
+  z-index: 127;
+}
+
+ul.sidebar-btn-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+ul.sidebar-btn-list li {
+  transition: all 0.2s;
+  font-size: 12px;
+  padding: 0 15px;
+  line-height: 40px;
+}
+
+ul.sidebar-btn-list li:not(.full):hover {
+  background-color: $hover-white;
+}
+
+ul.sidebar-btn-list li:not(.full):active {
+  background-color: $active-white;
+}
+
+ul.sidebar-btn-list li.full {
+  padding: 0;
+}
+
+ul.sidebar-btn-list li.full a {
+  transition: all 0.2s;
+  display: block;
+  padding: 0 15px;
+  line-height: 40px;
+}
+
+ul.sidebar-btn-list li.full a:hover {
+  background-color: $hover-white;
+}
+
+ul.sidebar-btn-list li.full a:active {
+  background-color: $active-white;
+}
+
+ul.sidebar-btn-list li.center {
+  text-align: center;
+}
+
+@media (max-width: 540px) {
+  #sidebar-toggle {
+    right: 9px;
+    top: 9px;
+  }
+
+  body.left #sidebar-toggle {
+    top: 8px;
+    left: 8px;
+  }
+}

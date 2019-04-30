@@ -6,7 +6,7 @@ module.exports = {
   mode: 'production',
   devtool: 'source-map',
   entry: {
-    app: './assets/typescript/index.ts'
+    app: './assets/typescript/main.ts'
   },
   output: {
     path: `${__dirname}/../../public/`,

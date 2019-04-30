@@ -8,6 +8,7 @@ struct TemplateData {
   username: String,
   logged_in: bool,
   genres: &'static [&'static Genre; 14],
+  parent: &'static str,
 }
 
 #[get("/index")]
@@ -17,5 +18,6 @@ pub fn index() -> Template {
     username: String::from("Liby99"),
     logged_in: true,
     genres: &ALL_GENRES,
+    parent: "layout/layout",
   })
 }

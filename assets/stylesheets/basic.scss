@@ -28,7 +28,8 @@ section:not(.no-border) {
   background: $pink-20;
 }
 
-a, a:visited {
+a,
+a:visited {
   text-decoration: none;
   color: $pink;
 }
@@ -41,12 +42,20 @@ a.red {
   color: $red;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
   color: $deep-text;
 }
 
-h3, h4, h5, h6 {
+h3,
+h4,
+h5,
+h6 {
   line-height: 22px;
 }
 
@@ -55,7 +64,8 @@ p {
   color: $grey-text;
 }
 
-input, textarea {
+input,
+textarea {
   outline: none;
 }
 
@@ -79,7 +89,8 @@ blockquote {
 
 /* -------------------- inputs -------------------- */
 
-input, textarea {
+input,
+textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -104,7 +115,8 @@ input {
     border: 1px solid $pink-80;
   }
 
-  :focus, :active {
+  :focus,
+  :active {
     border: 1px solid $pink;
   }
 }
@@ -279,14 +291,16 @@ button.btn {
   cursor: not-allowed;
 }
 
-.select, .zoom {
+.select,
+.zoom {
   display: flex;
   overflow: hidden;
   align-items: stretch;
   line-height: 24px;
 }
 
-.select a, .zoom > * {
+.select a,
+.zoom > * {
   transition: all 0.2s;
   display: block;
   text-align: center;
@@ -302,7 +316,8 @@ button.btn {
   white-space: nowrap;
   font-size: 12px;
 
-  .minus, .plus {
+  .minus,
+  .plus {
     width: 16px;
     padding: 0 4px;
     font-size: 10px;

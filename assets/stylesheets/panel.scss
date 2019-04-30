@@ -1,0 +1,64 @@
+.panel-mask {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+.panel-scroll {
+  transition: all 0.3s;
+  padding: 0;
+}
+
+.panel-mask.active .panel-scroll {
+  padding: 80px 0;
+}
+
+.panel-outer {
+  max-width: 648px;
+  width: calc(100% - 20px);
+  margin: 0 auto;
+  background-color: $white;
+  border-radius: 5px;
+  box-shadow: 0 0 10px $shadow;
+}
+
+.panel-head {
+  padding: 20px;
+  border-bottom: 1px solid $line;
+}
+
+.panel-head a i {
+  line-height: 22px;
+  color: $deep-text;
+}
+
+.panel-body {
+  padding: 20px 45px;
+}
+
+.panel-body h4 {
+  margin-top: 10px;
+}
+
+.panel-body p {
+  line-height: 20px;
+}
+
+@media (max-width: 540px) {
+  .panel-scroll {
+    margin-top: -40px;
+  }
+
+  .panel-mask.active .panel-scroll {
+    margin-top: 0;
+    padding: 20px 0;
+  }
+
+  .panel-body {
+    padding: 0 15px 15px;
+  }
+
+  .panel-body section.wrapper {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}

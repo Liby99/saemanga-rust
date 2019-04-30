@@ -1,7 +1,319 @@
+@import "color.scss";
 
-// First include font-awesome library
-$fa-font-path: "~font-awesome/fonts";
-@import "~font-awesome/scss/font-awesome.scss";
+#index-header-section {
+  padding: 60px 0 30px;
+}
 
-// Then import our files
-@import "basic.scss";
+.manga {
+  transition: background-color 0.15s;
+  text-align: center;
+  padding: 20px;
+}
+
+.manga:hover {
+  background-color: $hover-white;
+}
+
+.manga:active {
+  background-color: $active-white;
+}
+
+.manga .cover {
+  margin: 0 auto;
+  background-position: center;
+  background-size: cover;
+}
+
+.manga .title {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.manga.following {
+  display: inline;
+  vertical-align: top;
+  position: relative;
+  width: calc(33.3333% - 40px);
+}
+
+.manga.search .cover,
+.manga.discover .cover {
+  transition: all 0.2s;
+  width: 120px;
+  height: 160px;
+}
+
+.manga.search .title,
+.manga.discover .title {
+  width: 120px;
+}
+
+.manga.following .cover {
+  transition: all 0.1s;
+  max-width: 140px;
+  width: 100%;
+  height: 200px;
+}
+
+.manga .title {
+  transition: all 0.2s;
+  margin-top: 10px;
+  margin-bottom: -5px;
+}
+
+.manga.following .episode {
+  font-color: $light-text;
+  font-size: 10px;
+}
+
+.manga.following .title {
+  margin-top: -5px;
+}
+
+.manga.following .badge {
+  float: right;
+  display: block;
+  margin-right: -7px;
+  margin-top: -7px;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background-color: $red;
+  z-index: 0;
+}
+
+.manga.following .badge.hidden {
+  display: none;
+}
+
+.manga.following.managing .cover {
+  animation: shake;
+  animation-iteration-count: infinite;
+  animation-duration: 0.25s;
+}
+
+.manga.following .remove {
+  display: none;
+}
+
+.manga.following.managing .remove {
+  display: block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  position: absolute;
+  margin-left: calc(100% - 12px);
+  margin-top: -12px;
+  background-color: $bright-text;
+  color: $deep-text;
+}
+
+.manga.following.managing .remove:hover {
+  background-color: $fade-text;
+}
+
+.manga.following.managing .remove:active {
+  background-color: $light-text;
+}
+
+.manga.following .like {
+  display: block;
+  margin: -8px;
+  position: absolute;
+  font-size: 20px;
+}
+
+@keyframes shake {
+  0% {
+    transform: rotate(0deg) translateY(1px);
+  }
+  25% {
+    transform: rotate(1deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(0deg) translateY(-1px);
+  }
+  75% {
+    transform: rotate(-1deg) translateY(0px);
+  }
+  100% {
+    transform: rotate(0deg) translateY(1px);
+  }
+}
+
+#index-search-form {
+  transition: all 0.2s;
+  height: 36px;
+  border-radius: 18px;
+  border: 1px solid $line;
+  display: flex;
+  overflow: hidden;
+  cursor: text;
+}
+
+#index-search-form > i {
+  transition: all 0.2s;
+  width: 36px;
+  height: inherit;
+  line-height: 36px;
+  text-align: center;
+  color: $light-text;
+}
+
+#index-search {
+  width: calc(100% - 72px);
+  padding: 0;
+  margin: 0;
+  border: none;
+  background-color: transparent;
+  font-size: 12px;
+}
+
+#index-search-form.focus {
+  border: 1px solid $pink;
+}
+
+#index-search-form.focus > i {
+  color: $pink;
+}
+
+#index-search-loading {
+  position: absolute;
+  width: 20px;
+  height: 36px;
+  padding: 0 8px;
+}
+
+#index-search-clear {
+  position: absolute;
+  margin: 8px;
+  text-align: center;
+}
+
+#index-search-clear i {
+  font-size: 12px;
+  line-height: 20px;
+}
+
+#feeling-lucky {
+  line-height: 21px;
+  height: 20px;
+  margin: 0 10px;
+}
+
+#index-discover-tags-toggle .fa-angle-right {
+  margin-top: 0px;
+  font-size: 18px;
+}
+
+#index-discover-tags-holder {
+  transition: all 0.4s;
+  width: 0;
+}
+
+#index-discover-tags-holder.active {
+  margin-left: 10px;
+  flex-grow: 1;
+  padding-right: 10px;
+  width: calc(100% - 42px);
+}
+
+#index-discover-tags .tag {
+  height: 20px;
+  line-height: 21px;
+  margin-left: 5px;
+}
+
+#index-following-menu {
+  transition: all 0.2s;
+}
+
+#index-following-menu a {
+  display: block;
+  height: 22px;
+  text-align: center;
+}
+
+#index-following-menu a + a {
+  margin-right: 10px;
+}
+
+#index-following-header-content {
+  z-index: 1;
+}
+
+#index-following-header-inner {
+  transition: all 0.2s;
+}
+
+#index-following-header-inner.stick {
+  z-index: 1 !important;
+  background-color: $white-background;
+  border-bottom: 1px solid $line;
+}
+
+#index-following-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+#index-following-list.liked-only .manga:not(.liked) {
+  display: none;
+}
+
+body.full-width:not(.left) #index-following-header-inner.stick {
+  padding-right: 72px;
+}
+
+body.full-width.left #index-following-header-inner.stick {
+  padding-left: 72px;
+}
+
+#index-follow-login-holder {
+  padding: 50px 0;
+}
+
+@media (max-width: 540px) {
+  #index-header-section {
+    padding: 30px 0 10px;
+  }
+
+  .manga.search .cover,
+  .manga.discover .cover {
+    transition: all 0.2s;
+    width: 96px;
+    height: 120px;
+  }
+
+  .manga.search .title,
+  .manga.discover .title {
+    width: 96px;
+  }
+
+  .manga.following {
+    width: calc(50% - 40px);
+  }
+
+  .manga.following .cover {
+    height: 160px;
+  }
+
+  #index-discover-outer,
+  #index-following-list {
+    padding: 0;
+  }
+
+  body:not(.left) #index-following-header-inner.stick {
+    padding-right: 50px !important;
+  }
+
+  body.left #index-following-header-inner.stick {
+    padding-left: 50px !important;
+  }
+
+  #index-follow-login-holder {
+    padding: 20px 0;
+  }
+}

@@ -1,6 +1,4 @@
 use lazy_static::lazy_static;
-use chrono::prelude::*;
-use mongodb::oid::ObjectId;
 use regex::Regex;
 
 use super::genre::*;
@@ -59,6 +57,10 @@ impl MangaEpisode {
 
   pub fn num_pages(&self) -> u32 {
     self.num_pages
+  }
+
+  pub fn dmk_directory(&self) -> &String {
+    &self.dmk_directory
   }
 }
 
@@ -170,14 +172,17 @@ pub struct Manga {
 
   // Episode Information
   episodes: Vec<MangaEpisode>,
-
-  // Other Information
-  insert_date: DateTime<Utc>,
-  update_date: DateTime<Utc>,
-  id: ObjectId,
 }
 
 impl Manga {
+  pub fn new(
+    dmk_id: String, dmk_id_base: MangaDmkIdBase,
+    title: String, description: String, author: String, tags: Vec<String>,
+    genre: &'static Genre, status: MangaStatus, episodes: Vec<MangaEpisode>,
+  ) -> Self {
+    Self { dmk_id, dmk_id_base, title, description, author, tags, genre, status, episodes }
+  }
+
   pub fn title(&self) -> &String {
     &self.title
   }

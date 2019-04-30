@@ -1,1 +1,7 @@
+
+// First include font-awesome library
+$fa-font-path: "~font-awesome/fonts";
+@import "~font-awesome/scss/font-awesome.scss";
+
+// Then import our files
 @import "basic.scss";

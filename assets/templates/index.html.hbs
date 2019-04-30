@@ -1,15 +1,170 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{ title }}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <link rel="stylesheet" href="css/main.css" />
-  </head>
-  <body>
-    <main>
-      Hello, {{ name }}
-    </main>
-    <script src="js/main.js"></script>
-  </body>
+
+<head>
+  <title>{{ title }}</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+
+<body>
+  <main>
+    <section id="index-header-section">
+      <center>
+        <h1>冴え漫画 の 書架</h1>
+        <p style="margin-top: 0px;">
+          <span>
+            {{!-- <% if (loggedIn) { %> --}}
+            <span>欢迎回来，</span>
+            <a href="javascript:void(0);">{{name}}</a>
+            {{!-- <% } else { %>
+            <span>欢迎光临，</span>
+            <a href="javascript:void(0);" onclick="User.showLogin()">点此登陆</a>
+            <% } %> --}}
+          </span>
+        </p>
+      </center>
+    </section>
+    <section id="index-search-section">
+      <div id="index-search-form-outer" class="wrapper">
+        <form id="index-search-form">
+          <i class="fa fa-search"></i>
+          <input type="text" name="search" id="index-search" placeholder="请在这里输入想要搜索的漫画" autocomplete="off" />
+          <div>
+            <img id="index-search-loading" src="img/loading.svg" hidden="hidden" />
+            <a id="index-search-clear" class="btn circle grey solid" href="javascript:void(0);" hidden="hidden"
+              onclick="Search.clear()">
+              <i class="fa fa-times"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+      <div id="index-search-result-outer" class="scroll x wrapper no-top" hidden="hidden">
+        <div id="index-search-result" class="flex">
+          <!-- Template search-manga -->
+        </div>
+      </div>
+    </section>
+    <section id="index-discover-section">
+      <div class="flex full wrapper">
+        <h3>发现</h3>
+        <div class="flex-fill flex right">
+          <a href="javascript:void(0);" id="index-discover-tags-toggle" class="fa-rotation-toggle">
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-angle-right"></i>
+          </a>
+          <div id="index-discover-tags-holder" class="scroll x flex right hide-scrollbar">
+            <div id="index-discover-tags" class="flex">
+              <% genres.forEach(function (genre, i) { %>
+              <a class="btn rounded tag" id="<%= genre.dir %>" href="javascript:void(0);"><%= genre.name %></a>
+              <% }); %>
+            </div>
+          </div>
+          <!-- <a id="feeling-lucky" class="nowrap btn rounded full" href="javascript:void(0);">手气不错</a> -->
+        </div>
+      </div>
+      <div id="index-discover-outer" class="scroll x wrapper no-top">
+        <div id="index-discover-content" class="flex">
+          {{!-- <% latests.forEach(function (manga, i) { %>
+          <a class="manga discover" href="<%= manga.getSaemangaUrl() %>" id="<%= manga.dmkId() %>">
+            <div class="cover" style="background-image:
+                          url('<%= manga.getCoverUrl() %>')"></div>
+            <h4 class="title"><%= manga.title() %></h4>
+          </a>
+          <% }); %> --}}
+        </div>
+      </div>
+    </section>
+    <section id="index-following-section">
+      <div id="index-following-header" class="stick-top">
+        <div class="placeholder"></div>
+        <div class="content" id="index-following-header-content">
+          <div id="index-following-header-inner" class="flex wrapper">
+            <h3>正在追的</h3>
+            <% if (loggedIn) { %>
+            <div id="index-following-menu" class="flex-fill flex right">
+              <a id="index-following-manage" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
+                <span>管理</span>
+                <i class="fa-rotation-toggle">
+                  <i class="fa fa-pencil"></i>
+                  <i class="fa fa-check"></i>
+                </i>
+              </a>
+              <a id="index-following-only-liked" href="javascript:void(0);" class="btn rounded"
+                style="padding-right: 5px">
+                <span>仅喜爱</span>
+                <i class="fa-rotation-toggle">
+                  <i class="fa fa-heart-o"></i>
+                  <i class="fa fa-heart"></i>
+                </i>
+              </a>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      <div id="index-following-list" class="flex wrap wrapper no-top">
+        {{!-- <% if (loggedIn) { %>
+        <% if (follows.length) { %>
+        <% follows.forEach(function (follow, i) { %>
+        <a class="mix manga following<%= follow.liked ? " liked" : "" %>" id="<%= follow.manga.id() %>"
+          href="<%= follow.manga.getSaemangaUrl() %>">
+          <div class="cover" style="background-image:
+                              url('<%= follow.manga.getCoverUrl() %>')">
+            <span class="badge <%= follow.showBadge ? '' : 'hidden' %>"></span>
+            <span class="remove btn circle grey solid">
+              <i class="fa fa-times"></i>
+            </span>
+            <% if (follow.liked) { %>
+            <span class="like">
+              <i class="fa fa-heart"></i>
+            </span>
+            <% } %>
+          </div>
+          <center>
+            <p class="episode">
+              已读<%= follow.max_episode %>话，
+              <% if (follow.manga.ended()) { %>
+              共<%= follow.lastEpisode %>话，已完结
+              <% } else if (follow.hasUpdate) { %>
+              更新至<%= follow.lastEpisode %>话
+              <% } else { %>
+              未更新
+              <% } %>
+            </p>
+            <h4 class="title"><%= follow.manga.title() %></h4>
+          </center>
+        </a>
+        <% }); %>
+        <% } else { %>
+        <div class="flex-fill wrapper">
+          <center>
+            <p>
+              您还没有关注任何漫画呢！
+            </p>
+          </center>
+        </div>
+        <% } %>
+        <% } else { %>
+        <div class="flex-fill wrapper">
+          <center id="index-follow-login-holder">
+            <p>
+              请登陆已有账户或注册一个新账户，以开启 <strong>储存您正在关注的漫画</strong> 的功能～详情请见<a href="javascript:void(0);"
+                onclick="$.panel.show('help')">帮助</a>。
+            </p>
+            <p>
+              <a class="btn solid rounded big" href="javascript:void(0);" onclick="User.showLogin()">登录已有账户</a>
+              <span style="margin: 0 5px">或</span>
+              <a class="btn rounded big" href="javascript:void(0);" onclick="User.showRegister()">注册新账户</a>
+            </p>
+          </center>
+        </div>
+        <% } %> --}}
+      </div>
+    </section>
+  </main>
+  <script src="js/main.js"></script>
+</body>
+
 </html>

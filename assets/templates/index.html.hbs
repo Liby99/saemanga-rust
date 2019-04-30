@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>{{ title }}</title>
+  <title>{{title}}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <link rel="stylesheet" href="css/main.css" />
@@ -15,13 +15,13 @@
         <h1>冴え漫画 の 書架</h1>
         <p style="margin-top: 0px;">
           <span>
-            {{!-- <% if (loggedIn) { %> --}}
+            {{#if logged_in}}
             <span>欢迎回来，</span>
-            <a href="javascript:void(0);">{{name}}</a>
-            {{!-- <% } else { %>
+            <a href="javascript:void(0);">{{username}}</a>
+            {{else}}
             <span>欢迎光临，</span>
             <a href="javascript:void(0);" onclick="User.showLogin()">点此登陆</a>
-            <% } %> --}}
+            {{/if}}
           </span>
         </p>
       </center>
@@ -56,9 +56,9 @@
           </a>
           <div id="index-discover-tags-holder" class="scroll x flex right hide-scrollbar">
             <div id="index-discover-tags" class="flex">
-              <% genres.forEach(function (genre, i) { %>
-              <a class="btn rounded tag" id="<%= genre.dir %>" href="javascript:void(0);"><%= genre.name %></a>
-              <% }); %>
+              {{#each genres}}
+              <a class="btn rounded tag" id="{{dmk_directory}}" href="javascript:void(0);">{{name}}</a>
+              {{/each}}
             </div>
           </div>
           <!-- <a id="feeling-lucky" class="nowrap btn rounded full" href="javascript:void(0);">手气不错</a> -->
@@ -82,7 +82,7 @@
         <div class="content" id="index-following-header-content">
           <div id="index-following-header-inner" class="flex wrapper">
             <h3>正在追的</h3>
-            <% if (loggedIn) { %>
+            {{#if logged_in}}
             <div id="index-following-menu" class="flex-fill flex right">
               <a id="index-following-manage" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
                 <span>管理</span>
@@ -100,7 +100,7 @@
                 </i>
               </a>
             </div>
-            <% } %>
+            {{/if}}
           </div>
         </div>
       </div>

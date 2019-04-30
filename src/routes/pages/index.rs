@@ -1,15 +1,21 @@
 use rocket_contrib::templates::{Template};
 
+use crate::app::genre::*;
+
 #[derive(Serialize)]
 struct TemplateData {
   title: String,
-  name: String,
+  username: String,
+  logged_in: bool,
+  genres: &'static [&'static Genre; 14],
 }
 
 #[get("/index")]
 pub fn index() -> Template {
   Template::render("index", &TemplateData {
     title: String::from("saemanga"),
-    name: String::from("Liby"),
+    username: String::from("Liby99"),
+    logged_in: true,
+    genres: &ALL_GENRES,
   })
 }

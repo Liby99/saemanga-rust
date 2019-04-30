@@ -9,7 +9,7 @@ module.exports = {
     app: './assets/typescript/index.ts'
   },
   output: {
-    path: `${__dirname}/public/`,
+    path: `${__dirname}/../../public/`,
     filename: 'js/main.js'
   },
   module: {
@@ -51,5 +51,8 @@ module.exports = {
   ],
   resolve: {
     extensions: ['.ts']
+  },
+  performance: {
+    hints: false
   }
 };

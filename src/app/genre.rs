@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 pub struct Genre {
   id: &'static str,
   name: &'static str,
@@ -92,7 +92,7 @@ pub static OTHER : Genre = Genre {
   dmk_directory: "comic22",
 };
 
-static ALL_GENRES : [&'static Genre; 14] = [
+pub static ALL_GENRES : [&'static Genre; 14] = [
   &COMBAT,
   &MAGIC,
   &DETECTIVE,

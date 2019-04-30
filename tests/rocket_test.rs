@@ -12,7 +12,7 @@ use mongodb::{bson, doc};
 use mongodb::{ThreadedClient};
 use mongodb::db::ThreadedDatabase;
 
-mod app;
+use saemanga::app;
 
 #[database("mongodb")]
 struct SaemangaDatabase(mongodb::db::Database);

@@ -1,3 +1,5 @@
+use saemanga;
+
 fn main() {
-  println!("Hello World");
+  saemanga::launch();
 }

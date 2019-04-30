@@ -1,7 +1,23 @@
 {
-  "name": "saemanga-rust",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "saemanga",
+  "version": "0.1.0",
+  "main": "assets/typescript/index.ts",
   "author": "Liby Lee <liby99@icloud.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "description": "Minimal Manga Reader with Rust and Rocket",
+  "repository": "git@github.com:Liby99/saemanga-rust",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/jquery": "^3.3.29",
+    "del": "^4.1.1",
+    "gulp": "^4.0.1",
+    "gulp-stream": "^0.0.2",
+    "jquery": "^3.4.0",
+    "ts-loader": "^5.4.4",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1",
+    "webpack-stream": "^5.2.1"
+  }
 }

@@ -1,2 +1,7 @@
+# Rust related
 /target
 **/*.rs.bk
+
+# Typescript related
+/build
+node_modules

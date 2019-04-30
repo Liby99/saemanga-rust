@@ -1,7 +1,9 @@
 'use strict';
 
+import "../stylesheets/index.scss"
+
 import $ = require('jquery');
 
 $(() => {
-  $("main").append("Hello World");
+  $("main").prepend("Hello World");
 });

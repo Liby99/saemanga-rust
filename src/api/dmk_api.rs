@@ -17,18 +17,18 @@ fn extract_num_pages(font: &String) -> Result<u32, String> {
   }
 }
 
-fn extract_episode(a: &String) -> Result<u32, String> {
+fn extract_episode(a: &String) -> Result<(u32, bool), String> {
   lazy_static! { static ref EPISODE_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
   match EPISODE_RE.captures(a) {
     Some(cap) => match String::from(&cap[1]).parse::<u32>() {
-      Ok(i) => Ok(i),
+      Ok(i) => Ok((i, a.contains("卷"))),
       Err(_) => Err(format!("Error when parsing episode from {}", &cap[1]))
     },
     None => Err(format!("Error extracting episode data from {}", a))
   }
 }
 
-fn extract_episodes(trs: Select, is_book: bool, start_index: usize) -> Vec<MangaEpisode> {
+fn extract_episodes(trs: Select, start_index: usize) -> Vec<MangaEpisode> {
   let td_sel = Selector::parse("td").unwrap();
   let a_sel = Selector::parse("a").unwrap();
   let font_sel = Selector::parse("font").unwrap();
@@ -38,7 +38,7 @@ fn extract_episodes(trs: Select, is_book: bool, start_index: usize) -> Vec<Manga
       match td.select(&a_sel).next() {
         Some(a_elem) => {
           let index = index_count;
-          let episode = extract_episode(&a_elem.inner_html()).unwrap();
+          let (episode, is_book) = extract_episode(&a_elem.inner_html()).unwrap();
           let num_pages = extract_num_pages(&td.select(&font_sel).next().unwrap().inner_html()).unwrap();
           let href = a_elem.value().attr("href").unwrap().to_string();
           index_count += 1;
@@ -146,18 +146,18 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<(), String> {
             let first_table = tables.next().unwrap();
             match tables.next() {
               Some(second_table) => {
-                let books = extract_episodes(first_table.select(&tr_sel), true, 0);
-                let episodes = extract_episodes(second_table.select(&tr_sel), false, books.len());
+                let books = extract_episodes(first_table.select(&tr_sel), 0);
+                let episodes = extract_episodes(second_table.select(&tr_sel), books.len());
                 [&books[..], &episodes[..]].concat()
               },
-              None => extract_episodes(first_table.select(&tr_sel), false, 0)
+              None => extract_episodes(first_table.select(&tr_sel), 0)
             }
           };
 
           println!("Genre: {:?}", genre);
           println!("Author: {:?}", author);
           println!("Tags: {:?}", tags);
-          println!("Ended: {:?}", ended);
+          println!("Status: {:?}", ended);
           println!("Description: {:?}", description);
           println!("Episodes: {:?}", episodes);
 

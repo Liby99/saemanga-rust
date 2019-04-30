@@ -1,0 +1,15 @@
+{{#*inline "menu"}}
+
+<section style="padding: 15px 0">
+  {{#if logged_in }}
+    {{> partials/sidebar/user}}
+  {{else}}
+    {{> partials/sidebar/login}}
+  {{/if}}
+</section>
+
+{{> partials/sidebar/settings}}
+
+{{/inline}}
+
+{{~> layout/sidebar}}

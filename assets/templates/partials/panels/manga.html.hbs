@@ -1,0 +1,42 @@
+{{#*inline "body"}}
+
+<div id="manga-panel-body">
+  <div class="wrapper">
+    <center>
+      <img src="{{manga.cover_url}}" id="manga-panel-cover" class="drop-shadow" />
+    </center>
+    <button class="btn full rounded big" onclick="Page.requestUpdate()" style="margin-top: 10px">请求更新</button>
+  </div>
+  <div class="flex-fill">
+    <div class="wrapper">
+      <div class="flex">
+        <h3>
+          {{manga.title}}
+          <span id="manga-panel-ended" class="btn" style="font-weight: normal">
+            {{#if manga.ended}}已完结{{else}}连载中{{/if}}
+          </span>
+        </h3>
+      </div>
+      <p class="flex manga-info-item">
+        <label>作者：</label>
+        <span>{{manga.author}}</span>
+      </p>
+      <p class="flex manga-info-item">
+        <label>标签：</label>
+        <span>
+          {{#each manga.tags}}
+          <span class="btn grey">{{this}}</span>
+          {{/each}}
+        </span>
+      </p>
+      <p class="flex manga-info-item">
+        <label>简介：</label>
+        <span>{{manga.description}}</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+{{/inline}}
+
+{{~> layout/panel name="manga" title=(concat "关于 " manga.title) index="260"}}

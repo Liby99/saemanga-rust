@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   devtool: 'source-map',
   entry: {
     app :'./assets/typescript/index.ts'

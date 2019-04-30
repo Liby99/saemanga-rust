@@ -1,7 +1,53 @@
+use lazy_static::lazy_static;
+use regex::Regex;
 use scraper::{Selector, Html};
+use scraper::element_ref::{ElementRef, Select};
 
 use crate::app::manga::*;
 use crate::app::genre::*;
+
+fn extract_num_pages(font: &String) -> Result<u32, String> {
+  lazy_static! { static ref NUM_PAGES_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
+  match NUM_PAGES_RE.captures(font) {
+    Some(cap) => match String::from(&cap[1]).parse::<u32>() {
+      Ok(i) => Ok(i),
+      Err(_) => Err(format!("Error when parsing num pages from {}", &cap[1]))
+    },
+    None => Err(format!("Error extracting num pages data from {}", font))
+  }
+}
+
+fn extract_episode(a: &String) -> Result<u32, String> {
+  lazy_static! { static ref EPISODE_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
+  match EPISODE_RE.captures(a) {
+    Some(cap) => match String::from(&cap[1]).parse::<u32>() {
+      Ok(i) => Ok(i),
+      Err(_) => Err(format!("Error when parsing episode from {}", &cap[1]))
+    },
+    None => Err(format!("Error extracting episode data from {}", a))
+  }
+}
+
+fn extract_episodes(trs: Select, is_book: bool, start_index: usize) -> Vec<MangaEpisode> {
+  let td_sel = Selector::parse("td").unwrap();
+  let a_sel = Selector::parse("a").unwrap();
+  let font_sel = Selector::parse("font").unwrap();
+  let mut index_count = start_index;
+  trs.map(|tr: ElementRef| {
+    tr.select(&td_sel).filter_map(|td: ElementRef| {
+      match td.select(&a_sel).next() {
+        Some(a_elem) => {
+          let index = index_count;
+          let episode = extract_episode(&a_elem.inner_html()).unwrap();
+          let num_pages = extract_num_pages(&td.select(&font_sel).next().unwrap().inner_html()).unwrap();
+          let href = a_elem.value().attr("href").unwrap().to_string();
+          index_count += 1;
+          Some(MangaEpisode::new(index, is_book, episode, num_pages, href))
+        }, None => None
+      }
+    }).collect::<Vec<_>>()
+  }).flatten().collect::<Vec<_>>()
+}
 
 pub fn fetch_manga_data(dmk_id: &String) -> Result<(), String> {
 
@@ -89,12 +135,31 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<(), String> {
           };
 
           // Extract book and episode information
+          let episodes : Vec<MangaEpisode> = {
+
+            // First get all tables
+            let table_sel = Selector::parse("table:nth-child(3) > tbody > tr > td > fieldset > table").unwrap();
+            let tr_sel = Selector::parse("tbody > tr").unwrap();
+            let mut tables = info_td.select(&table_sel);
+
+            // Get the first table and extract it to episodes
+            let first_table = tables.next().unwrap();
+            match tables.next() {
+              Some(second_table) => {
+                let books = extract_episodes(first_table.select(&tr_sel), true, 0);
+                let episodes = extract_episodes(second_table.select(&tr_sel), false, books.len());
+                [&books[..], &episodes[..]].concat()
+              },
+              None => extract_episodes(first_table.select(&tr_sel), false, 0)
+            }
+          };
 
           println!("Genre: {:?}", genre);
           println!("Author: {:?}", author);
           println!("Tags: {:?}", tags);
           println!("Ended: {:?}", ended);
           println!("Description: {:?}", description);
+          println!("Episodes: {:?}", episodes);
 
           Ok(())
         },

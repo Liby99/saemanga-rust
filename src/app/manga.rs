@@ -25,21 +25,23 @@ impl MangaStatus {
   }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MangaEpisode {
   index: usize,
   is_book: bool,
   episode: u32,
   num_pages: u32,
+  dmk_directory: String,
 }
 
 impl MangaEpisode {
-  pub fn new(index: usize, is_book: bool, episode: u32, num_pages: u32) -> MangaEpisode {
+  pub fn new(index: usize, is_book: bool, episode: u32, num_pages: u32, dmk_directory: String) -> MangaEpisode {
     MangaEpisode {
       index: index,
       is_book: is_book,
       episode: episode,
       num_pages: num_pages,
+      dmk_directory: dmk_directory
     }
   }
 

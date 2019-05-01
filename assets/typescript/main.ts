@@ -15,6 +15,8 @@ import Body from "./components/body";
 import Sidebar from "./components/sidebar";
 import LightModeSelect from "./components/light_mode_select";
 import HandModeSelect from "./components/hand_mode_select";
+import Panel from "./components/panel";
+import Emitter from "./components/emitter";
 
 // Initialize all the components
 $(document).ready(() => {
@@ -22,5 +24,7 @@ $(document).ready(() => {
   Registry.register("sidebar", Sidebar);
   Registry.register("light-mode-select", LightModeSelect);
   Registry.register("hand-mode-select", HandModeSelect);
+  Registry.register("panel", Panel);
+  Registry.register("emitter", Emitter);
   Registry.build();
 });

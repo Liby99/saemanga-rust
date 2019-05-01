@@ -25,10 +25,10 @@ export default class Registry {
         if (c) {
           new c($elem);
         } else {
-          throw new Error(`Unknown Component [${name}]`);
+          console.error(`Unknown Component [${name}]`);
         }
       } else {
-        throw new Error("Unknown error: doesn't have component attr");
+        console.error("Unknown error: doesn't have component attr");
       }
     });
   }

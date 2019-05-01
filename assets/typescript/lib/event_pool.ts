@@ -1,5 +1,5 @@
 export default class EventPool {
-  static events: { [key: string]: [Function] } = {};
+  static events: { [key: string]: Function[] } = {};
 
   static listen(evt: string, callback: Function) {
     if (this.events[evt]) {

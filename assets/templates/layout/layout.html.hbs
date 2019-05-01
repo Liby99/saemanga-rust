@@ -8,10 +8,10 @@
   <link rel="stylesheet" href="css/main.css" />
 </head>
 
-<body component="body">
+<body class="{{#if setting.is_left_hand_mode}}left{{/if}} {{#if setting.is_night_mode}}night{{/if}}" ctrl="body">
   {{> (sidebar)}}
   <main>
-    {{~> page}}
+    {{~> main}}
     {{> partials/footer}}
   </main>
   {{> partials/panels}}

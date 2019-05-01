@@ -1,6 +1,7 @@
 use rocket_contrib::templates::{Template};
 
 use crate::app::genre::*;
+// use crate::app::user_setting::*;
 
 #[derive(Serialize)]
 struct TemplateData {
@@ -8,6 +9,13 @@ struct TemplateData {
   latests: Vec<MangaData>,
   user: Option<UserData>,
   genres: &'static [&'static Genre; 14],
+  setting: SettingData,
+}
+
+#[derive(Serialize)]
+struct SettingData {
+  is_left_hand_mode: bool,
+  is_night_mode: bool,
 }
 
 #[derive(Serialize)]
@@ -83,6 +91,10 @@ pub fn index() -> Template {
       ],
     }),
     genres: &ALL_GENRES,
+    setting: SettingData {
+      is_left_hand_mode: true,
+      is_night_mode: false,
+    }
   };
 
   // Render the data

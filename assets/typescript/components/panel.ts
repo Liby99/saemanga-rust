@@ -1,11 +1,11 @@
-import Component from "../lib/component";
+import Controller from '../lib/controller';
 import EventPool from "../lib/event_pool";
 
 type PanelState = {
   active: boolean,
 };
 
-export default class Panel extends Component<PanelState> {
+export default class Panel extends Controller<PanelState> {
 
   name: string;
 

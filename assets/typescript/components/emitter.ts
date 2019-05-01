@@ -1,7 +1,7 @@
-import Component from '../lib/component';
+import Controller from '../lib/controller';
 import EventPool from '../lib/event_pool';
 
-export default class Emitter extends Component<{}> {
+export default class Emitter extends Controller<{}> {
 
   events: string[];
 

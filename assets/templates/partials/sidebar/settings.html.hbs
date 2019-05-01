@@ -1,11 +1,11 @@
 <section class="wrapper" style="padding-top: 20px; padding-bottom: 20px;">
   <div id="light-mode-select" class="select" style="margin-bottom: 15px" component="light-mode-select">
-    <a class="active" href="javascript:void(0);" value="day">日间模式</a>
-    <a href="javascript:void(0);" value="night">夜间模式</a>
+    <a {{#unless setting.is_night_mode}}class="active"{{/unless}} href="javascript:void(0);" value="day">日间模式</a>
+    <a {{#if setting.is_night_mode}}class="active"{{/if}} href="javascript:void(0);" value="night">夜间模式</a>
   </div>
   <div id="hand-mode-select" class="select" style="margin-bottom: 15px" component="hand-mode-select">
-    <a href="javascript:void(0);" value="left">左手模式</a>
-    <a class="active" href="javascript:void(0);" value="right">右手模式</a>
+    <a {{#if setting.is_left_hand_mode}}class="active"{{/if}} href="javascript:void(0);" value="left">左手模式</a>
+    <a {{#unless setting.is_left_hand_mode}}class="active"{{/unless}} href="javascript:void(0);" value="right">右手模式</a>
   </div>
   <div id="zoom" class="zoom">
     <a class="minus" href="javascript:void(0);">

@@ -1,10 +1,10 @@
-import Component from '../lib/component';
+import Controller from '../lib/controller';
 
 type SelectState = {
   leftSelected: boolean,
 };
 
-export default class Select extends Component<SelectState> {
+export default class Select extends Controller<SelectState> {
 
   $left: JQuery<HTMLElement>;
   $right: JQuery<HTMLElement>;

@@ -1,4 +1,4 @@
-{{#*inline "page"}}
+{{#*inline "main"}}
 
 <section id="index-header-section">
   <center>
@@ -23,8 +23,7 @@
       <input type="text" name="search" id="index-search" placeholder="请在这里输入想要搜索的漫画" autocomplete="off" />
       <div>
         <img id="index-search-loading" src="img/loading.svg" hidden="hidden" />
-        <a id="index-search-clear" class="btn circle grey solid" href="javascript:void(0);" hidden="hidden"
-          onclick="Search.clear()">
+        <a id="index-search-clear" class="btn circle grey solid" href="javascript:void(0);" hidden="hidden" onclick="Search.clear()">
           <i class="fa fa-times"></i>
         </a>
       </div>
@@ -96,9 +95,9 @@
     {{#if logged_in}}
       {{#if user.has_follows}}
         {{#each user.follows}}
-          <a class="mix manga following{{#if liked}} liked{{/if}}" href="{{manga.saemanga_url}}">
+          <a class="mix manga following {{#if liked}}liked{{/if}}" href="{{manga.saemanga_url}}">
             <div class="cover" style="background-image: url('{{manga.cover_url}}')">
-              <span class="badge <%= follow.showBadge ? '' : 'hidden' %>"></span>
+              <span class="badge {{#unless has_update}}hidden{{/unless}}"></span>
               <span class="remove btn circle grey solid">
                 <i class="fa fa-times"></i>
               </span>
@@ -136,13 +135,16 @@
       <div class="flex-fill wrapper">
         <center id="index-follow-login-holder">
           <p>
-            请登陆已有账户或注册一个新账户，以开启 <strong>储存您正在关注的漫画</strong> 的功能～详情请见<a href="javascript:void(0);"
-              onclick="$.panel.show('help')">帮助</a>。
+            请登陆已有账户或注册一个新账户，以开启
+            <strong>储存您正在关注的漫画</strong>
+            的功能～详情请见
+            <a href="javascript:void(0);" ctrl="emitter" events="panel.help.open">帮助</a>
+            。
           </p>
           <p>
-            <a class="btn solid rounded big" href="javascript:void(0);" onclick="User.showLogin()">登录已有账户</a>
+            <a class="btn solid rounded big" href="javascript:void(0);" ctrl="emitter" events="user.login.focus">登录已有账户</a>
             <span style="margin: 0 5px">或</span>
-            <a class="btn rounded big" href="javascript:void(0);" onclick="User.showRegister()">注册新账户</a>
+            <a class="btn rounded big" href="javascript:void(0);" ctrl="emitter" events="user.register.focus">注册新账户</a>
           </p>
         </center>
       </div>

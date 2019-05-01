@@ -1,4 +1,4 @@
-import Component from '../lib/component';
+import Controller from '../lib/controller';
 import EventPool from '../lib/event_pool';
 
 type BodyState = {
@@ -6,7 +6,7 @@ type BodyState = {
   isNightMode: boolean,
 };
 
-export default class Body extends Component<BodyState> {
+export default class Body extends Controller<BodyState> {
   constructor(root: JQuery<HTMLElement>) {
     super(root);
 

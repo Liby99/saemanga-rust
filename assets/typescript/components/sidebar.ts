@@ -1,10 +1,11 @@
-import Component from "../lib/component";
+import Controller from "../lib/controller";
+import EventPool from "../lib/event_pool";
 
 type SidebarState = {
   active: boolean,
 };
 
-export default class Sidebar extends Component<SidebarState> {
+export default class Sidebar extends Controller<SidebarState> {
 
   $toggle: JQuery<HTMLElement>;
   $rotationToggle: JQuery<HTMLElement>;
@@ -23,6 +24,10 @@ export default class Sidebar extends Component<SidebarState> {
     // Initialize callbacks
     this.$toggle.click(() => this.toggle());
     this.$mask.click(() => this.close());
+
+    // Global listeners
+    EventPool.listen("sidebar.open", () => this.open());
+    EventPool.listen("sidebar.close", () => this.close());
   }
 
   initialState(_: JQuery<HTMLElement>) : SidebarState {

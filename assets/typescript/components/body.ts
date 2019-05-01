@@ -16,6 +16,13 @@ export default class Body extends Component<BodyState> {
         case "right": this.setRightHandMode(); break;
       }
     });
+
+    EventPool.listen("settings.light_mode.change", (mode: string) => {
+      switch (mode) {
+        case "day": this.setDayLightMode(); break;
+        case "night": this.setNightLightMode(); break;
+      }
+    });
   }
 
   initialState(root: JQuery<HTMLElement>) : BodyState {
@@ -33,12 +40,29 @@ export default class Body extends Component<BodyState> {
     this.setState({ isLeftHandMode: false });
   }
 
+  setDayLightMode() {
+    this.setState({ isNightMode: false });
+  }
+
+  setNightLightMode() {
+    this.setState({ isNightMode: true });
+  }
+
   update() {
-    const { isLeftHandMode } = this.state;
+    const { isLeftHandMode, isNightMode } = this.state;
+
+    // Deal with hand mode
     if (isLeftHandMode) {
       this.root.addClass("left");
     } else {
       this.root.removeClass("left");
+    }
+
+    // Deal with light mode
+    if (isNightMode) {
+      this.root.addClass("night");
+    } else {
+      this.root.removeClass("night");
     }
   }
 }

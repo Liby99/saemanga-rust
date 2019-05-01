@@ -7,7 +7,7 @@ export default class Component<State> {
     this.state = this.initialState(root);
   }
 
-  initialState(root: JQuery<HTMLElement>) : State {
+  initialState(_: JQuery<HTMLElement>) : State {
     throw new Error("Component must have an initial state");
   }
 

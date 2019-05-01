@@ -25,7 +25,7 @@ export default class Sidebar extends Component<SidebarState> {
     this.$mask.click(() => this.close());
   }
 
-  initialState(root: JQuery<HTMLElement>) : SidebarState {
+  initialState(_: JQuery<HTMLElement>) : SidebarState {
     return { active: false };
   }
 
@@ -47,12 +47,10 @@ export default class Sidebar extends Component<SidebarState> {
     if (active) {
       this.root.addClass("active");
       this.$rotationToggle.addClass("active");
-      this.$sidebar.addClass("active");
       this.$mask.fadeIn(200);
     } else {
       this.root.removeClass("active");
       this.$rotationToggle.removeClass("active");
-      this.$sidebar.removeClass("active");
       this.$mask.fadeOut(200);
     }
   }

@@ -1,13 +1,14 @@
 import Select from "./select";
+import EventPool from "../lib/event_pool";
 
 export default class LightModeSelect extends Select {
   selectLeft() {
     super.selectLeft();
-    // TODO: Emit Light Mode Change Event
+    EventPool.dispatch("settings.light_mode.change", "day");
   }
 
   selectRight() {
     super.selectRight();
-    // TODO: Emit Light Mode Change Event
+    EventPool.dispatch("settings.light_mode.change", "night");
   }
 }

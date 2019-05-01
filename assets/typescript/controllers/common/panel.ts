@@ -1,5 +1,4 @@
 import Controller from '../../library/controller';
-import EventPool from "../../library/event_pool";
 
 type PanelState = {
   active: boolean,
@@ -30,8 +29,8 @@ export default class Panel extends Controller<PanelState> {
     this.$closeButton.click(() => this.close());
 
     // Listeners
-    EventPool.listen(`panel.${this.name}.open`, () => this.open());
-    EventPool.listen(`panel.${this.name}.close`, () => this.close());
+    this.listen(`panel.${this.name}.open`, () => this.open());
+    this.listen(`panel.${this.name}.close`, () => this.close());
   }
 
   initialState(_: JQuery<HTMLElement>) : PanelState {

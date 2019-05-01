@@ -1,5 +1,4 @@
 import Controller from "../../library/controller";
-import EventPool from "../../library/event_pool";
 
 type SidebarState = {
   active: boolean,
@@ -26,8 +25,8 @@ export default class Sidebar extends Controller<SidebarState> {
     this.$mask.click(() => this.close());
 
     // Global listeners
-    EventPool.listen("sidebar.open", () => this.open());
-    EventPool.listen("sidebar.close", () => this.close());
+    this.listen("sidebar.open", () => this.open());
+    this.listen("sidebar.close", () => this.close());
   }
 
   initialState(_: JQuery<HTMLElement>) : SidebarState {

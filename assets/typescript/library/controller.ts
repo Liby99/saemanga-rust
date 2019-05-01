@@ -38,12 +38,12 @@ export default class Controller<State> {
     }
   }
 
-  protected setState(newState: Partial<State>) {
+  protected setState(newState: Partial<State>, callback?: () => void) {
     this.state = { ...this.state, ...newState };
-    this.update();
+    this.update(callback);
   }
 
-  protected update() {
+  protected update(callback?: () => void) {
     // Do nothing
   }
 

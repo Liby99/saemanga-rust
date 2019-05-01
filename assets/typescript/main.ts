@@ -18,6 +18,7 @@ import HandModeSelect from "./controllers/common/hand_mode_select";
 import Panel from "./controllers/common/panel";
 import Emitter from "./controllers/helpers/emitter";
 import Discover from "./controllers/index/discover";
+import Genres from "./controllers/index/genres";
 
 // Initialize all the components
 $(document).ready(() => {
@@ -28,5 +29,6 @@ $(document).ready(() => {
   Registry.register("panel", Panel);
   Registry.register("emitter", Emitter);
   Registry.register("discover", Discover);
+  Registry.register("genres", Genres);
   Registry.build();
 });

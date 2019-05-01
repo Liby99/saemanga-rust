@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import Handlebars from 'handlebars';
 
 export default class Template<Data> {
@@ -9,11 +8,11 @@ export default class Template<Data> {
     this.template = template;
   }
 
-  render(data: Data | Data[]) : JQuery<HTMLElement> {
+  render(data: Data | Data[]) : string {
     if (Array.isArray(data)) {
-      return $(data.map(d => this.template(d)).join());
+      return data.map(d => this.template(d)).join();
     } else {
-      return $(this.template(data));
+      return this.template(data);
     }
   }
 }

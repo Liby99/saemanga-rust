@@ -1,5 +1,4 @@
 import Controller from '../../library/controller';
-import EventPool from '../../library/event_pool';
 
 type BodyState = {
   isLeftHandMode: boolean,
@@ -10,14 +9,14 @@ export default class Body extends Controller<BodyState> {
   constructor(root: JQuery<HTMLElement>) {
     super(root);
 
-    EventPool.listen("settings.hand_mode.change", (mode: string) => {
+    this.listen("settings.hand_mode.change", (mode: string) => {
       switch (mode) {
         case "left": this.setLeftHandMode(); break;
         case "right": this.setRightHandMode(); break;
       }
     });
 
-    EventPool.listen("settings.light_mode.change", (mode: string) => {
+    this.listen("settings.light_mode.change", (mode: string) => {
       switch (mode) {
         case "day": this.setDayLightMode(); break;
         case "night": this.setNightLightMode(); break;

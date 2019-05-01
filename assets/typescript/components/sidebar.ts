@@ -12,7 +12,7 @@ export default class Sidebar extends Component<SidebarState> {
   $sidebar: JQuery<HTMLElement>;
 
   constructor(root: JQuery<HTMLElement>) {
-    super(root, { active: false });
+    super(root);
 
     // Initialize elements
     this.$toggle = root.children("#sidebar-toggle");
@@ -23,6 +23,10 @@ export default class Sidebar extends Component<SidebarState> {
     // Initialize callbacks
     this.$toggle.click(() => this.toggle());
     this.$mask.click(() => this.close());
+  }
+
+  initialState(root: JQuery<HTMLElement>) : SidebarState {
+    return { active: false };
   }
 
   close() {

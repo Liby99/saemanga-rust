@@ -45,10 +45,12 @@ export default class Sidebar extends Component<SidebarState> {
   update() {
     const { active } = this.state;
     if (active) {
+      this.root.addClass("active");
       this.$rotationToggle.addClass("active");
       this.$sidebar.addClass("active");
       this.$mask.fadeIn(200);
     } else {
+      this.root.removeClass("active");
       this.$rotationToggle.removeClass("active");
       this.$sidebar.removeClass("active");
       this.$mask.fadeOut(200);

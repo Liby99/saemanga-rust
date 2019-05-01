@@ -5,15 +5,19 @@ interface ComponentClass<T> {
   new (root: JQuery<HTMLElement>): Component<T>;
 }
 
-export default class Controller {
-  registry: { [key: string]: ComponentClass<any> } = {};
+export default class Registry {
+  static registry: { [key: string]: ComponentClass<any> } = {};
 
-  register<T>(name: string, comp: ComponentClass<T>) {
-    this.registry[name] = comp;
+  static register<T>(name: string, comp: ComponentClass<T>) {
+    if (!this.registry[name]) {
+      this.registry[name] = comp;
+    } else {
+      throw new Error(`Component ${name} already registered`);
+    }
   }
 
-  build() {
-    $("body").find("[component]").each((index, element) => {
+  static build() {
+    $("[component]").each((index, element) => {
       const $elem = $(element);
       const name = $elem.attr("component");
       if (name !== undefined) {
@@ -24,7 +28,7 @@ export default class Controller {
           throw new Error(`Unknown Component [${name}]`);
         }
       } else {
-        console.error("Unknown error: doesn't have component attr");
+        throw new Error("Unknown error: doesn't have component attr");
       }
     });
   }

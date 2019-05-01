@@ -6,17 +6,19 @@ module.exports = {
   mode: 'development',
   devtool: 'source-map',
   entry: {
-    app: './assets/typescript/main.ts'
+    app: './assets/typescript/main.ts',
   },
   output: {
-    path: `${__dirname}/../../public/`,
+    path: `${__dirname}/public/`,
     filename: 'js/main.js'
   },
   module: {
     rules: [{
       test: /\.ts$/,
       exclude: /node_modules/,
-      use: { loader: 'ts-loader' }
+      use: {
+        loader: 'ts-loader'
+      }
     }, {
       test: /\.scss$/,
       use: [
@@ -42,6 +44,9 @@ module.exports = {
           name: 'fonts/[name].[ext]'
         }
       }]
+    }, {
+      test: /\.html\.hbs$/,
+      loader: "handlebars-loader"
     }]
   },
   plugins: [
@@ -50,7 +55,7 @@ module.exports = {
     })
   ],
   resolve: {
-    extensions: ['.ts']
+    extensions: ['.ts', '.tsx', '.js', '.json']
   },
   performance: {
     hints: false

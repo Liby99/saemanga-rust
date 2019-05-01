@@ -1,4 +1,4 @@
-import Controller from '../lib/controller';
+import Controller from '../../library/controller';
 
 type SelectState = {
   leftSelected: boolean,

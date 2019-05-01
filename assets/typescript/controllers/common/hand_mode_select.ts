@@ -1,5 +1,5 @@
 import Select from "./select";
-import EventPool from "../lib/event_pool";
+import EventPool from "../../library/event_pool";
 
 export default class HandModeSelect extends Select {
   selectLeft() {

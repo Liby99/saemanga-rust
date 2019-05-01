@@ -1,5 +1,5 @@
-import Controller from '../lib/controller';
-import EventPool from '../lib/event_pool';
+import Controller from '../../library/controller';
+import EventPool from '../../library/event_pool';
 
 type BodyState = {
   isLeftHandMode: boolean,

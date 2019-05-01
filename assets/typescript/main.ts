@@ -8,15 +8,16 @@ import "../images/loading.svg";
 import "../stylesheets/main.scss";
 
 // Component Library
-import Registry from "./lib/registry";
+import Registry from "./library/registry";
 
 // Components
-import Body from "./components/body";
-import Sidebar from "./components/sidebar";
-import LightModeSelect from "./components/light_mode_select";
-import HandModeSelect from "./components/hand_mode_select";
-import Panel from "./components/panel";
-import Emitter from "./components/emitter";
+import Body from "./controllers/common/body";
+import Sidebar from "./controllers/common/sidebar";
+import LightModeSelect from "./controllers/common/light_mode_select";
+import HandModeSelect from "./controllers/common/hand_mode_select";
+import Panel from "./controllers/common/panel";
+import Emitter from "./controllers/helpers/emitter";
+import Discover from "./controllers/index/discover";
 
 // Initialize all the components
 $(document).ready(() => {
@@ -26,5 +27,6 @@ $(document).ready(() => {
   Registry.register("hand-mode-select", HandModeSelect);
   Registry.register("panel", Panel);
   Registry.register("emitter", Emitter);
+  Registry.register("discover", Discover);
   Registry.build();
 });

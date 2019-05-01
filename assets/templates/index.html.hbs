@@ -35,7 +35,7 @@
     </div>
   </div>
 </section>
-<section id="index-discover-section">
+<section id="index-discover-section" ctrl="discover">
   <div class="flex full wrapper">
     <h3>发现</h3>
     <div class="flex-fill flex right">
@@ -56,10 +56,7 @@
   <div id="index-discover-outer" class="scroll x wrapper no-top">
     <div id="index-discover-content" class="flex">
       {{#each latests}}
-        <a class="manga discover" href="{{saemanga_url}}" id="{{dmk_id}}">
-          <div class="cover" style="background-image: url('{{cover_url}}')"></div>
-          <h4 class="title">{{title}}</h4>
-        </a>
+        {{> partials/latest_manga}}
       {{/each}}
     </div>
   </div>
@@ -93,44 +90,42 @@
   </div>
   <div id="index-following-list" class="flex wrap wrapper no-top">
     {{#if logged_in}}
-      {{#if user.has_follows}}
-        {{#each user.follows}}
-          <a class="mix manga following {{#if liked}}liked{{/if}}" href="{{manga.saemanga_url}}">
-            <div class="cover" style="background-image: url('{{manga.cover_url}}')">
-              <span class="badge {{#unless has_update}}hidden{{/unless}}"></span>
-              <span class="remove btn circle grey solid">
-                <i class="fa fa-times"></i>
+      {{#each user.follows}}
+        <a class="mix manga following {{#if liked}}liked{{/if}}" href="{{manga.saemanga_url}}">
+          <div class="cover" style="background-image: url('{{manga.cover_url}}')">
+            <span class="badge {{#unless has_update}}hidden{{/unless}}"></span>
+            <span class="remove btn circle grey solid">
+              <i class="fa fa-times"></i>
+            </span>
+            {{#if liked}}
+              <span class="like">
+                <i class="fa fa-heart"></i>
               </span>
-              {{#if liked}}
-                <span class="like">
-                  <i class="fa fa-heart"></i>
-                </span>
-              {{/if}}
-            </div>
-            <center>
-              <p class="episode">
-                已读{{max_read_episode}}话，
-                {{#if manga.ended}}
-                  共{{manga.last_episode}}话，已完结
+            {{/if}}
+          </div>
+          <center>
+            <p class="episode">
+              已读{{max_read_episode}}话，
+              {{#if manga.ended}}
+                共{{manga.last_episode}}话，已完结
+              {{else}}
+                {{#if has_update}}
+                  更新至{{manga.last_episode}}{{#if manga.last_episode_is_book}}卷{{else}}话{{/if}}
                 {{else}}
-                  {{#if has_update}}
-                    更新至{{manga.last_episode}}{{#if manga.last_episode_is_book}}卷{{else}}话{{/if}}
-                  {{else}}
-                    未更新
-                  {{/if}}
+                  未更新
                 {{/if}}
-              </p>
-              <h4 class="title">{{manga.title}}</h4>
-            </center>
-          </a>
-        {{/each}}
+              {{/if}}
+            </p>
+            <h4 class="title">{{manga.title}}</h4>
+          </center>
+        </a>
       {{else}}
         <div class="flex-fill wrapper">
           <center>
             <p>您还没有关注任何漫画呢！</p>
           </center>
         </div>
-      {{/if}}
+      {{/each}}
     {{else}}
       <div class="flex-fill wrapper">
         <center id="index-follow-login-holder">

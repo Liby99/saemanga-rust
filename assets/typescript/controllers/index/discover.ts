@@ -1,16 +1,10 @@
 import $ from 'jquery';
 import Controller from '../../library/controller';
-import LatestManga, { LatestMangaData } from '../../templates/latest_manga';
-
-enum ShowingState {
-  Hiding,
-  Rendering,
-  Showing,
-}
+import DiscoverManga, { DiscoverMangaData } from '../../templates/discover_manga';
 
 type DiscoverState = {
   show: boolean,
-  mangas: LatestMangaData[],
+  mangas: DiscoverMangaData[],
 };
 
 export default class Discover extends Controller<DiscoverState> {
@@ -27,7 +21,7 @@ export default class Discover extends Controller<DiscoverState> {
 
     // Listener
     this.listen("discover.genre.change", (genre: string) => {
-      let mangas: LatestMangaData[] | undefined = undefined;
+      let mangas: DiscoverMangaData[] | undefined = undefined;
       let hidden = false;
       const next = () => {
         if (mangas && hidden) {
@@ -63,7 +57,7 @@ export default class Discover extends Controller<DiscoverState> {
     };
   }
 
-  fetch(genre: string, callback: (mangas: LatestMangaData[]) => void) {
+  fetch(genre: string, callback: (mangas: DiscoverMangaData[]) => void) {
     callback([{
       title: "五等分的花嫁",
       dmk_id: "5893",
@@ -84,7 +78,7 @@ export default class Discover extends Controller<DiscoverState> {
   update(callback: () => void) {
     const { mangas, show } = this.state;
 
-    this.$inner.html(LatestManga.render(mangas));
+    this.$inner.html(DiscoverManga.render(mangas));
 
     if (show) {
       this.$outer.animate({ "opacity": 1 }, 150, callback);

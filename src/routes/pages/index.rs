@@ -69,6 +69,15 @@ pub fn index() -> Template {
         last_episode_is_book: false,
         ended: true,
       },
+      MangaData {
+        title: String::from("聖癖✟櫻之丘"),
+        dmk_id: String::from("5901"),
+        cover_url: String::from("http://cartoonmad.com/cartoonimg/coimg/5901.jpg"),
+        saemanga_url: String::from("http://saemanga.com/manga/5901"),
+        last_episode: 26,
+        last_episode_is_book: false,
+        ended: false,
+      },
     ],
     user: Some(UserData {
       username: String::from("Liby99"),

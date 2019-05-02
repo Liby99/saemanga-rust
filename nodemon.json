@@ -1,0 +1,9 @@
+{
+  "watch": [
+    "src/",
+    "assets/"
+  ],
+  "ext": "js json ts rs hbs scss",
+  "verbose": true,
+  "exec": "npm run build && cargo run"
+}

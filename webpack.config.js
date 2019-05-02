@@ -46,7 +46,12 @@ module.exports = {
       }]
     }, {
       test: /\.html\.hbs$/,
-      loader: "handlebars-loader"
+      use: [{
+        loader: "handlebars-loader",
+        options: {
+          rootRelative: ""
+        }
+      }],
     }]
   },
   plugins: [

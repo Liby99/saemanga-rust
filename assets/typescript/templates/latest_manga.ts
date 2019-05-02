@@ -1,4 +1,4 @@
-import hbs from '../../templates/partials/latest_manga.html.hbs';
+import hbs from '../../templates/partials/index/latest_manga.html.hbs';
 import Template from '../library/template';
 
 export type LatestMangaData = {

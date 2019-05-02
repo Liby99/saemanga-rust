@@ -78,6 +78,15 @@ pub fn index() -> Template {
         last_episode_is_book: false,
         ended: false,
       },
+      MangaData {
+        title: String::from("田中君總是如此慵懶"),
+        dmk_id: String::from("4159"),
+        cover_url: String::from("http://cartoonmad.com/cartoonimg/coimg/4159.jpg"),
+        saemanga_url: String::from("http://saemanga.com/manga/4159"),
+        last_episode: 26,
+        last_episode_is_book: false,
+        ended: false,
+      },
     ],
     user: Some(UserData {
       username: String::from("Liby99"),

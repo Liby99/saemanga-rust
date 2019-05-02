@@ -6,7 +6,9 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "npx gulp dev"
+    "dev": "npx gulp dev",
+    "build": "npx gulp build",
+    "start": "cargo run"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 const gulp = require('gulp');
 const nodemon = require('gulp-nodemon');
-const exec = require('child_process').exec;
+const { exec } = require('child_process');
 const path = require('path');
 
 const backendFileExt = [".rs"];
@@ -8,10 +8,8 @@ const frontendFileExt = [".scss", ".js", ".json", ".ts", ".hbs"];
 const backendBuildTask = "build-back-end";
 const frontendBuildTask = "build-front-end";
 
-let nodemonInstance;
-
 gulp.task(backendBuildTask, (done) => {
-  exec("cargo build", (err, stdout, stderr) => {
+  exec("cargo build --color always", (err, stdout, stderr) => {
     console.log(stdout);
     console.error(stderr);
     done(err);
@@ -19,15 +17,17 @@ gulp.task(backendBuildTask, (done) => {
 });
 
 gulp.task(frontendBuildTask, (done) => {
-  exec("npx webpack", (err, stdout, stderr) => {
+  exec("npx webpack --colors", (err, stdout, stderr) => {
     console.log(stdout);
     console.error(stderr);
     done(err);
   });
 });
 
+gulp.task('build', gulp.parallel(backendBuildTask, frontendBuildTask));
+
 gulp.task('dev', (done) => {
-  nodemonInstance = nodemon({
+  nodemon({
     watch: ["src/", "assets/"],
     ext: "js json ts rs hbs scss",
     verbose: true,
@@ -48,9 +48,5 @@ gulp.task('dev', (done) => {
         }
       }, {}));
     }
-  }).on('restart', function () {
-    console.log('restarted!')
-  }).on('crash', function() {
-    console.error('Application has crashed!\n');
   });
 });

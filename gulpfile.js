@@ -24,9 +24,12 @@ gulp.task(frontendBuildTask, (done) => {
   });
 });
 
-gulp.task('build', gulp.parallel(backendBuildTask, frontendBuildTask));
+gulp.task('build', gulp.parallel(
+  backendBuildTask,
+  frontendBuildTask
+));
 
-gulp.task('dev', (done) => {
+gulp.task('nodemon', (done) => {
   nodemon({
     watch: ["src/", "assets/"],
     ext: "js json ts rs hbs scss",
@@ -49,4 +52,9 @@ gulp.task('dev', (done) => {
       }, {}));
     }
   });
-});
+})
+
+gulp.task('dev', gulp.series(
+  'build',
+  'nodemon',
+));

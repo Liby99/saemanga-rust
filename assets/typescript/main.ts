@@ -3,9 +3,8 @@
 // Jquery
 import $ from "jquery";
 
-// Images and Scss
-import "../images/loading.svg";
-import "../stylesheets/main.scss";
+// Import assets
+import "./assets";
 
 // Component Library
 import Registry from "./library/registry";

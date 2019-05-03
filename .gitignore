@@ -5,3 +5,6 @@
 # Webpack, JavaScript related
 /public
 node_modules
+
+# Dev Env related
+.vscode

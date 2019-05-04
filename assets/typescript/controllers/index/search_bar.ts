@@ -42,6 +42,10 @@ export default class SearchResult extends Controller<SearchBarState> {
 
     this.$input.on('input', () => this.change());
 
+    this.$input.keyup((e) => {
+      if (e.key === "Escape") EventPool.emit("search.result.close");
+    });
+
     this.$clear.click(() => {
       EventPool.emit("search.result.close");
     });

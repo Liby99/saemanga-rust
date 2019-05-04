@@ -6,6 +6,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 module.exports = {
   mode: 'development',
   devtool: 'source-map',
+  cache: true,
   entry: {
     app: './assets/typescript/main.ts',
   },
@@ -62,7 +63,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "css/main.css"
     }),
-    new ForkTsCheckerWebpackPlugin()
+    new ForkTsCheckerWebpackPlugin(),
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json']

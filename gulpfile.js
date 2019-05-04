@@ -6,17 +6,29 @@ const { exec } = require('child_process');
 let nodemonInstance;
 
 gulp.task("build-cargo", (done) => {
+  process.stdout.write("Building cargo... ");
   exec("cargo build --color always", (err, stdout, stderr) => {
-    console.log(stdout);
-    console.error(stderr);
+    if (err) {
+      console.log("Failed");
+      console.log(stdout);
+      console.error(stderr);
+    } else {
+      console.log("Done");
+    }
     done(err);
   });
 });
 
 gulp.task("build-webpack", (done) => {
+  process.stdout.write("Building webpack... ");
   exec("npx webpack --colors", (err, stdout, stderr) => {
-    console.log(stdout);
-    console.error(stderr);
+    if (err) {
+      console.log("Failed");
+      console.log(stdout);
+      console.error(stderr);
+    } else {
+      console.log("Done");
+    }
     done(err);
   });
 });
@@ -41,8 +53,11 @@ gulp.task('dev-run', (done) => {
 gulp.task('dev-watch', (done) => {
   return watch(['src/', 'assets/'], {
     read: false,
+    readDelay: 0,
   }, (file) => {
-    const task = file.extname === '.rs' ? "build-cargo" : "build-webpack";
+    const isRustChange = file.extname === '.rs';
+    const task = isRustChange ? "build-cargo" : "build-webpack";
+    console.log(`Detected ${isRustChange ? "back-end" : "front-end"} changes. Rebuilding.`);
     gulp.task(task)((err) => {
       if (err) {
         console.log("Error detected. Waiting for changes...");

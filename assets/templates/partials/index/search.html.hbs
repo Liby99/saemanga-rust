@@ -1,0 +1,19 @@
+<section id="index-search-section">
+  <div id="index-search-form-outer" class="wrapper">
+    <form id="index-search-form">
+      <i class="fa fa-search"></i>
+      <input type="text" name="search" id="index-search" placeholder="请在这里输入想要搜索的漫画" autocomplete="off" />
+      <div>
+        <img id="index-search-loading" src="img/loading.svg" hidden="hidden" />
+        <a id="index-search-clear" class="btn circle grey solid" href="javascript:void(0);" hidden="hidden" onclick="Search.clear()">
+          <i class="fa fa-times"></i>
+        </a>
+      </div>
+    </form>
+  </div>
+  <div id="index-search-result-outer" class="scroll x wrapper no-top" hidden="hidden">
+    <div id="index-search-result" class="flex">
+      <!-- Template search-manga -->
+    </div>
+  </div>
+</section>

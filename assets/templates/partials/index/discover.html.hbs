@@ -1,0 +1,25 @@
+<section id="index-discover-section">
+  <div class="flex full wrapper">
+    <h3>发现</h3>
+    <div class="flex-fill flex right" ctrl="genres">
+      <a href="javascript:void(0);" id="index-discover-tags-toggle" class="fa-rotation-toggle">
+        <i class="fa fa-bars"></i>
+        <i class="fa fa-angle-right"></i>
+      </a>
+      <div id="index-discover-tags-holder" class="scroll x flex right hide-scrollbar">
+        <div id="index-discover-tags" class="flex">
+          {{#each genres}}
+            <a class="btn rounded tag" id="{{dmk_directory}}" href="javascript:void(0);">{{name}}</a>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="index-discover-outer" class="scroll x wrapper no-top" ctrl="discover">
+    <div id="index-discover-content" class="flex">
+      {{#each latests}}
+        {{> partials/index/discover_manga}}
+      {{/each}}
+    </div>
+  </div>
+</section>

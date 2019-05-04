@@ -1,0 +1,16 @@
+<section id="index-header-section">
+  <center>
+    <h1>冴え漫画 の 書架</h1>
+    <p style="margin-top: 0px;">
+      <span>
+        {{#if logged_in}}
+          <span>欢迎回来，</span>
+          <a href="javascript:void(0);">{{user.username}}</a>
+        {{else}}
+          <span>欢迎光临，</span>
+          <a href="javascript:void(0);" onclick="User.showLogin()">点此登陆</a>
+        {{/if}}
+      </span>
+    </p>
+  </center>
+</section>

@@ -24,6 +24,9 @@ export default class Registry {
     }
   }
 
+  /**
+   * Build the whole controller tree starting from the root
+   */
   static build() {
     $(`[${this.ATTR}]`).each((_, element) => this.buildController(element));
   }
@@ -34,16 +37,16 @@ export default class Registry {
 
   static buildController(element: HTMLElement) {
     const $elem = $(element);
-    const name = $elem.attr(this.ATTR);
-    if (name !== undefined) {
-      const c = this.registry[name];
-      if (c) {
-        new c($elem);
-      } else {
-        console.error(`Unknown controller [${name}]`);
+    const attr = $elem.attr(this.ATTR);
+    if (attr !== undefined) {
+      const ctrls = attr.split(' ');
+      for (const ctrl of ctrls) {
+        const C = this.registry[ctrl];
+        if (C) new C($elem);
+        else console.error(`Unknown controller [${ctrl}]`);
       }
     } else {
-      console.error("Unknown error: element doesn't have controller attr");
+      console.error(`Unknown error: element doesn't have ${this.ATTR} attr`);
     }
   }
 }

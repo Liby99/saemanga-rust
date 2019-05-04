@@ -1,14 +1,11 @@
 const gulp = require('gulp');
 const nodemon = require('gulp-nodemon');
+const watch = require('gulp-watch');
 const { exec } = require('child_process');
-const path = require('path');
 
-const backendFileExt = [".rs"];
-const frontendFileExt = [".scss", ".js", ".json", ".ts", ".hbs"];
-const backendBuildTask = "build-back-end";
-const frontendBuildTask = "build-front-end";
+let nodemonInstance;
 
-gulp.task(backendBuildTask, (done) => {
+gulp.task("build-cargo", (done) => {
   exec("cargo build --color always", (err, stdout, stderr) => {
     console.log(stdout);
     console.error(stderr);
@@ -16,7 +13,7 @@ gulp.task(backendBuildTask, (done) => {
   });
 });
 
-gulp.task(frontendBuildTask, (done) => {
+gulp.task("build-webpack", (done) => {
   exec("npx webpack --colors", (err, stdout, stderr) => {
     console.log(stdout);
     console.error(stderr);
@@ -24,37 +21,43 @@ gulp.task(frontendBuildTask, (done) => {
   });
 });
 
-gulp.task('build', gulp.parallel(
-  backendBuildTask,
-  frontendBuildTask
+gulp.task('build', gulp.series(
+  "build-cargo",
+  "build-webpack"
 ));
 
-gulp.task('nodemon', (done) => {
-  nodemon({
-    watch: ["src/", "assets/"],
-    ext: "js json ts rs hbs scss",
-    verbose: true,
-    exec: "cargo run",
-    done: done,
-    tasks: (changedFiles) => {
+gulp.task('dev-run', (done) => {
+  if (nodemonInstance) {
+    nodemonInstance.emit('restart');
+  } else {
+    nodemonInstance = nodemon({
+      done: done,
+      watch: ["--non-existing-folder--"],
+      exec: "cargo run",
+    });
+  }
+});
 
-      // If no changed files then no task to do
-      if (!changedFiles) return [];
-
-      // Check back end or front file and push tasks
-      return Object.keys(changedFiles.reduce((acc, file) => {
-        const ext = path.extname(file);
-        if (~backendFileExt.indexOf(ext)) {
-          return { ...acc, [backendBuildTask]: true };
-        } else if (~frontendFileExt.indexOf(ext)) {
-          return { ...acc, [frontendBuildTask]: true };
-        }
-      }, {}));
-    }
+gulp.task('dev-watch', (done) => {
+  return watch(['src/', 'assets/'], {
+    read: false,
+  }, (file) => {
+    const task = file.extname === '.rs' ? "build-cargo" : "build-webpack";
+    gulp.task(task)((err) => {
+      if (err) {
+        console.log("Error detected. Waiting for changes...");
+        gulp.task('dev-watch')(done);
+      } else {
+        gulp.task('dev-run')(done);
+      }
+    });
   });
-})
+});
 
-gulp.task('dev', gulp.series(
-  'build',
-  'nodemon',
-));
+gulp.task('dev', (done) => {
+  gulp.task('build')((err) => {
+    if (err) console.log("Error detected. Waiting for changes...");
+    else gulp.task('dev-run')(done);
+    gulp.task('dev-watch')(done);
+  });
+});

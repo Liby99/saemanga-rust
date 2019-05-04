@@ -1,6 +1,7 @@
 'use strict';
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -17,7 +18,10 @@ module.exports = {
       test: /\.ts$/,
       exclude: /node_modules/,
       use: {
-        loader: 'ts-loader'
+        loader: 'ts-loader',
+        options: {
+          transpileOnly: true
+        }
       }
     }, {
       test: /\.scss$/,
@@ -57,7 +61,8 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       filename: "css/main.css"
-    })
+    }),
+    new ForkTsCheckerWebpackPlugin()
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json']

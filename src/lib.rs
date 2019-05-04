@@ -48,6 +48,8 @@ pub fn launch() {
   // Variables
   let public_path = concat!(env!("CARGO_MANIFEST_DIR"), "/public");
 
+
+
   // Start the server
   rocket::ignite()
     .attach(template())

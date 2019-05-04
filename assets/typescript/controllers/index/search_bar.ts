@@ -61,7 +61,11 @@ export default class SearchResult extends Controller<SearchBarState> {
     });
 
     this.listen("search.result.fetched", () => {
-      this.setState({ loading: false, clearShowing: true });
+      this.setState({ loading: false });
+    });
+
+    this.listen("search.result.opened", () => {
+      this.setState({ clearShowing: true });
     });
   }
 

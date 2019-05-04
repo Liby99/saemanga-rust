@@ -58,17 +58,19 @@ export default class Discover extends Controller<DiscoverState> {
   }
 
   fetch(genre: string, callback: (mangas: DiscoverMangaData[]) => void) {
-    callback([{
-      title: "五等分的花嫁",
-      dmk_id: "5893",
-      cover_url: "http://cartoonmad.com/cartoonimg/coimg/5893.jpg",
-      saemanga_url: "http://saemanga.com/manga/5893",
-    }, {
-      title: "雖然我也想脫宅",
-      dmk_id: "7702",
-      cover_url: "http://cartoonmad.com/cartoonimg/coimg/7702.jpg",
-      saemanga_url: "http://saemanga.com/manga/7702",
-    }]);
+    setTimeout(() => {
+      callback([{
+        title: "五等分的花嫁",
+        dmk_id: "5893",
+        cover_url: "http://cartoonmad.com/cartoonimg/coimg/5893.jpg",
+        saemanga_url: "http://saemanga.com/manga/5893",
+      }, {
+        title: "雖然我也想脫宅",
+        dmk_id: "7702",
+        cover_url: "http://cartoonmad.com/cartoonimg/coimg/7702.jpg",
+        saemanga_url: "http://saemanga.com/manga/7702",
+      }]);
+    }, 2000);
   }
 
   scrollToLeft() {

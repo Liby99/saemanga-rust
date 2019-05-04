@@ -45,7 +45,9 @@ export default class Genres extends Controller<GenresState> {
 
   toggleGenreList() {
     const { opened } = this.state;
-    this.setState({ opened: !opened });
+    this.setState({ opened: !opened }, () => {
+      if (!opened) this.tagScrollToRight();
+    });
   }
 
   toggleGenre(genre: string) {
@@ -90,19 +92,19 @@ export default class Genres extends Controller<GenresState> {
       this.clearTagHolderCss();
       this.$tagsToggle.addClass("active");
       this.$tagsHolder.addClass("active");
-      this.tagScrollToRight();
     } else {
       this.$tagsToggle.removeClass("active");
       this.$tagsHolder.removeClass("active");
       const $active = this.$tags.filter(".active");
       if ($active.length) {
         const activeOffset = $active.offset();
-        const parentOffset = $active.parent().offset();
+        const parentOffset = this.$tagsOuter.offset();
         const tagsOuterWidth = this.$tagsOuter.width();
         const activeWidth = $active.outerWidth();
         if (activeOffset && parentOffset && tagsOuterWidth && activeWidth) {
           const offset = activeOffset.left - parentOffset.left;
           const scrollLeft = -(tagsOuterWidth - activeWidth - offset);
+          console.log(scrollLeft);
           this.$tagsHolder.css({
             width: $active.outerWidth() || 0,
             marginRight: 10

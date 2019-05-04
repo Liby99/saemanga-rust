@@ -1,10 +1,8 @@
-import $ from 'jquery';
 import Controller from '../../library/controller';
 import EventPool from '../../library/event_pool';
 import DiscoverManga, { DiscoverMangaData } from '../../templates/discover_manga';
 
 type SearchResultData = {
-  opened: boolean,
   result: DiscoverMangaData[],
 };
 
@@ -21,24 +19,29 @@ export default class SearchResult extends Controller<SearchResultData> {
     this.listen("search.submit", (searchText: string) => {
       this.fetch(searchText, (err, mangas) => {
         if (err) {
-          EventPool.emit("search.result.failed");
+          EventPool.emit("search.result.failed", err);
         } else {
-          this.setState({ result: mangas, opened: true }, () => {
+          if (mangas.length) {
             EventPool.emit("search.result.fetched", mangas);
-          });
+            this.setState({ result: mangas }, () => {
+              EventPool.emit("search.result.opened");
+            });
+          } else {
+            EventPool.emit("search.result.failed", new Error("抱歉，您搜索的漫画未能找到。"));
+          }
         }
       });
     });
 
     this.listen("search.result.close", () => {
-      this.setState({ opened: false }, () => {
+      this.setState({ result: [] }, () => {
         EventPool.emit("search.result.closed");
       });
     });
   }
 
   initialState() : SearchResultData {
-    return { opened: false, result: [] };
+    return { result: [] };
   }
 
   fetch(searchText: string, callback: (err: any, result: DiscoverMangaData[]) => void) {
@@ -64,16 +67,14 @@ export default class SearchResult extends Controller<SearchResultData> {
   }
 
   update(callback: () => void) {
-
-    const { opened } = this.state;
-    if (opened) {
-      this.$outer.slideDown(200, () => {
-        EventPool.emit("search.result.opened");
-        this.updateResult(callback);
-      });
+    const { result } = this.state;
+    if (result.length) {
+      this.$result.html(DiscoverManga.render(result));
+      this.$outer.slideDown(200, callback);
     } else {
       this.$outer.slideUp(200, () => {
-        this.updateResult(callback);
+        this.$result.html("");
+        callback();
       });
     }
   }

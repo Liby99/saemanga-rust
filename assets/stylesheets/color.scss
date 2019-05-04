@@ -1,70 +1,73 @@
-/**
- * Stylesheet containing all the colors
- */
+* {
 
-// Pink colors
-$pink-10: rgba(237, 104, 149, 0.1);
-$pink-20: rgba(237, 104, 149, 0.2);
-$pink-30: rgba(237, 104, 149, 0.3);
-$pink-40: rgba(237, 104, 149, 0.4);
-$pink-50: rgba(237, 104, 149, 0.5);
-$pink-60: rgba(237, 104, 149, 0.6);
-$pink-70: rgba(237, 104, 149, 0.7);
-$pink-80: rgba(237, 104, 149, 0.8);
-$pink-90: rgba(237, 104, 149, 0.9);
-$pink: rgba(237, 104, 149, 1);
+  /* Pink */
+  --pink-10: rgba(237, 104, 149, 0.1);
+  --pink-20: rgba(237, 104, 149, 0.2);
+  --pink-30: rgba(237, 104, 149, 0.3);
+  --pink-40: rgba(237, 104, 149, 0.4);
+  --pink-60: rgba(237, 104, 149, 0.6);
+  --pink-70: rgba(237, 104, 149, 0.7);
+  --pink-80: rgba(237, 104, 149, 0.8);
+  --pink-90: rgba(237, 104, 149, 0.9);
+  --pink: rgba(237, 104, 149, 1);
 
-// Other pink colors
-$hover-pink: rgba(222, 92, 136, 1);
-$active-pink: rgba(209, 83, 125, 1);
+  --hover-pink: rgba(222, 92, 136, 1);
+  --active-pink: rgba(209, 83, 125, 1);
 
-// Colorful colors
-$red: rgba(228, 62, 62, 1);
+  --red: rgba(228, 62, 62, 1);
 
-// Elem B & W Styles
-$white: rgba(255, 255, 255, 1);
-$black: rgba(30, 30, 30, 1);
+  /* Elem B & W Styles */
+  --white: rgba(255, 255, 255, 1);
+  --black: rgba(30, 30, 30, 1);
 
-// Text colors
-$deep-text: rgba(44, 44, 44, 1);
-$normal-text: rgba(80, 80, 80, 1);
-$grey-text: rgba(135, 135, 135, 1);
-$light-text: rgba(170, 170, 170, 1);
-$fade-text: rgba(200, 200, 200, 1);
-$bright-text: rgba(230, 230, 230, 1);
+  /* Text colors */
+  --deep-text: rgba(44, 44, 44, 1);
+  --normal-text: rgba(80, 80, 80, 1);
+  --grey-text: rgba(135, 135, 135, 1);
+  --light-text: rgba(170, 170, 170, 1);
+  --fade-text: rgba(200, 200, 200, 1);
+  --bright-text: rgba(230, 230, 230, 1);
 
-// Interaction Style
-$hover-white: rgba(245, 245, 245, 1);
-$active-white: rgba(235, 235, 235, 1);
+  /* Interaction Style */
+  --hover-white: rgba(245, 245, 245, 1);
+  --active-white: rgba(235, 235, 235, 1);
 
-// Line Style
-$line: rgba(220, 220, 220, 1);
+  /* Line Style */
+  --line: rgba(220, 220, 220, 1);
 
-// Background
-$black-background: rgba(60, 60, 60, 0.8);
-$white-background: rgba(255, 255, 255, 0.95);
+  /* Background */
+  --black-background: rgba(60, 60, 60, 0.8);
+  --white-background: rgba(255, 255, 255, 0.95);
 
-// Masks and Shadows
-$mask: rgba(0, 0, 0, 0.3);
-$shadow: rgba(0, 0, 0, 0.3);
+  /* Masks and Shadows */
+  --mask: rgba(0, 0, 0, 0.3);
+  --shadow: rgba(0, 0, 0, 0.3);
+}
 
-// Night mode related colors
-$night-white: rgba(30, 30, 30, 1);
-$night-black: rgba(255, 255, 255, 1);
+body.night,
+body.night * {
 
-$night-deep-text: rgba(245, 245, 245, 1);
-$night-normal-text: rgba(230, 230, 230, 1);
-$night-grey-text: rgba(215, 215, 215, 1);
-$night-light-text: rgba(200, 200, 200, 1);
-$night-fade-text: rgba(180, 180, 180, 1);
-$night-bright-text: rgba(150, 150, 150, 1);
+  --white: rgba(30, 30, 30, 1);
+  --black: rgba(255, 255, 255, 1);
 
-$night-hover-white: rgba(255, 255, 255, 0.05);
-$night-active-white: rgba(255, 255, 255, 0.1);
+  --deep-text: rgba(245, 245, 245, 1);
+  --normal-text: rgba(230, 230, 230, 1);
+  --grey-text: rgba(215, 215, 215, 1);
+  --light-text: rgba(200, 200, 200, 1);
+  --fade-text: rgba(180, 180, 180, 1);
+  --bright-text: rgba(150, 150, 150, 1);
 
-$night-line: rgba(150, 150, 150, 1);
+  --hover-white: rgba(255, 255, 255, 0.05);
+  --active-white: rgba(255, 255, 255, 0.1);
 
-$night-white-background: rgba(30, 30, 30, 0.95);
+  --line: rgba(150, 150, 150, 1);
 
-$night-mask: rgba(0, 0, 0, 0.8);
-$night-shadow: rgba(0, 0, 0, 0.8);
+  --white-background: rgba(30, 30, 30, 0.95);
+
+  --mask: rgba(0, 0, 0, 0.8);
+  --shadow: rgba(0, 0, 0, 0.8);
+}
+
+body.night {
+  filter: brightness(0.8);
+}

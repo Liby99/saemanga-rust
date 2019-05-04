@@ -16,19 +16,19 @@
   max-width: 648px;
   width: calc(100% - 20px);
   margin: 0 auto;
-  background-color: $white;
+  background-color: var(--white);
   border-radius: 5px;
-  box-shadow: 0 0 10px $shadow;
+  box-shadow: 0 0 10px var(--shadow);
 }
 
 .panel-head {
   padding: 20px;
-  border-bottom: 1px solid $line;
+  border-bottom: 1px solid var(--line);
 }
 
 .panel-head a i {
   line-height: 22px;
-  color: $deep-text;
+  color: var(--deep-text);
 }
 
 .panel-body {
@@ -43,22 +43,22 @@
   line-height: 20px;
 }
 
-@media (max-width: 540px) {
+@media(max-width: 540px) {
   .panel-scroll {
-    margin-top: -40px;
+      margin-top: -40px;
   }
 
   .panel-mask.active .panel-scroll {
-    margin-top: 0;
-    padding: 20px 0;
+      margin-top: 0;
+      padding: 20px 0;
   }
 
   .panel-body {
-    padding: 0 15px 15px;
+      padding: 0 15px 15px;
   }
 
   .panel-body section.wrapper {
-    padding-left: 5px;
-    padding-right: 5px;
+      padding-left: 5px;
+      padding-right: 5px;
   }
 }

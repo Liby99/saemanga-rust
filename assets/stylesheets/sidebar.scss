@@ -1,104 +1,84 @@
-@import "color.scss";
+#sidebar-toggle {
+  transition: all 0.3s;
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  font-size: 16px;
+  text-align: center;
+  z-index: 129;
+}
 
-body {
-  nav {
-    #sidebar-toggle {
-      transition: all 0.3s;
-      position: fixed;
-      right: 20px;
-      top: 20px;
-      width: 36px;
-      height: 36px;
-      line-height: 36px;
-      font-size: 16px;
-      text-align: center;
-      z-index: 129;
+body.left #sidebar-toggle {
+  transition: all 0.4s;
+  left: 20px;
+  right: auto;
+}
 
-      .fa-rotation-toggle {
-        margin: 7px;
+body.left nav.active #sidebar-toggle {
+  top: 20px !important;
+  left: 244px !important;
+}
 
-        i.fa-angle-right {
-          font-size: 20px;
-        }
-      }
-    }
+body.left #sidebar-toggle .fa-angle-right {
+  transform: rotate(180deg);
+}
 
-    #sidebar {
-      position: fixed;
-      transition: all 0.4s;
-      height: 100%;
-      top: 0;
-      right: -310px;
-      width: 300px;
-      background-color: $white-background;
-      z-index: 128;
-    }
+body.left #sidebar-toggle.active .fa-angle-right {
+  transform: rotate(0);
+}
 
-    #sidebar-mask {
-      z-index: 127;
-    }
+body.night #sidebar-toggle {
+  border-radius: 5px;
+  background-color: rgba(30, 30, 30, 0.3);
+}
 
-    &.active {
-      #sidebar-toggle {
-        right: 20px !important;
-        top: 20px !important;
-      }
+body.full-width #sidebar-toggle.stick {
+  top: 8px;
+}
 
-      #sidebar {
-        right: 0;
-      }
-    }
-  }
+nav.active #sidebar-toggle {
+  right: 20px !important;
+  top: 20px !important;
+}
 
-  &.left {
-    nav {
-      #sidebar-toggle {
-        transition: all 0.4s;
-        left: 20px;
-        right: auto;
+#sidebar-toggle .fa-rotation-toggle {
+  margin: 7px;
+}
 
-        .fa-angle-right {
-          transform: rotate(180deg);
-        }
+#sidebar-toggle .fa-rotation-toggle i.fa-angle-right {
+  font-size: 20px;
+}
 
-        &.active {
-          .fa-angle-right {
-            transform: rotate(0);
-          }
-        }
-      }
+#sidebar {
+  position: fixed;
+  transition: all 0.4s;
+  height: 100%;
+  top: 0;
+  right: -310px;
+  width: 300px;
+  background-color: var(--white-background);
+  z-index: 128;
+}
 
-      #sidebar {
-        right: auto;
-        left: -310px;
-      }
+body.left #sidebar {
+  right: auto;
+  left: -310px;
+}
 
-      &.active {
-        #sidebar-toggle {
-          top: 20px !important;
-          left: 244px !important;
-        }
+nav.active #sidebar {
+  right: 0;
+}
 
-        #sidebar {
-          right: auto;
-          left: 0;
-        }
-      }
-    }
-  }
+body.left nav.active #sidebar {
+  right: auto;
+  left: 0;
+}
 
-  &.night {
-    #sidebar-toggle {
-      border-radius: 5px;
-      background-color: rgba(30, 30, 30, 0.3);
-    }
-  }
-
-  &.full-width {
-    #sidebar-toggle.stick {
-      top: 8px;
-    }
-  }
+#sidebar-mask {
+  z-index: 127;
 }
 
 ul.sidebar-btn-list {
@@ -115,11 +95,11 @@ ul.sidebar-btn-list li {
 }
 
 ul.sidebar-btn-list li:not(.full):hover {
-  background-color: $hover-white;
+  background-color: var(--hover-white);
 }
 
 ul.sidebar-btn-list li:not(.full):active {
-  background-color: $active-white;
+  background-color: var(--active-white);
 }
 
 ul.sidebar-btn-list li.full {
@@ -134,25 +114,25 @@ ul.sidebar-btn-list li.full a {
 }
 
 ul.sidebar-btn-list li.full a:hover {
-  background-color: $hover-white;
+  background-color: var(--hover-white);
 }
 
 ul.sidebar-btn-list li.full a:active {
-  background-color: $active-white;
+  background-color: var(--active-white);
 }
 
 ul.sidebar-btn-list li.center {
   text-align: center;
 }
 
-@media (max-width: 540px) {
+@media(max-width: 540px) {
   #sidebar-toggle {
-    right: 9px;
-    top: 9px;
+      right: 9px;
+      top: 9px;
   }
 
   body.left #sidebar-toggle {
-    top: 8px;
-    left: 8px;
+      top: 8px;
+      left: 8px;
   }
 }

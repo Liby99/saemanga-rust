@@ -5,6 +5,7 @@ $fa-font-path: "~font-awesome/fonts";
 @import "~font-awesome/scss/font-awesome.scss";
 
 // Then import our files
+@import "color.scss";
 @import "basic.scss";
 @import "sidebar.scss";
 @import "index.scss";

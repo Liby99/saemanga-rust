@@ -1,4 +1,10 @@
-@import "color.scss";
+/**
+ * All the basic styles
+ * @author Liby99
+ * @date 2017/12/04
+ */
+
+/* -------------------- basics -------------------- */
 
 html {
   height: auto;
@@ -11,7 +17,7 @@ body {
   height: auto;
   font-family: "SimHei", sans-serif;
   font-size: 13px;
-  background-color: $white;
+  background-color: var(--white);
 }
 
 main {
@@ -21,58 +27,52 @@ main {
 }
 
 section:not(.no-border) {
-  border-bottom: 1px solid $line;
+  border-bottom: 1px solid var(--line);
 }
 
 ::selection {
-  background: $pink-20;
+  background: var(--pink-20);
 }
 
-a,
-a:visited {
+a, a:visited {
   text-decoration: none;
-  color: $pink;
+  color: var(--pink);
 }
 
 a.black {
-  color: $deep-text;
+  color: var(--deep-text);
 }
 
 a.red {
-  color: $red;
+  color: var(--red);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+.pink {
+  color: var(--pink);
+}
+
+h1, h2, h3, h4, h5, h6 {
   margin: 0;
-  color: $deep-text;
+  color: var(--deep-text);
 }
 
-h3,
-h4,
-h5,
-h6 {
+h3, h4, h5, h6 {
   line-height: 22px;
 }
 
 p {
   font-size: 12px;
-  color: $grey-text;
+  color: var(--grey-text);
 }
 
-input,
-textarea {
+input, textarea {
   outline: none;
 }
 
 hr {
   height: 1px;
   border: none;
-  background-color: $line;
+  background-color: var(--line);
 }
 
 form {
@@ -80,17 +80,16 @@ form {
 }
 
 blockquote {
-  border-left: 2px solid $pink;
-  background-color: $pink-10;
+  border-left: 2px solid var(--pink);
+  background-color: var(--pink-10);
   padding: 10px 15px;
   margin: 15px 0;
-  color: $pink;
+  color: var(--pink);
 }
 
 /* -------------------- inputs -------------------- */
 
-input,
-textarea {
+input, textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -101,7 +100,7 @@ textarea {
   padding: 6px 15px;
   line-height: 18px;
   background-color: transparent;
-  border: 1px solid $line;
+  border: 1px solid var(--line);
 }
 
 textarea {
@@ -110,21 +109,14 @@ textarea {
 
 input {
   border-radius: 9999px;
-
-  :hover {
-    border: 1px solid $pink-80;
-  }
-
-  :focus,
-  :active {
-    border: 1px solid $pink;
-  }
 }
 
-/* -------------------- color related items -------------------- */
+input:hover {
+  border: 1px solid var(--pink-80);
+}
 
-.pink {
-  color: $pink;
+input:focus, input:active {
+  border: 1px solid var(--pink);
 }
 
 /* -------------------- coordinating element styles -------------------- */
@@ -135,14 +127,14 @@ input {
 
 .wrapper {
   padding: 15px;
+}
 
-  &.no-top {
-    padding-top: 0;
-  }
+.wrapper.no-top {
+  padding-top: 0;
+}
 
-  &.no-bottom {
-    padding-bottom: 0;
-  }
+.wrapper.no-bottom {
+  padding-bottom: 0;
 }
 
 .center {
@@ -151,14 +143,14 @@ input {
 
 .scroll {
   -webkit-overflow-scrolling: touch;
+}
 
-  &.x {
-    overflow-x: scroll;
-  }
+.scroll.x {
+  overflow-x: scroll;
+}
 
-  &.y {
-    overflow-y: scroll;
-  }
+.scroll.y {
+  overflow-y: scroll;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -170,22 +162,22 @@ input {
 
 .flex {
   display: flex !important;
+}
 
-  &.wrap {
-    flex-wrap: wrap;
-  }
+.flex.wrap {
+  flex-wrap: wrap;
+}
 
-  &.full {
-    flex-grow: 1;
+.flex.full {
+  flex-grow: 1;
+}
 
-    > * {
-      flex-shrink: 0;
-    }
-  }
+.flex.full > * {
+  flex-shrink: 0;
+}
 
-  &.right {
-    flex-direction: row-reverse;
-  }
+.flex.right {
+  flex-direction: row-reverse;
 }
 
 .flex-fill {
@@ -198,8 +190,8 @@ input {
 .btn,
 .select {
   transition: all 0.2s;
-  color: $pink;
-  border: 1px solid $pink;
+  color: var(--pink);
+  border: 1px solid var(--pink);
   border-radius: 4px;
   white-space: nowrap;
   font-size: 12px;
@@ -213,94 +205,92 @@ button.btn {
 
 .btn {
   padding: 0 10px;
+}
 
-  &.circle {
-    padding: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-  }
+.btn.circle {
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
 
-  &.grey {
-    border: 1px solid $light-text;
-    color: $light-text;
-  }
+.btn.grey {
+  border: 1px solid var(--light-text);
+  color: var(--light-text);
+}
 
-  &.solid {
-    border: 0;
-    background-color: $pink;
-    color: $white;
+.btn.solid {
+  border: 0;
+  background-color: var(--pink);
+  color: var(--white);
+}
 
-    &.grey {
-      background-color: $light-text;
-    }
-  }
+.btn.solid.grey {
+  background-color: var(--light-text);
+}
 
-  &.full {
-    display: block;
-  }
+.btn.full {
+  display: block;
+}
 
-  &.big {
-    display: inline-block;
-    line-height: 26px;
-    padding: 0 20px;
-  }
+.btn.big {
+  display: inline-block;
+  line-height: 26px;
+  padding: 0 20px;
+}
 
-  &.large {
-    line-height: 35px;
-  }
+.btn.large {
+  line-height: 35px;
+}
 
-  &.rounded {
-    border-radius: 9999px;
-  }
+.btn.rounded {
+  border-radius: 9999px;
 }
 
 .btn:hover,
 .select a:hover,
 .zoom a:hover {
-  background-color: $pink-10;
+  background-color: var(--pink-10);
 }
 
 .btn.solid:hover {
-  background-color: $hover-pink;
+  background-color: var(--hover-pink);
 }
 
 .btn.solid:active {
-  background-color: $active-pink;
+  background-color: var(--active-pink);
 }
 
 .btn:active,
 .select a:active,
 .zoom a:active {
-  background-color: $pink-20;
+  background-color: var(--pink-20);
 }
 
 .btn.active,
 .select a.active,
 .zoom a.active {
-  background-color: $pink;
-  color: $white;
+  background-color: var(--pink);
+  color: var(--white);
 }
 
 .btn.disabled,
 .select a.disabled,
 .zoom a.disabled {
-  background-color: $active-white;
-  color: $grey-text;
-  border-color: $grey-text;
+  background-color: var(--active-white);
+  color: var(--grey-text);
+  border-color: var(--grey-text);
   cursor: not-allowed;
 }
 
-.select,
-.zoom {
+.select, .zoom {
   display: flex;
   overflow: hidden;
   align-items: stretch;
   line-height: 24px;
 }
 
-.select a,
-.zoom > * {
+.select a, .zoom > * {
   transition: all 0.2s;
   display: block;
   text-align: center;
@@ -312,58 +302,57 @@ button.btn {
 
 .zoom {
   transition: all 0.2s;
-  color: $pink;
+  color: var(--pink);
   white-space: nowrap;
   font-size: 12px;
+}
 
-  .minus,
-  .plus {
-    width: 16px;
-    padding: 0 4px;
-    font-size: 10px;
-  }
+.zoom .minus, .zoom .plus {
+  width: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+}
 
-  > * > i {
-    line-height: 24px;
-  }
+.zoom > * > i {
+  line-height: 24px;
+}
 
-  .data {
-    border-top: 1px solid $pink;
-    border-bottom: 1px solid $pink;
-    flex-grow: 1;
+.zoom .data {
+  border-top: 1px solid var(--pink);
+  border-bottom: 1px solid var(--pink);
+  flex-grow: 1;
+}
 
-    &:before {
-      content: "缩放：";
-    }
+.zoom .data:before {
+  content: "缩放：";
+}
 
-    &:after {
-      content: "%";
-    }
-  }
+.zoom .data:after {
+  content: "%";
+}
 
-  .minus {
-    border-radius: 4px 0 0 4px;
-    border: 1px solid $pink;
-  }
+.zoom .minus {
+  border-radius: 4px 0 0 4px;
+  border: 1px solid var(--pink);
+}
 
-  .plus {
-    border-radius: 0 4px 4px 0;
-    border: 1px solid $pink;
-  }
+.zoom .plus {
+  border-radius: 0 4px 4px 0;
+  border: 1px solid var(--pink);
 }
 
 /* -------------------- shadows -------------------- */
 
 .drop-shadow {
-  box-shadow: 0 0 10px $shadow;
+  box-shadow: 0 0 10px var(--shadow);
 }
 
 .text-drop-shadow {
-  text-shadow: 0 0 5px $shadow;
+  text-shadow: 0 0 5px var(--shadow);
+}
 
-  &.pink {
-    text-shadow: 0 0 5px $pink-50;
-  }
+.text-drop-shadow.pink {
+  text-shadow: 0 0 5px var(--pink-50);
 }
 
 /* -------------------- rotation toggle -------------------- */
@@ -374,37 +363,35 @@ button.btn {
   height: 22px;
   text-align: center;
   line-height: 22px;
+}
 
-  > i {
-    display: block;
-    transition: all 0.4s;
-    left: 0;
-    top: 0;
-    position: relative;
-    width: inherit;
-    height: inherit;
-    transform: rotate(0);
-    opacity: 1;
-    line-height: inherit;
+.fa-rotation-toggle > i {
+  display: block;
+  transition: all 0.4s;
+  left: 0;
+  top: 0;
+  position: relative;
+  width: inherit;
+  height: inherit;
+  transform: rotate(0);
+  opacity: 1;
+  line-height: inherit;
+}
 
-    + i {
-      opacity: 0;
-      transform: rotate(-180deg);
-      margin-left: -22px;
-    }
-  }
+.fa-rotation-toggle i + i {
+  opacity: 0;
+  transform: rotate(-180deg);
+  margin-left: -22px;
+}
 
-  &.active {
-    > i {
-      opacity: 0;
-      transform: rotate(180deg);
+.fa-rotation-toggle.active i {
+  opacity: 0;
+  transform: rotate(180deg);
+}
 
-      + i {
-        opacity: 1;
-        transform: rotate(0);
-      }
-    }
-  }
+.fa-rotation-toggle.active i + i {
+  opacity: 1;
+  transform: rotate(0);
 }
 
 /* -------------------- mask -------------------- */
@@ -415,5 +402,5 @@ button.btn {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: $mask;
+  background-color: var(--mask);
 }

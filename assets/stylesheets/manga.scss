@@ -52,11 +52,11 @@
 }
 
 #manga-navigation-section a:not(.disabled):hover {
-  background-color: $hover-white;
+  background-color: var(--hover-white);
 }
 
 #manga-navigation-section a:not(.disabled):active {
-  background-color: $active-white;
+  background-color: var(--active-white);
 }
 
 #manga-navigation-section a i {
@@ -89,18 +89,18 @@
 }
 
 #copied-tag .tag {
-  background-color: $black-background;
+  background-color: var(--black-background);
   border-radius: 5px;
   line-height: 24px;
   padding: 0 12px;
   margin: 8px 20px 8px 12px;
-  color: $white;
+  color: var(--white);
 }
 
 #copied-tag .tag i {
   position: absolute;
   display: inline-block;
-  color: $black-background;
+  color: var(--black-background);
   margin-left: 12px;
   line-height: 24px;
   font-size: 16px;
@@ -115,18 +115,18 @@
   min-width: 50px;
 }
 
-@media (max-width: 748px) {
+@media(max-width: 748px) {
   #manga-panel-body {
-    flex-flow: column;
+      flex-flow: column;
   }
 
   #manga-panel-body > div {
-    width: auto !important;
+      width: auto !important;
   }
 }
 
-@media (max-width: 540px) {
+@media(max-width: 540px) {
   #manga-header-section {
-    padding-top: 15px;
+      padding-top: 15px;
   }
 }

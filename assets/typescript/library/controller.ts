@@ -38,9 +38,9 @@ export default class Controller<State> {
     }
   }
 
-  protected setState(newState: Partial<State>, callback?: () => void) {
+  protected setState(newState: Partial<State>, callback?: () => void, noUpdate?: boolean) {
     this.state = { ...this.state, ...newState };
-    this.update(callback);
+    if (!noUpdate) this.update(callback);
   }
 
   protected update(callback?: () => void) {

@@ -52,7 +52,7 @@ export default class Genres extends Controller<GenresState> {
     const { selected: currGenre } = this.state;
     const nextGenre = currGenre == genre ? "" : genre;
     this.setState({ selected: nextGenre });
-    EventPool.dispatch("discover.genre.change", nextGenre);
+    EventPool.emit("discover.genre.change", nextGenre);
   }
 
   tagScrollToRight() {

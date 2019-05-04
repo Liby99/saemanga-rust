@@ -5,32 +5,63 @@ const { exec } = require('child_process');
 
 let nodemonInstance;
 
+const events = {};
+
+function opened(evt) {
+  return events[evt] !== undefined;
+}
+
+function open(evt) {
+  events[evt] = [];
+}
+
+function wait(evt, fn) {
+  if (opened(evt)) events[evt].push(fn);
+}
+
+function emit(evt) {
+  for (const fn of events[evt]) fn();
+  delete events[evt];
+}
+
 gulp.task("build-cargo", (done) => {
-  process.stdout.write("Building cargo... ");
-  exec("cargo build --color always", (err, stdout, stderr) => {
-    if (err) {
-      console.log("Failed");
-      console.log(stdout);
-      console.error(stderr);
-    } else {
-      console.log("Done");
-    }
-    done(err);
-  });
+  if (!opened('cargo')) {
+    open('cargo');
+    process.stdout.write("Building cargo... ");
+    exec("cargo build --color always", (err, stdout, stderr) => {
+      if (err) {
+        console.log("Failed");
+        console.log(stdout);
+        console.error(stderr);
+      } else {
+        console.log("Done");
+      }
+      emit('cargo');
+      done(err);
+    });
+  } else {
+    wait('cargo', done);
+  }
 });
 
 gulp.task("build-webpack", (done) => {
-  process.stdout.write("Building webpack... ");
-  exec("npx webpack --colors", (err, stdout, stderr) => {
-    if (err) {
-      console.log("Failed");
-      console.log(stdout);
-      console.error(stderr);
-    } else {
-      console.log("Done");
-    }
-    done(err);
-  });
+  if (!opened('webpack')) {
+    open('webpack')
+    process.stdout.write("Building webpack... ");
+    exec("npx webpack --colors", (err, stdout, stderr) => {
+      if (err) {
+        console.log("Failed");
+        console.log(stdout);
+        console.error(stderr);
+      } else {
+        console.log("Done");
+      }
+      emit('webpack');
+      done(err);
+    });
+  } else {
+    wait('webpack', done);
+  }
 });
 
 gulp.task('build', gulp.series(

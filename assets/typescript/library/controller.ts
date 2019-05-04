@@ -6,7 +6,7 @@ export default class Controller<State> {
 
   root: JQuery<HTMLElement>;
   state: State;
-  listeners: { [key: string]: number[] };
+  listeners: { [key: string]: Function[] };
   observer: MutationObserver | undefined;
   parent: Node | undefined;
 
@@ -30,11 +30,11 @@ export default class Controller<State> {
   }
 
   protected listen(evt: string, callback: Function) {
-    const id = EventPool.listen(evt, callback);
+    EventPool.listen(evt, callback);
     if (this.listeners[evt]) {
-      this.listeners[evt].push(id);
+      this.listeners[evt].push(callback);
     } else {
-      this.listeners[evt] = [id];
+      this.listeners[evt] = [callback];
     }
   }
 
@@ -66,8 +66,8 @@ export default class Controller<State> {
 
     // Unlisten all listeners
     for (const evt in this.listeners) {
-      for (const listenerId of this.listeners[evt]) {
-        EventPool.unlisten(evt, listenerId);
+      for (const listener of this.listeners[evt]) {
+        EventPool.unlisten(evt, listener);
       }
     }
   }

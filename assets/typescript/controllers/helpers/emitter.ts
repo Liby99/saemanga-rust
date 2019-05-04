@@ -14,7 +14,7 @@ export default class Emitter extends Controller<{}> {
 
     // Events
     this.root.click(() => {
-      this.events.forEach((e) => EventPool.dispatch(e));
+      this.events.forEach((e) => EventPool.emit(e));
     });
   }
 

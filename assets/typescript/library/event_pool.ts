@@ -22,19 +22,20 @@ export default class EventPool {
    * @param evt The event identifier. E.g. "event.is.triggered"
    * @param id The id of the listener
    */
-  static unlisten(evt: string, id: number) {
+  static unlisten(evt: string, fn: Function) {
     if (this.events[evt]) {
-      this.events[evt].splice(id, 1);
+      const index = this.events[evt].indexOf(fn);
+      if (index) this.events[evt].splice(index, 1);
     }
   }
 
   /**
-   * Dispatch an event. This event along with its data will be delegated to any
+   * Emit an event. This event along with its data will be delegated to any
    * event listener associated with this event name
    * @param evt The event identifier. E.g. "event.is.triggered"
    * @param data The data associated with the event
    */
-  static dispatch(evt: string, data?: any) {
+  static emit(evt: string, data?: any) {
     if (this.events[evt]) {
       this.events[evt].forEach((callback) => {
         callback(data);

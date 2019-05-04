@@ -53,7 +53,6 @@ gulp.task('dev-run', (done) => {
 gulp.task('dev-watch', (done) => {
   return watch(['src/', 'assets/'], {
     read: false,
-    readDelay: 0,
   }, (file) => {
     const isRustChange = file.extname === '.rs';
     const task = isRustChange ? "build-cargo" : "build-webpack";

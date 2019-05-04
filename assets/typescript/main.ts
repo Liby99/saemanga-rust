@@ -10,17 +10,14 @@ import "./assets";
 import Registry from "./library/registry";
 
 // Components
-import Body from "./controllers/common/body";
-import Sidebar from "./controllers/common/sidebar";
-import LightModeSelect from "./controllers/common/light_mode_select";
-import HandModeSelect from "./controllers/common/hand_mode_select";
-import Panel from "./controllers/common/panel";
-import Emitter from "./controllers/helpers/emitter";
-import Discover from "./controllers/index/discover";
-import Genres from "./controllers/index/genres";
+import { Body, Sidebar, LightModeSelect, HandModeSelect, Panel } from './controllers/common/mod';
+import { Emitter } from './controllers/helpers/mod';
+import { Discover, Genres } from './controllers/index/mod';
 
 // Initialize all the components
 $(document).ready(() => {
+
+  // First register all the components
   Registry.register("body", Body);
   Registry.register("sidebar", Sidebar);
   Registry.register("light-mode-select", LightModeSelect);
@@ -29,5 +26,7 @@ $(document).ready(() => {
   Registry.register("emitter", Emitter);
   Registry.register("discover", Discover);
   Registry.register("genres", Genres);
+
+  // Then build the registry
   Registry.build();
 });

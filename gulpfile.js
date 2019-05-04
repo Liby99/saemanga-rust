@@ -1,66 +1,78 @@
+// `Colors` doesn't need a local variable
+require('colors');
+
+// Imports
 const gulp = require('gulp');
 const nodemon = require('gulp-nodemon');
 const watch = require('gulp-watch');
 const { exec } = require('child_process');
 
+// Need to keep track of the global nodemon instance
 let nodemonInstance;
 
-const events = {};
+// Event handling
+class EventPool {
+  constructor() {
+    this.events = {};
+  }
 
-function opened(evt) {
-  return events[evt] !== undefined;
+  opened(evt) {
+    return this.events[evt] !== undefined;
+  }
+
+  open(evt) {
+    this.events[evt] = [];
+  }
+
+  wait(evt, fn) {
+    if (this.opened(evt)) this.events[evt].push(fn);
+  }
+
+  emit(evt) {
+    for (const fn of this.events[evt]) fn();
+    delete this.events[evt];
+  }
 }
 
-function open(evt) {
-  events[evt] = [];
-}
-
-function wait(evt, fn) {
-  if (opened(evt)) events[evt].push(fn);
-}
-
-function emit(evt) {
-  for (const fn of events[evt]) fn();
-  delete events[evt];
-}
+const pool = new EventPool();
 
 gulp.task("build-cargo", (done) => {
-  if (!opened('cargo')) {
-    open('cargo');
-    process.stdout.write("Building cargo... ");
+  if (!pool.opened('cargo')) {
+    pool.open('cargo');
+    process.stdout.write(`${"[build]".cyan} Building cargo... `);
     exec("cargo build --color always", (err, stdout, stderr) => {
       if (err) {
-        console.log("Failed");
+        console.log("Failed".red);
         console.log(stdout);
         console.error(stderr);
       } else {
-        console.log("Done");
+        console.log("Done".green);
       }
-      emit('cargo');
+      pool.emit('cargo');
       done(err);
     });
   } else {
-    wait('cargo', done);
+    pool.wait('cargo', done);
   }
 });
 
 gulp.task("build-webpack", (done) => {
-  if (!opened('webpack')) {
-    open('webpack')
-    process.stdout.write("Building webpack... ");
+  if (!pool.opened('webpack')) {
+    pool.open('webpack');
+    process.stdout.write(`${"[build]".cyan} Building webpack... `);
     exec("npx webpack --colors", (err, stdout, stderr) => {
       if (err) {
-        console.log("Failed");
+        console.log("Failed".red);
         console.log(stdout);
         console.error(stderr);
       } else {
-        console.log("Done");
+        console.log("Done".green);
       }
-      emit('webpack');
+      pool.emit('webpack');
       done(err);
     });
   } else {
-    wait('webpack', done);
+    pool.wait('webpack', done);
   }
 });
 
@@ -82,16 +94,15 @@ gulp.task('dev-run', (done) => {
 });
 
 gulp.task('dev-watch', (done) => {
-  return watch(['src/', 'assets/'], {
+  watch(['src/', 'assets/'], {
     read: false,
   }, (file) => {
     const isRustChange = file.extname === '.rs';
     const task = isRustChange ? "build-cargo" : "build-webpack";
-    console.log(`Detected ${isRustChange ? "back-end" : "front-end"} changes. Rebuilding.`);
+    console.log(`${"[dev-watch]".cyan} Detected ${isRustChange ? "back-end" : "front-end"} changes. Rebuilding.`);
     gulp.task(task)((err) => {
       if (err) {
-        console.log("Error detected. Waiting for changes...");
-        gulp.task('dev-watch')(done);
+        console.log(`${"[dev-watch]".red} Error detected. Waiting for changes...`);
       } else {
         gulp.task('dev-run')(done);
       }
@@ -101,7 +112,7 @@ gulp.task('dev-watch', (done) => {
 
 gulp.task('dev', (done) => {
   gulp.task('build')((err) => {
-    if (err) console.log("Error detected. Waiting for changes...");
+    if (err) console.log(`${"[dev]".red} Error detected. Waiting for changes...`);
     else gulp.task('dev-run')(done);
     gulp.task('dev-watch')(done);
   });

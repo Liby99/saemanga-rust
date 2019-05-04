@@ -19,7 +19,9 @@ export default class SearchResult extends Controller<SearchResultData> {
     this.listen("search.submit", (searchText: string) => {
       this.fetch(searchText, (err, mangas) => {
         if (err) {
-          EventPool.emit("search.result.failed", err);
+          this.setState({ result: [] }, () => {
+            EventPool.emit("search.result.failed", new Error("抱歉，服务器出错了。"));
+          });
         } else {
           if (mangas.length) {
             EventPool.emit("search.result.fetched", mangas);
@@ -27,7 +29,9 @@ export default class SearchResult extends Controller<SearchResultData> {
               EventPool.emit("search.result.opened");
             });
           } else {
-            EventPool.emit("search.result.failed", new Error("抱歉，您搜索的漫画未能找到。"));
+            this.setState({ result: [] }, () => {
+              EventPool.emit("search.result.failed", new Error("抱歉，您搜索的漫画未能找到。"));
+            });
           }
         }
       });
@@ -57,6 +61,7 @@ export default class SearchResult extends Controller<SearchResultData> {
         cover_url: "http://cartoonmad.com/cartoonimg/coimg/7702.jpg",
         saemanga_url: "http://saemanga.com/manga/7702",
       }]);
+      // callback(new Error("Server side asflas lasj la lka sldf"), []);
     }, 1000);
   }
 

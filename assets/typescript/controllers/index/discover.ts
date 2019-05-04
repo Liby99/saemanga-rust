@@ -41,10 +41,10 @@ export default class Discover extends Controller<DiscoverState> {
     });
   }
 
-  initialState(root: JQuery<HTMLElement>) : DiscoverState {
+  initialState() : DiscoverState {
     return {
       show: true,
-      mangas: root.children().children().toArray().map((elem) => {
+      mangas: this.root.children().children().toArray().map((elem) => {
         const $elem = $(elem);
         const bgimg = $elem.find("div").css("background-image");
         return {

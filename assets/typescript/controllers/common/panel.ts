@@ -33,7 +33,7 @@ export default class Panel extends Controller<PanelState> {
     this.listen(`panel.${this.name}.close`, () => this.close());
   }
 
-  initialState(_: JQuery<HTMLElement>) : PanelState {
+  initialState() : PanelState {
     return { active: false };
   }
 

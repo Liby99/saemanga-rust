@@ -24,10 +24,10 @@ export default class Body extends Controller<BodyState> {
     });
   }
 
-  initialState(root: JQuery<HTMLElement>) : BodyState {
+  initialState() : BodyState {
     return {
-      isLeftHandMode: root.hasClass("left"),
-      isNightMode: root.hasClass("night"),
+      isLeftHandMode: this.root.hasClass("left"),
+      isNightMode: this.root.hasClass("night"),
     };
   }
 

@@ -31,11 +31,8 @@ export default class Genres extends Controller<GenresState> {
     this.$tagsToggle.click(() => this.toggleGenreList());
   }
 
-  initialState(_: JQuery<HTMLElement>) : GenresState {
-    return {
-      opened: false,
-      selected: "",
-    };
+  initialState() : GenresState {
+    return { opened: false, selected: "" };
   }
 
   openGenreList() {

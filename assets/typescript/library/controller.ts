@@ -14,7 +14,7 @@ export default class Controller<State> {
 
     // Initialize basic variables
     this.root = root;
-    this.state = this.initialState(root);
+    this.state = this.initialState();
     this.listeners = {};
 
     // Detect mutation
@@ -25,7 +25,7 @@ export default class Controller<State> {
     }
   }
 
-  protected initialState(_: JQuery<HTMLElement>) : State {
+  protected initialState() : State {
     throw new Error("Component must have an initial state");
   }
 

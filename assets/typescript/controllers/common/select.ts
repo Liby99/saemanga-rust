@@ -21,9 +21,9 @@ export default class Select extends Controller<SelectState> {
     this.$right.click(() => this.selectRight());
   }
 
-  initialState(root: JQuery<HTMLElement>) : SelectState {
+  initialState() : SelectState {
     return {
-      leftSelected: root.children().first().hasClass("active")
+      leftSelected: this.root.children().first().hasClass("active")
     };
   }
 

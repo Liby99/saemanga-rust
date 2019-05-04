@@ -29,7 +29,7 @@ export default class Sidebar extends Controller<SidebarState> {
     this.listen("sidebar.close", () => this.close());
   }
 
-  initialState(_: JQuery<HTMLElement>) : SidebarState {
+  initialState() : SidebarState {
     return { active: false };
   }
 

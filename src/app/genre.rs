@@ -145,6 +145,6 @@ impl Genre {
   }
 
   pub fn dmk_url(&self) -> String {
-    format!("") // TODO
+    format!("https://cartoonmad.com/{}.html", self.dmk_directory)
   }
 }

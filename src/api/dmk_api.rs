@@ -202,3 +202,45 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkScrapeError> {
   // Return the finally extracted Manga object
   Ok(Manga::new(dmk_id.clone(), dmk_id_base, title, description, author, tags, genre, status, episodes))
 }
+
+fn get_latest_manga_from_row(a_elems: Select) -> Result<Vec<String>, DmkScrapeError> {
+  let ids = a_elems.filter_map(|a: ElementRef| {
+    match a.value().attr("href") {
+      Some(href) => {
+        lazy_static! { static ref COMIC_URL_REG : Regex = Regex::new(r"comic/(\d+).html").unwrap(); }
+        match COMIC_URL_REG.captures(href) {
+          Some(cap) => Some(String::from(&cap[1])),
+          None => None
+        }
+      },
+      None => None
+    }
+  }).collect::<Vec<_>>();
+  Ok(ids)
+}
+
+fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, DmkScrapeError> {
+  let html_text = reqwest::get(url.as_str())?.text_with_charset("big5")?;
+  let document = Html::parse_document(&html_text);
+
+  // Select the tbody that includes the latest mangas
+  let tbody_sel = Selector::parse("body > table > tbody > tr:first-child > td:nth-child(2) > table > tbody > tr:nth-child(4) > td > table > tbody > tr:nth-child(2) > td:nth-child(2) > table > tbody").unwrap();
+  let tbody = document.select(&tbody_sel).next()?;
+
+  // Get the manga rows
+  let first_row_sel = Selector::parse("tr:nth-child(3) > td > a").unwrap();
+  let second_row_sel = Selector::parse("tr:nth-child(5) > td > a").unwrap();
+
+  let first_row_ids = get_latest_manga_from_row(tbody.select(&first_row_sel))?;
+  let second_row_ids = get_latest_manga_from_row(tbody.select(&second_row_sel))?;
+
+  Ok([first_row_ids, second_row_ids].concat())
+}
+
+pub fn fetch_latest_manga() -> Result<Vec<String>, DmkScrapeError> {
+  fetch_latest_manga_with_url(&String::from("https://cartoonmad.com/"))
+}
+
+pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<String>, DmkScrapeError> {
+  fetch_latest_manga_with_url(&genre.dmk_url())
+}

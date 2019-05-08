@@ -1,4 +1,4 @@
-use rocket_contrib::templates::{Template};
+use rocket_contrib::templates::Template;
 
 use crate::app::genre::*;
 // use crate::app::user_setting::*;

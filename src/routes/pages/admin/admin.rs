@@ -1,6 +1,6 @@
 use rocket_contrib::templates::Template;
 use mongodb::{Bson, doc};
-use crate::utilities::database::Database;
+use crate::util::database::Database;
 
 #[derive(Serialize)]
 struct RegisteredUser {

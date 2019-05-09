@@ -2,7 +2,7 @@ use rocket::request::{Form, FromForm, FormItems};
 use rocket::response::Redirect;
 use mongodb::{bson, doc};
 use mongodb::oid::ObjectId;
-use crate::utilities::database::Database;
+use crate::util::database::Database;
 
 #[derive(Debug)]
 pub enum UpdateMethod {

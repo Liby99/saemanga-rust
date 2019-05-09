@@ -1,4 +1,4 @@
-use crate::utilities::database::Database;
+use crate::util::database::Database;
 use rocket::request::Form;
 use rocket::response::Redirect;
 use mongodb::{bson, doc};

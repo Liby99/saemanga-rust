@@ -12,14 +12,14 @@ extern crate lazy_static;
 pub mod app;
 pub mod api;
 pub mod routes;
-pub mod utilities;
+pub mod util;
 
 pub fn launch() {
   rocket::ignite()
-    .attach(utilities::template())
-    .attach(utilities::database())
+    .attach(util::template())
+    .attach(util::database())
     .mount("/", routes::routes())
-    .mount("/", utilities::static_files())
+    .mount("/", util::static_files())
     .register(routes::catchers())
     .launch();
 }

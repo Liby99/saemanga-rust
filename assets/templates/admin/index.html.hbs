@@ -1,0 +1,51 @@
+{{#*inline "main"}}
+  <h2>User Creation</h2>
+  <form action="/admin/user/create" method="POST">
+    <p>Use the form below to create a new user...</p>
+    <input type="text" name="username" placeholder="Username" />
+    <input type="text" name="password" placeholder="Password" />
+    <button type="submit" value="submit">Create</button>
+  </form>
+  <h2>Registered Users</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Register Time</th>
+        <th>Remove User</th>
+        <th>Change Password</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+      <tr>
+        <td>{{@index}}</td>
+        <td>{{id}}</td>
+        <td>{{username}}</td>
+        <td>{{register_date_time}}</td>
+        <td>
+          <button form="user_update_{{id}}" name="method" type="submit" value="remove">Remove</button>
+        </td>
+        <td>
+          <a href="/admin/user/change_password/{{id}}">Change Password</a>
+        </td>
+        <td style="display: none">
+          <form id="user_update_{{id}}" action="/admin/user/update" method="POST" onsubmit="return confirm('Are you sure you want to remove user {{username}}?')">
+            <input name="user_id" value="{{id}}" />
+          </form>
+        </td>
+      </tr>
+      {{else}}
+      <tr>
+        <td colspan="6">
+          <p style="text-align: center">No user found</p>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{/inline}}
+
+{{~> layout/admin title="Index"}}

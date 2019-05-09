@@ -8,11 +8,12 @@ module.exports = {
   devtool: 'source-map',
   cache: true,
   entry: {
-    app: './assets/typescript/main.ts',
+    'index': './assets/typescript/index.ts',
+    'admin': './assets/typescript/admin.ts',
   },
   output: {
     path: `${__dirname}/public/`,
-    filename: 'js/main.js'
+    filename: 'js/[name].js'
   },
   module: {
     rules: [{
@@ -61,7 +62,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "css/main.css"
+      filename: "css/[name].css"
     }),
     new ForkTsCheckerWebpackPlugin(),
   ],

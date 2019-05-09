@@ -19,6 +19,7 @@ lazy_static = "1.3"
 regex = "1"
 # reqwest = "0.9.15"
 rust-crypto = "^0.2"
+bson = "0.13"
 reqwest = { git = "https://github.com/liby99/reqwest" }
 
 [dependencies.rocket_contrib]

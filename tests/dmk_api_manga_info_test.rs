@@ -1,4 +1,4 @@
-use saemanga::api::dmk_api::*;
+use saemanga::app::dmk::*;
 use saemanga::app::manga::*;
 
 #[test]

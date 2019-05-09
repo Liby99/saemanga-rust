@@ -121,7 +121,7 @@ impl Manga {
   }
 
   pub fn dmk_cover_url(&self) -> String {
-    format!("http://cartoonmad.com/cartoonimg/coimg/{}.jpg", self.dmk_id)
+    format!("http://cartoonmad.com/cartoonimgs/coimg/{}.jpg", self.dmk_id)
   }
 
   pub fn dmk_image_url(&self, episode: u32, page: u32) -> String {

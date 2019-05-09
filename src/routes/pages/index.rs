@@ -54,7 +54,7 @@ pub fn index() -> Template {
       MangaData {
         title: String::from("可憐可愛元氣君"),
         dmk_id: String::from("8193"),
-        cover_url: String::from("http://cartoonmad.com/cartoonimg/coimg/8193.jpg"),
+        cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/8193.jpg"),
         saemanga_url: String::from("http://saemanga.com/manga/8193"),
         last_episode: 7,
         last_episode_is_book: false,
@@ -63,7 +63,7 @@ pub fn index() -> Template {
       MangaData {
         title: String::from("家庭教師"),
         dmk_id: String::from("1254"),
-        cover_url: String::from("http://cartoonmad.com/cartoonimg/coimg/1254.jpg"),
+        cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/1254.jpg"),
         saemanga_url: String::from("http://saemanga.com/manga/1254"),
         last_episode: 409,
         last_episode_is_book: false,
@@ -72,7 +72,7 @@ pub fn index() -> Template {
       MangaData {
         title: String::from("聖癖✟櫻之丘"),
         dmk_id: String::from("5901"),
-        cover_url: String::from("http://cartoonmad.com/cartoonimg/coimg/5901.jpg"),
+        cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/5901.jpg"),
         saemanga_url: String::from("http://saemanga.com/manga/5901"),
         last_episode: 26,
         last_episode_is_book: false,
@@ -81,7 +81,7 @@ pub fn index() -> Template {
       MangaData {
         title: String::from("田中君總是如此慵懶"),
         dmk_id: String::from("4159"),
-        cover_url: String::from("http://cartoonmad.com/cartoonimg/coimg/4159.jpg"),
+        cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/4159.jpg"),
         saemanga_url: String::from("http://saemanga.com/manga/4159"),
         last_episode: 26,
         last_episode_is_book: false,
@@ -99,7 +99,7 @@ pub fn index() -> Template {
           manga: MangaData {
             title: String::from("家庭教師"),
             dmk_id: String::from("1254"),
-            cover_url: String::from("http://cartoonmad.com/cartoonimg/coimg/1254.jpg"),
+            cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/1254.jpg"),
             saemanga_url: String::from("http://saemanga.com/manga/1254"),
             last_episode: 409,
             last_episode_is_book: false,

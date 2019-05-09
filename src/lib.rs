@@ -14,6 +14,7 @@ pub mod app;
 pub mod api;
 pub mod routes;
 pub mod util;
+pub mod models;
 
 pub fn launch() {
   rocket::ignite()

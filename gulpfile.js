@@ -5,12 +5,7 @@ require('colors');
 const gulp = require('gulp');
 const nodemon = require('gulp-nodemon');
 const watch = require('gulp-watch');
-
-// Scripting library
 const buildTask = require('./scripts/gulp_build_task');
-
-// Need to keep track of the global nodemon instance
-let nodemonInstance;
 
 gulp.task("build-cargo", buildTask('cargo', 'cargo build --color always'));
 
@@ -21,17 +16,20 @@ gulp.task('build', gulp.series(
   "build-webpack"
 ));
 
-gulp.task('dev-run', (done) => {
-  if (nodemonInstance) {
-    nodemonInstance.emit('restart');
-  } else {
-    nodemonInstance = nodemon({
-      done: done,
-      watch: ["--non-existing-folder--"],
-      exec: "cargo run",
-    });
+gulp.task('dev-run', (() => {
+  let nodemonInstance = undefined;
+  return (done) => {
+    if (nodemonInstance) {
+      nodemonInstance.emit('restart');
+    } else {
+      nodemonInstance = nodemon({
+        done: done,
+        watch: ["--non-existing-folder--"],
+        exec: "cargo run",
+      });
+    }
   }
-});
+})());
 
 gulp.task('dev-watch', (done) => {
   watch(['src/', 'assets/'], {

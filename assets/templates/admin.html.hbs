@@ -47,6 +47,7 @@
             <th>#</th>
             <th>ID</th>
             <th>Username</th>
+            <th>Register Time</th>
             <th>Remove User</th>
             <th>Change Password</th>
           </tr>
@@ -57,6 +58,7 @@
             <td>{{@index}}</td>
             <td>{{id}}</td>
             <td>{{username}}</td>
+            <td>{{register_date_time}}</td>
             <td>
               <button form="user_update_{{id}}" name="method" type="submit" value="remove">Remove</button>
             </td>
@@ -71,7 +73,7 @@
           </tr>
           {{else}}
           <tr>
-            <td colspan="5">
+            <td colspan="6">
               <p style="text-align: center">No user found</p>
             </td>
           </tr>

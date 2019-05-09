@@ -4,12 +4,10 @@ mod index;
 mod admin;
 
 pub fn routes() -> Vec<Route> {
-  routes![
+  [routes![
     index::index,
-    admin::admin,
-    admin::create_user,
-    admin::update_user,
-  ]
+  ],
+  admin::routes()].concat()
 }
 
 pub fn catchers() -> Vec<Catcher> {

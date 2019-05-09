@@ -1,59 +1,8 @@
 use rocket::request::{Form, FromForm, FormItems};
 use rocket::response::Redirect;
-use rocket_contrib::templates::Template;
-use mongodb::{Bson, bson, doc};
+use mongodb::{bson, doc};
 use mongodb::oid::ObjectId;
 use crate::utilities::database::Database;
-
-#[derive(Serialize)]
-struct RegisteredUser {
-  id: String,
-  username: String,
-}
-
-#[derive(Serialize)]
-struct AdminData {
-  users: Vec<RegisteredUser>
-}
-
-#[get("/admin")]
-pub fn admin(conn: Database) -> Template {
-  let user_collection = &conn.collection("user_info");
-  let cursor = user_collection.find(None, None).ok().expect("Failed to find users");
-  let users = cursor.map(|result| {
-    let doc = result.expect("Received network error during cursor operations.");
-    let username = if let Some(&Bson::String(ref value)) = doc.get("username") {
-      value.clone()
-    } else {
-      panic!("Not possible");
-    };
-    let id = if let Some(&Bson::ObjectId(ref obj_id)) = doc.get("_id") {
-      obj_id.to_hex()
-    } else {
-      panic!("Oh No!");
-    };
-
-    RegisteredUser { id: id, username: username }
-  }).collect::<Vec<_>>();
-  Template::render("admin", &AdminData { users: users })
-}
-
-#[derive(FromForm)]
-pub struct User {
-  username: String,
-  password: String,
-}
-
-#[post("/admin/user/create", data="<info>")]
-pub fn create_user(conn: Database, info: Form<User>) -> Redirect {
-  println!("Testing, received username {}, password {}", info.username, info.password);
-  let user_collection = &conn.collection("user_info");
-  user_collection.insert_one(doc! {
-    "username": info.username.as_str(),
-    "password": info.password.as_str(),
-  }, None).unwrap();
-  Redirect::to("/admin")
-}
 
 #[derive(Debug)]
 pub enum UpdateMethod {

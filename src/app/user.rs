@@ -102,11 +102,11 @@ impl User {
     }
   }
 
-  pub fn get_by_id(conn: &Database, id: String) -> Result<Self, UserError> {
+  pub fn get_by_id(conn: &Database, id: &String) -> Result<Self, UserError> {
     Self::get_one(&conn, doc! { "_id": ObjectId::with_string(id.as_str())? })
   }
 
-  pub fn get_by_username(conn: &Database, username: String) -> Result<Self, UserError> {
+  pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, UserError> {
     Self::get_one(&conn, doc! { "username": username.to_lowercase() })
   }
 

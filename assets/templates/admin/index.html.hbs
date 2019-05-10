@@ -26,15 +26,13 @@
         <td>{{username}}</td>
         <td>{{register_date_time}}</td>
         <td>
-          <button form="user_update_{{id}}" name="method" type="submit" value="remove">Remove</button>
+          <form action="/admin/user/remove" method="POST" onsubmit="return confirm('Are you sure you want to remove user {{username}}?')">
+            <input style="display: none" name="id" value="{{id}}" />
+            <button type="submit">Remove</button>
+          </form>
         </td>
         <td>
           <a href="/admin/user/change_password/{{id}}">Change Password</a>
-        </td>
-        <td style="display: none">
-          <form id="user_update_{{id}}" action="/admin/user/update" method="POST" onsubmit="return confirm('Are you sure you want to remove user {{username}}?')">
-            <input name="user_id" value="{{id}}" />
-          </form>
         </td>
       </tr>
       {{else}}

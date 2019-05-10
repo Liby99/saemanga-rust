@@ -4,14 +4,13 @@ use rocket::request::Form;
 use rocket::response::Redirect;
 
 #[derive(FromForm)]
-pub struct CreateUserForm {
-  username: String,
-  password: String,
+pub struct RemoveUserForm {
+  id: String,
 }
 
-#[post("/admin/user/create", data="<info>")]
-pub fn create_user(conn: Database, info: Form<CreateUserForm>) -> Redirect {
-  match User::insert(&conn, &info.username, &info.password) {
+#[post("/admin/user/remove", data="<info>")]
+pub fn remove(conn: Database, info: Form<RemoveUserForm>) -> Redirect {
+  match User::remove(&conn, &info.id) {
     Ok(_) => Redirect::to("/admin"),
     Err(err) => Redirect::to(format!("/admin/error?code={}", err as u32))
   }

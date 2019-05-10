@@ -16,6 +16,7 @@
         <th>Register Time</th>
         <th>Remove User</th>
         <th>Change Password</th>
+        <th>Test Password</th>
       </tr>
     </thead>
     <tbody>
@@ -34,16 +35,24 @@
         <td>
           <a href="/admin/user/change_password/{{id}}">Change Password</a>
         </td>
+        <td>
+          <a href="/admin/user/test_password/{{id}}">Test Password</a>
+        </td>
       </tr>
       {{else}}
       <tr>
-        <td colspan="6">
+        <td colspan="7">
           <p style="text-align: center">No user found</p>
         </td>
       </tr>
       {{/each}}
     </tbody>
   </table>
+  <h2>User Collection Setup</h2>
+  <form action="/admin/user/setup" method="POST">
+    <p>Click the button below to setup the index (After this you will no longer be able to have duplicate usernames)</p>
+    <button type="submit">Setup</button>
+  </form>
 {{/inline}}
 
 {{~> layout/admin title="Index"}}

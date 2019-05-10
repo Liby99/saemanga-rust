@@ -8,3 +8,6 @@ node_modules
 
 # Dev Env related
 .vscode
+
+# OSX
+.DS_Store

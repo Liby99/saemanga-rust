@@ -52,6 +52,19 @@ impl User {
     conn.collection("user")
   }
 
+  pub fn setup_collection_index(conn: &Database) -> Result<(), UserError> {
+    let coll = Self::coll(&conn);
+    match coll.create_index(doc! {
+      "username": 1
+    }, Some(mongodb::coll::options::IndexOptions {
+      unique: Some(true),
+      ..Default::default()
+    })) {
+      Ok(_) => Ok(()),
+      Err(err) => Err(UserError::from(err)),
+    }
+  }
+
   pub fn from_bson(bs: Bson) -> Result<Self, UserError> {
     match bson::from_bson::<User>(bs) {
       Ok(user) => Ok(user),
@@ -173,19 +186,33 @@ impl User {
   }
 
   pub fn change_password(conn: &Database, id: &String, new_password: &String) -> Result<(), UserError> {
-    let coll = Self::coll(&conn);
-    match coll.update_one(doc! {
-      "_id": ObjectId::with_string(id.as_str())?
-    }, doc! {
-      "$set": {
-        "password": Self::encrypt(&new_password)
+    if Self::is_valid_password(new_password) {
+      let coll = Self::coll(&conn);
+      match coll.update_one(doc! {
+        "_id": ObjectId::with_string(id.as_str())?
+      }, doc! {
+        "$set": {
+          "password": Self::encrypt(&new_password)
+        }
+      }, None) {
+        Ok(result) => match result.modified_count {
+          1 => Ok(()),
+          _ => Err(UserError::UserNotFoundError)
+        },
+        Err(_) => Err(UserError::DatabaseError)
       }
-    }, None) {
-      Ok(result) => match result.modified_count {
-        1 => Ok(()),
-        _ => Err(UserError::UserNotFoundError)
+    } else {
+      Err(UserError::InvalidPassword)
+    }
+  }
+
+  pub fn is_password_match(conn: &Database, id: &String, password: &String) -> Result<bool, UserError> {
+    match Self::get_by_id(conn, id) {
+      Ok(user) => {
+        let hashed_pwd = Self::encrypt(password);
+        Ok(hashed_pwd == user.password)
       },
-      Err(_) => Err(UserError::DatabaseError)
+      Err(err) => Err(err)
     }
   }
 

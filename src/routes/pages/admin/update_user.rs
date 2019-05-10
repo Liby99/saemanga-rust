@@ -1,8 +1,8 @@
 use rocket::request::{Form, FromForm, FormItems};
 use rocket::response::Redirect;
-use mongodb::{bson, doc};
-use mongodb::oid::ObjectId;
+
 use crate::util::database::Database;
+use crate::app::user::User;
 
 #[derive(Debug)]
 pub enum UpdateMethod {
@@ -56,10 +56,12 @@ pub fn update_user(conn: Database, data: Form<UpdateUser>) -> Redirect {
   println!("Updating user (id: {}) with method {:?}", data.id, data.method);
   match data.method {
     UpdateMethod::Remove => {
-      let user_collection = &conn.collection("user_info");
-      user_collection.delete_one(doc! {
-        "_id": ObjectId::with_string(data.id.as_str()).unwrap(),
-      }, None).unwrap();
+      match User::remove(&conn, &data.id) {
+        Ok(()) => Redirect::to("/admin/index"),
+        Err(err) => Redirect::to(format!("/admin/error?code={}", err as u32))
+      }
+    },
+    UpdateMethod::ChangePassword => {
       Redirect::to("/admin")
     },
     _ => Redirect::to("/admin")

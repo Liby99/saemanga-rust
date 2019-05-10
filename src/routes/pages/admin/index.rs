@@ -1,7 +1,8 @@
 use rocket_contrib::templates::Template;
-use mongodb::doc;
+use rocket::response::Redirect;
+
 use crate::util::database::Database;
-use mongodb::ordered::OrderedDocument;
+use crate::app::user::User;
 
 #[derive(Serialize, Deserialize)]
 struct RegisteredUser {
@@ -10,29 +11,12 @@ struct RegisteredUser {
   register_date_time: String,
 }
 
-impl From<User> for RegisteredUser {
-  fn from(user: User) -> Self {
+impl From<&User> for RegisteredUser {
+  fn from(user: &User) -> Self {
     RegisteredUser {
-      id: user.id.to_hex(),
-      username: user.username,
-      register_date_time: user.register_date_time.to_rfc3339(),
-    }
-  }
-}
-
-#[derive(Serialize, Deserialize)]
-struct User {
-  #[serde(rename = "_id")]
-  id: bson::oid::ObjectId,
-  username: String,
-  register_date_time: bson::UtcDateTime,
-}
-
-impl From<OrderedDocument> for User {
-  fn from(doc: OrderedDocument) -> Self {
-    match bson::from_bson::<User>(bson::Bson::Document(doc)) {
-      Ok(user) => user,
-      Err(_) => panic!("Not able to deserialize object to registered user")
+      id: user.id().to_hex(),
+      username: user.username().clone(),
+      register_date_time: user.register_date_time().to_rfc3339(),
     }
   }
 }
@@ -43,12 +27,12 @@ struct AdminData {
 }
 
 #[get("/admin/index")]
-pub fn index(conn: Database) -> Template {
-  let user_collection = &conn.collection("user_info");
-  let cursor = user_collection.find(None, None).ok().expect("Failed to find users");
-  let users = cursor.map(|result| {
-    let doc : OrderedDocument = result.expect("Received network error during cursor operations.");
-    RegisteredUser::from(User::from(doc))
-  }).collect::<Vec<_>>();
-  Template::render("admin/index", &AdminData { users: users })
+pub fn index(conn: Database) -> Result<Template, Redirect> {
+  let users_res = User::get_all(&conn).map(|users: Vec<User>| {
+    users.iter().map(|u| RegisteredUser::from(u)).collect()
+  });
+  match users_res {
+    Ok(users) => Ok(Template::render("admin/index", &AdminData { users: users })),
+    Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
+  }
 }

@@ -9,15 +9,17 @@ use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use chrono::Utc;
 
-#[derive(Debug)]
-pub enum UserError {
-  UserIdError,
-  DatabaseError,
-  UserNotFoundError,
-  UserDataError,
-  UserExistedError,
-  InvalidUsername,
-  InvalidPassword,
+enum_from_primitive! {
+  #[derive(Debug)]
+  pub enum UserError {
+    DatabaseError = 1000, // We start the user error from 1000
+    UserIdError,
+    UserNotFoundError,
+    UserDataError,
+    UserExistedError,
+    InvalidUsername,
+    InvalidPassword,
+  }
 }
 
 impl From<mongodb::oid::Error> for UserError {
@@ -91,22 +93,21 @@ impl User {
     Ok(users)
   }
 
-  pub fn get_by_id(conn: &Database, id: String) -> Result<Self, UserError> {
+  pub fn get_one(conn: &Database, doc: OrderedDocument) -> Result<Self, UserError> {
     let coll = Self::coll(&conn);
-    let option_user_doc = coll.find_one(Some(doc! { "_id": ObjectId::with_string(id.as_str())? }), None)?;
+    let option_user_doc = coll.find_one(Some(doc), None)?;
     match option_user_doc {
       Some(user_doc) => Self::from_doc(user_doc),
       None => Err(UserError::UserNotFoundError)
     }
   }
 
+  pub fn get_by_id(conn: &Database, id: String) -> Result<Self, UserError> {
+    Self::get_one(&conn, doc! { "_id": ObjectId::with_string(id.as_str())? })
+  }
+
   pub fn get_by_username(conn: &Database, username: String) -> Result<Self, UserError> {
-    let coll = Self::coll(&conn);
-    let option_user_doc = coll.find_one(Some(doc! { "username": username }), None)?;
-    match option_user_doc {
-      Some(user_doc) => Self::from_doc(user_doc),
-      None => Err(UserError::UserNotFoundError)
-    }
+    Self::get_one(&conn, doc! { "username": username.to_lowercase() })
   }
 
   pub fn encrypt(password: &String) -> String {
@@ -158,5 +159,45 @@ impl User {
       },
       Err(_) => Err(UserError::DatabaseError)
     }
+  }
+
+  pub fn remove(conn: &Database, id: &String) -> Result<(), UserError> {
+    let coll = Self::coll(&conn);
+    match coll.delete_one(doc! { "_id": ObjectId::with_string(id.as_str())? }, None) {
+      Ok(result) => match result.deleted_count {
+        1 => Ok(()),
+        _ => Err(UserError::UserNotFoundError)
+      },
+      Err(_) => Err(UserError::DatabaseError)
+    }
+  }
+
+  pub fn change_password(conn: &Database, id: &String, new_password: &String) -> Result<(), UserError> {
+    let coll = Self::coll(&conn);
+    match coll.update_one(doc! {
+      "_id": ObjectId::with_string(id.as_str())?
+    }, doc! {
+      "$set": {
+        "password": Self::encrypt(&new_password)
+      }
+    }, None) {
+      Ok(result) => match result.modified_count {
+        1 => Ok(()),
+        _ => Err(UserError::UserNotFoundError)
+      },
+      Err(_) => Err(UserError::DatabaseError)
+    }
+  }
+
+  pub fn id(&self) -> &ObjectId {
+    &self.id
+  }
+
+  pub fn username(&self) -> &String {
+    &self.username
+  }
+
+  pub fn register_date_time(&self) -> &bson::UtcDateTime {
+    &self.register_date_time
   }
 }

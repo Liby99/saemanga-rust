@@ -227,4 +227,8 @@ impl User {
   pub fn register_date_time(&self) -> &bson::UtcDateTime {
     &self.register_date_time
   }
+
+  pub fn visit_count(&self) -> i32 {
+    self.visit_count
+  }
 }

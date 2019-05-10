@@ -22,3 +22,11 @@ main {
 td, th {
   padding: 0 10px;
 }
+
+hr {
+  margin: 20px 0;
+  height: 1px;
+  color: rgba(230, 230, 230, 1);
+  background-color: rgba(230, 230, 230, 1);
+  border: none;
+}

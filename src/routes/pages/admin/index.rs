@@ -9,6 +9,7 @@ struct RegisteredUser {
   id: String,
   username: String,
   register_date_time: String,
+  visit_count: i32,
 }
 
 impl From<&User> for RegisteredUser {
@@ -17,6 +18,7 @@ impl From<&User> for RegisteredUser {
       id: user.id().to_hex(),
       username: user.username().clone(),
       register_date_time: user.register_date_time().to_rfc3339(),
+      visit_count: user.visit_count()
     }
   }
 }

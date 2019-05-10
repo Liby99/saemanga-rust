@@ -1,7 +1,7 @@
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MangaStatus {
-  Ended,
-  Updating,
+  #[serde(rename = "ended")] Ended,
+  #[serde(rename = "updating")] Updating,
 }
 
 impl MangaStatus {

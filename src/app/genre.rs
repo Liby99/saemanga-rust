@@ -1,7 +1,9 @@
+use serde::ser::{Serialize, Serializer};
+use serde::de::{self, Deserialize, Deserializer};
 use lazy_static::lazy_static;
 use regex::Regex;
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq)]
 pub struct Genre {
   id: &'static str,
   name: &'static str,
@@ -146,5 +148,21 @@ impl Genre {
 
   pub fn dmk_url(&self) -> String {
     format!("https://cartoonmad.com/{}.html", self.dmk_directory)
+  }
+}
+
+impl Serialize for Genre {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    serializer.serialize_str(self.id)
+  }
+}
+
+impl<'de> Deserialize<'de> for &'static Genre {
+  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+    let s = String::deserialize(deserializer)?;
+    match Genre::for_id(s.as_str()) {
+      Some(genre) => Ok(genre),
+      None => Err(de::Error::custom(format!("Unknown genre {}", s)))
+    }
   }
 }

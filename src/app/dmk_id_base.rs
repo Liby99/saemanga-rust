@@ -1,7 +1,8 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "version")]
 pub enum DmkIdBase {
   V10 { dmk_id_web: String, dmk_id_home: String },
   V09 { dmk_id_home: String },

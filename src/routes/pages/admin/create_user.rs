@@ -1,35 +1,26 @@
+use crate::app::user::{User, UserError};
 use crate::util::database::Database;
 use rocket::request::Form;
 use rocket::response::Redirect;
-use mongodb::{bson, doc};
-use crypto::digest::Digest;
-use crypto::sha2::Sha256;
-use chrono::Utc;
 
 #[derive(FromForm)]
-pub struct User {
+pub struct CreateUserForm {
   username: String,
   password: String,
 }
 
 #[post("/admin/user/create", data="<info>")]
-pub fn create_user(conn: Database, info: Form<User>) -> Redirect {
-  let mut hasher = Sha256::new();
-  hasher.input_str(&info.password.as_str());
-  println!("Testing, received username {}, password {}", info.username, info.password);
-  let user_collection = &conn.collection("user_info");
-  match user_collection.insert_one(doc! {
-    "username": info.username.as_str(),
-    "password": hasher.result_str(),
-    "register_date_time": Utc::now(),
-    "login_count": 0,
-  }, None) {
-    Ok(result) => {
-      match result.inserted_id {
-        Some(_) => Redirect::to("/admin"),
-        None => Redirect::to("/admin/error?code=1001")
-      }
-    },
-    Err(_) => Redirect::to("/admin/error?code=1000")
+pub fn create_user(conn: Database, info: Form<CreateUserForm>) -> Redirect {
+  match User::insert(&conn, &info.username, &info.password) {
+    Ok(_) => Redirect::to("/admin"),
+    Err(err) => match err {
+      UserError::DatabaseError => Redirect::to("/admin/error?code=1000"),
+      UserError::UserDataError => Redirect::to("/admin/error?code=1001"),
+      UserError::UserIdError => Redirect::to("/admin/error?code=1002"),
+      UserError::UserNotFoundError => Redirect::to("/admin/error?code=1003"),
+      UserError::UserExistedError => Redirect::to("/admin/error?code=1004"),
+      UserError::InvalidPassword => Redirect::to("/admin/error?code=1005"),
+      UserError::InvalidUsername => Redirect::to("/admin/error?code=1006"),
+    }
   }
 }

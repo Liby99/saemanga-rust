@@ -2,6 +2,7 @@ use saemanga;
 use saemanga::app::dmk_id_base::*;
 use saemanga::app::manga_status::*;
 use saemanga::app::manga::*;
+use saemanga::app::user::*;
 use mongodb::{Bson, bson, doc};
 
 #[test]
@@ -70,4 +71,15 @@ fn manga_deser_test() {
     }]
   }));
   println!("{:?}", dib);
+}
+
+#[test]
+fn manga_ser_test() {
+  let username = String::from("test_user");
+  let password = String::from("12345678");
+  let user_res = User::new(&username, &password);
+  match user_res {
+    Ok(user) => println!("{:?}", bson::to_bson(&user)),
+    Err(err) => println!("User Construction Error: {:?}", err)
+  }
 }

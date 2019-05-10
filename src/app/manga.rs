@@ -74,7 +74,7 @@ impl Manga {
     self.episodes.iter().filter(|e| !e.is_book()).collect()
   }
 
-  pub fn find_episode(&self, epi: u32) -> Option<&MangaEpisode> {
+  pub fn find_episode(&self, epi: i32) -> Option<&MangaEpisode> {
     self.episodes.iter().find(|&e| e.episode() == epi)
   }
 

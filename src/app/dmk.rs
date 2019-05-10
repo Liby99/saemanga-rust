@@ -39,18 +39,18 @@ impl From<reqwest::Error> for DmkScrapeError {
   }
 }
 
-fn extract_num_pages(font: &String) -> Option<u32> {
+fn extract_num_pages(font: &String) -> Option<i32> {
   lazy_static! { static ref NUM_PAGES_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
   match NUM_PAGES_RE.captures(font) {
-    Some(cap) => match String::from(&cap[1]).parse::<u32>() { Ok(i) => Some(i), Err(_) => None },
+    Some(cap) => match String::from(&cap[1]).parse::<i32>() { Ok(i) => Some(i), Err(_) => None },
     None => None,
   }
 }
 
-fn extract_episode(a: &String) -> Option<(u32, bool)> {
+fn extract_episode(a: &String) -> Option<(i32, bool)> {
   lazy_static! { static ref EPISODE_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
   match EPISODE_RE.captures(a) {
-    Some(cap) => match String::from(&cap[1]).parse::<u32>() { Ok(i) => Some((i, a.contains("卷"))), Err(_) => None },
+    Some(cap) => match String::from(&cap[1]).parse::<i32>() { Ok(i) => Some((i, a.contains("卷"))), Err(_) => None },
     None => None
   }
 }

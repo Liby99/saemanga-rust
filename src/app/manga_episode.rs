@@ -2,13 +2,13 @@
 pub struct MangaEpisode {
   index: usize,
   is_book: bool,
-  episode: u32,
-  num_pages: u32,
+  episode: i32,
+  num_pages: i32,
   dmk_directory: String,
 }
 
 impl MangaEpisode {
-  pub fn new(index: usize, is_book: bool, episode: u32, num_pages: u32, dmk_directory: String) -> MangaEpisode {
+  pub fn new(index: usize, is_book: bool, episode: i32, num_pages: i32, dmk_directory: String) -> MangaEpisode {
     MangaEpisode { index, is_book, episode, num_pages, dmk_directory }
   }
 
@@ -20,11 +20,11 @@ impl MangaEpisode {
     self.is_book
   }
 
-  pub fn episode(&self) -> u32 {
+  pub fn episode(&self) -> i32 {
     self.episode
   }
 
-  pub fn num_pages(&self) -> u32 {
+  pub fn num_pages(&self) -> i32 {
     self.num_pages
   }
 

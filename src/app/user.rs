@@ -9,7 +9,7 @@ use chrono::Utc;
 
 use super::user_session::UserSession;
 use crate::util::database::Database;
-use super::user_error::UserError;
+use super::error::Error;
 
 #[derive(Serialize, Deserialize)]
 pub struct User {
@@ -29,7 +29,7 @@ impl User {
     conn.collection("user")
   }
 
-  pub fn setup_collection_index(conn: &Database) -> Result<(), UserError> {
+  pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
     match coll.create_index(doc! {
       "username": 1
@@ -38,66 +38,70 @@ impl User {
       ..Default::default()
     })) {
       Ok(_) => Ok(()),
-      Err(err) => Err(UserError::from(err)),
+      Err(err) => Err(Error::DatabaseError),
     }
   }
 
-  pub fn from_bson(bs: Bson) -> Result<Self, UserError> {
+  pub fn from_bson(bs: Bson) -> Result<Self, Error> {
     match bson::from_bson::<User>(bs) {
       Ok(user) => Ok(user),
-      Err(_) => Err(UserError::UserDataError)
+      Err(_) => Err(Error::UserDeserializeError)
     }
   }
 
-  pub fn from_doc(doc: OrderedDocument) -> Result<Self, UserError> {
+  pub fn from_doc(doc: OrderedDocument) -> Result<Self, Error> {
     Self::from_bson(bson::Bson::Document(doc))
   }
 
-  pub fn to_bson(&self) -> Result<Bson, UserError> {
+  pub fn to_bson(&self) -> Result<Bson, Error> {
     match bson::to_bson(&self) {
       Ok(bs) => Ok(bs),
       Err(_) => {
         println!("BSON...");
-        Err(UserError::UserDataError)
+        Err(Error::UserSerializeError)
       }
     }
   }
 
-  pub fn to_doc(&self) -> Result<OrderedDocument, UserError> {
+  pub fn to_doc(&self) -> Result<OrderedDocument, Error> {
     self.to_bson().and_then(|bs| match bs {
       Bson::Document(doc) => Ok(doc),
       _ => {
         println!("Doc...");
-        Err(UserError::UserDataError)
+        Err(Error::UserSerializeError)
       },
     })
   }
 
-  pub fn get_all(conn: &Database) -> Result<Vec<Self>, UserError> {
+  pub fn get_all(conn: &Database) -> Result<Vec<Self>, Error> {
     let coll = Self::coll(&conn);
-    let cursor = coll.find(None, None)?;
+    let cursor = coll.find(None, None).map_err(|_| Error::DatabaseError)?;
     let users = cursor.map(|result| match result {
       Ok(doc) => Self::from_doc(doc),
-      Err(_) => Err(UserError::DatabaseError)
+      Err(_) => Err(Error::DatabaseError)
     }).filter_map(Result::ok).collect::<Vec<_>>();
     Ok(users)
   }
 
-  pub fn get_one(conn: &Database, doc: OrderedDocument) -> Result<Self, UserError> {
+  pub fn get_one(conn: &Database, doc: OrderedDocument) -> Result<Self, Error> {
     let coll = Self::coll(&conn);
-    let option_user_doc = coll.find_one(Some(doc), None)?;
+    let option_user_doc = coll.find_one(Some(doc), None).map_err(|_| Error::DatabaseError)?;
     match option_user_doc {
       Some(user_doc) => Self::from_doc(user_doc),
-      None => Err(UserError::UserNotFoundError)
+      None => Err(Error::UserNotFoundError)
     }
   }
 
-  pub fn get_by_id(conn: &Database, id: &String) -> Result<Self, UserError> {
-    Self::get_one(&conn, doc! { "_id": ObjectId::with_string(id.as_str())? })
+  pub fn get_by_id(conn: &Database, id: &String) -> Result<Self, Error> {
+    Self::get_one(&conn, doc! {
+      "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
+    })
   }
 
-  pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, UserError> {
-    Self::get_one(&conn, doc! { "username": username.to_lowercase() })
+  pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, Error> {
+    Self::get_one(&conn, doc! {
+      "username": username.to_lowercase()
+    })
   }
 
   pub fn encrypt(password: &String) -> String {
@@ -116,13 +120,13 @@ impl User {
     PASSWORD_REG.is_match(&password.as_str())
   }
 
-  pub fn new(username: &String, password: &String) -> Result<Self, UserError> {
+  pub fn new(username: &String, password: &String) -> Result<Self, Error> {
     if Self::is_valid_password(&password) {
       if Self::is_valid_username(&username) {
         let hashed_pwd = Self::encrypt(&password);
         let now = mongodb::UtcDateTime::from(Utc::now());
         Ok(User {
-          id: ObjectId::new()?,
+          id: ObjectId::new().map_err(|_| Error::CannotCreateObjectId)?,
           username: username.to_lowercase(), // Always use lower case to store username
           password: hashed_pwd,
           is_admin: false,
@@ -132,41 +136,43 @@ impl User {
           sessions: vec![]
         })
       } else {
-        Err(UserError::InvalidUsername)
+        Err(Error::InvalidUsername)
       }
     } else {
-      Err(UserError::InvalidPassword)
+      Err(Error::InvalidPassword)
     }
   }
 
-  pub fn insert(conn: &Database, username: &String, password: &String) -> Result<Self, UserError> {
+  pub fn insert(conn: &Database, username: &String, password: &String) -> Result<Self, Error> {
     let coll = Self::coll(&conn);
     let user = Self::new(&username, &password)?;
     match coll.insert_one(user.to_doc()?, None) {
       Ok(result) => match result.inserted_id {
         Some(_) => Ok(user),
-        None => Err(UserError::UserExistedError)
+        None => Err(Error::UserExistedError)
       },
-      Err(_) => Err(UserError::DatabaseError)
+      Err(_) => Err(Error::DatabaseError)
     }
   }
 
-  pub fn remove(conn: &Database, id: &String) -> Result<(), UserError> {
+  pub fn remove(conn: &Database, id: &String) -> Result<(), Error> {
     let coll = Self::coll(&conn);
-    match coll.delete_one(doc! { "_id": ObjectId::with_string(id.as_str())? }, None) {
+    match coll.delete_one(doc! {
+      "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
+    }, None) {
       Ok(result) => match result.deleted_count {
         1 => Ok(()),
-        _ => Err(UserError::UserNotFoundError)
+        _ => Err(Error::UserNotFoundError)
       },
-      Err(_) => Err(UserError::DatabaseError)
+      Err(_) => Err(Error::DatabaseError)
     }
   }
 
-  pub fn change_password(conn: &Database, id: &String, new_password: &String) -> Result<(), UserError> {
+  pub fn change_password(conn: &Database, id: &String, new_password: &String) -> Result<(), Error> {
     if Self::is_valid_password(new_password) {
       let coll = Self::coll(&conn);
       match coll.update_one(doc! {
-        "_id": ObjectId::with_string(id.as_str())?
+        "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
       }, doc! {
         "$set": {
           "password": Self::encrypt(&new_password)
@@ -174,16 +180,16 @@ impl User {
       }, None) {
         Ok(result) => match result.modified_count {
           1 => Ok(()),
-          _ => Err(UserError::UserNotFoundError)
+          _ => Err(Error::UserNotFoundError)
         },
-        Err(_) => Err(UserError::DatabaseError)
+        Err(_) => Err(Error::DatabaseError)
       }
     } else {
-      Err(UserError::InvalidPassword)
+      Err(Error::InvalidPassword)
     }
   }
 
-  pub fn is_password_match(conn: &Database, id: &String, password: &String) -> Result<bool, UserError> {
+  pub fn is_password_match(conn: &Database, id: &String, password: &String) -> Result<bool, Error> {
     match Self::get_by_id(conn, id) {
       Ok(user) => {
         let hashed_pwd = Self::encrypt(password);

@@ -28,6 +28,7 @@ enum_from_primitive! {
     DmkIdBaseParseError,
     DmkSearchEncodingError,
     MangaExistedError,
+    MangaNotFoundError,
     MangaSerializeError,
     MangaDeserializeError,
   }
@@ -61,6 +62,7 @@ impl Error {
       Error::DmkRedirectNotFoundError => "Unable to Find Redirect Information for Cartoonmad Image",
       Error::DmkIdBaseParseError => "Unable to Parse Cartoonmad Image Information",
       Error::DmkSearchEncodingError => "Unable to Encode Search Text",
+      Error::MangaNotFoundError => "Manga Not Found",
       Error::MangaExistedError => "Manga Already Existed",
       Error::MangaSerializeError => "Unable to Serialize Manga Data",
       Error::MangaDeserializeError => "Unable to Deserialize Manga Data",

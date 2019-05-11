@@ -1,0 +1,35 @@
+{{#*inline "main"}}
+  <h2>Manga Information</h2>
+  <div>
+    <p>Cartoonmad URL: <a href="{{cartoonmad_url}}">{{cartoonmad_url}}</a></p>
+    {{#with manga}}
+      <p>Title: {{title}}</p>
+      <p>Author: {{author}}</p>
+      <p>Tags: {{#each tags}}{{this}}, {{/each}}</p>
+      <p>Description: {{description}}</p>
+      <p>Cartoonmad ID: {{dmk_id}}</p>
+      <p>Base:</p>
+      <ul>
+        <li>version: {{dmk_id_base.version}}</li>
+        <li>dmk_id_gen: {{dmk_id_base.dmk_id_gen}}</li>
+        <li>dmk_id_web: {{dmk_id_base.dmk_id_web}}</li>
+        <li>dmk_id_home: {{dmk_id_base.dmk_id_home}}</li>
+      </ul>
+      <p>Episodes:</p>
+      <ol>
+        {{#each episodes}}
+          <li>
+            <span>{{#if is_book}}Book{{else}}Episode{{/if}}</span>
+            <span>{{episode}}</span>
+            <a href="https://www.cartoonmad.com{{dmk_directory}}">https://www.cartoonmad.com{{dmk_directory}}</a>
+          </li>
+        {{/each}}
+      </ol>
+    {{/with}}
+  </div>
+  <p>
+    <a href="/admin/index">Back</a>
+  </p>
+{{/inline}}
+
+{{~> layout/admin title="Manga Information"}}

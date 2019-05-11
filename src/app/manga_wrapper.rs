@@ -86,6 +86,17 @@ impl MangaWrapper {
     Ok(mangas)
   }
 
+  pub fn get(conn: &Database, dmk_id: &String) -> Result<Self, Error> {
+    let coll = Self::coll(&conn);
+    let option_user_doc = coll.find_one(Some(doc! {
+      "dmk_id": dmk_id
+    }), None).map_err(|_| Error::DatabaseError)?;
+    match option_user_doc {
+      Some(user_doc) => Self::from_doc(user_doc),
+      None => Err(Error::MangaNotFoundError)
+    }
+  }
+
   pub fn insert(conn: &Database, manga: &Manga) -> Result<Self, Error> {
     let coll = Self::coll(&conn);
     let wrapped = Self::new(manga)?;

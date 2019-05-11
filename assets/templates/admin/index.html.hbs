@@ -2,8 +2,8 @@
   <h2>User Creation</h2>
   <form action="/admin/user/create" method="POST">
     <p>Use the form below to create a new user...</p>
-    <input type="text" name="username" placeholder="Username" />
-    <input type="text" name="password" placeholder="Password" />
+    <input type="text" name="username" placeholder="Username" autocomplete="off" />
+    <input type="text" name="password" placeholder="Password" autocomplete="off" />
     <button type="submit" value="submit">Create</button>
   </form>
   <hr />
@@ -61,8 +61,15 @@
   <h2>Add Manga</h2>
   <form action="/admin/manga/add" method="POST">
     <p>Add a manga by its Cartoonmad ID (e.g. 1456)</p>
-    <input name="dmk_id" placeholder="Cartoonmad ID" />
+    <input name="dmk_id" placeholder="Cartoonmad ID" autocomplete="off" />
     <button type="submit">Add</button>
+  </form>
+  <hr />
+  <h2>Check Manga</h2>
+  <form action="/admin/manga/check" method="POST">
+    <p>Check a manga by its Cartoonmad ID (e.g. 1456)</p>
+    <input name="dmk_id" placeholder="Cartoonmad ID" autocomplete="off" />
+    <button type="submit">Check</button>
   </form>
   <hr />
   <h2>Manga Collection Setup</h2>

@@ -64,6 +64,12 @@
     <input name="dmk_id" placeholder="Cartoonmad ID" />
     <button type="submit">Add</button>
   </form>
+  <hr />
+  <h2>Manga Collection Setup</h2>
+  <form action="/admin/manga/setup" method="POST">
+    <p>Click the button below to setup the <code>dmk_id</code> index (After this you will no longer be able to have duplicate <code>dmk_id</code>)</p>
+    <button type="submit">Setup</button>
+  </form>
 {{/inline}}
 
 {{~> layout/admin title="Index"}}

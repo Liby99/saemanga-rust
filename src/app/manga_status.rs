@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MangaStatus {
   #[serde(rename = "ended")] Ended,
   #[serde(rename = "updating")] Updating,

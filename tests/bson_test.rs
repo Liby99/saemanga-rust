@@ -1,8 +1,10 @@
 use saemanga;
+use saemanga::app::dmk;
 use saemanga::app::dmk_id_base::*;
 use saemanga::app::manga_status::*;
 use saemanga::app::manga::*;
 use saemanga::app::user::*;
+use saemanga::app::manga_wrapper::*;
 use mongodb::{Bson, bson, doc};
 
 #[test]
@@ -74,12 +76,26 @@ fn manga_deser_test() {
 }
 
 #[test]
-fn manga_ser_test() {
+fn user_ser_test() {
   let username = String::from("test_user");
   let password = String::from("12345678");
   let user_res = User::new(&username, &password);
   match user_res {
     Ok(user) => println!("{:?}", bson::to_bson(&user)),
     Err(err) => println!("User Construction Error: {:?}", err)
+  }
+}
+
+#[test]
+fn manga_wrapper_ser_test() {
+  match dmk::fetch_manga_data(&String::from("1234")) {
+    Ok(manga) => match MangaWrapper::new(&manga) {
+      Ok(wrapped) => match bson::to_bson(&wrapped) {
+        Ok(doc) => println!("Serialized: {:?}", doc),
+        Err(err) => println!("Unable to serialize: {:?}", err)
+      },
+      Err(err) => println!("Manga wrapping error: {:?}", err)
+    },
+    Err(err) => println!("Fetch manga 1234 failed: {:?}", err)
   }
 }

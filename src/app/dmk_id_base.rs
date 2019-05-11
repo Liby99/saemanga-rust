@@ -3,7 +3,7 @@ use regex::Regex;
 
 use crate::app::error::Error;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "version")]
 pub enum DmkIdBase {
   V10 { dmk_id_web: String, dmk_id_home: String },

@@ -28,7 +28,7 @@ fn extract_episode(a: &String) -> Option<(i32, bool)> {
   }
 }
 
-fn extract_episodes(trs: Select, start_index: usize) -> Vec<MangaEpisode> {
+fn extract_episodes(trs: Select, start_index: i32) -> Vec<MangaEpisode> {
   lazy_static!{
     static ref TD_SEL : Selector = Selector::parse("td").unwrap();
     static ref A_SEL : Selector = Selector::parse("a").unwrap();
@@ -168,7 +168,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, Error> {
     match tables.next() {
       Some(second_table) => {
         let books = extract_episodes(first_table.select(&TR_SEL), 0);
-        let episodes = extract_episodes(second_table.select(&TR_SEL), books.len());
+        let episodes = extract_episodes(second_table.select(&TR_SEL), books.len() as i32);
         [&books[..], &episodes[..]].concat()
       },
       None => extract_episodes(first_table.select(&TR_SEL), 0)

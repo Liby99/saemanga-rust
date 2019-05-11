@@ -5,6 +5,7 @@ pub mod dmk_id_base;
 pub mod manga_status;
 pub mod manga_episode;
 pub mod manga;
+pub mod manga_wrapper;
 pub mod user_setting;
 pub mod user_session;
 pub mod user;

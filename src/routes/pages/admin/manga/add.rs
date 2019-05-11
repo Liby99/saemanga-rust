@@ -2,8 +2,8 @@ use rocket::response::Redirect;
 use rocket::request::Form;
 
 use crate::util::database::Database;
-use crate::app::error::Error;
 use crate::app::dmk;
+use crate::app::manga_wrapper::MangaWrapper;
 
 #[derive(FromForm)]
 pub struct AddMangaFormData {
@@ -13,8 +13,9 @@ pub struct AddMangaFormData {
 #[post("/admin/manga/add", data="<data>")]
 pub fn add(conn: Database, data: Form<AddMangaFormData>) -> Redirect {
   match dmk::fetch_manga_data(&data.dmk_id) {
-    Ok(manga) => {
-      Redirect::to(format!("/admin/error?code={}", Error::NotImplementedError.code()))
+    Ok(manga) => match MangaWrapper::insert(&conn, &manga) {
+      Ok(_) => Redirect::to("/admin/index"),
+      Err(err) => Redirect::to(format!("/admin/error?code={}", err.code()))
     },
     Err(err) => Redirect::to(format!("/admin/error?code={}", err.code()))
   }

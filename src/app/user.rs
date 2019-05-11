@@ -2,6 +2,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use mongodb::oid::ObjectId;
 use mongodb::ordered::OrderedDocument;
+use mongodb::coll::Collection;
 use mongodb::{Bson, bson, doc};
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
@@ -25,7 +26,7 @@ pub struct User {
 }
 
 impl User {
-  pub fn coll(conn: &Database) -> mongodb::coll::Collection {
+  pub fn coll(conn: &Database) -> Collection {
     conn.collection("user")
   }
 
@@ -38,7 +39,7 @@ impl User {
       ..Default::default()
     })) {
       Ok(_) => Ok(()),
-      Err(err) => Err(Error::DatabaseError),
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 
@@ -56,20 +57,14 @@ impl User {
   pub fn to_bson(&self) -> Result<Bson, Error> {
     match bson::to_bson(&self) {
       Ok(bs) => Ok(bs),
-      Err(_) => {
-        println!("BSON...");
-        Err(Error::UserSerializeError)
-      }
+      Err(_) => Err(Error::UserSerializeError),
     }
   }
 
   pub fn to_doc(&self) -> Result<OrderedDocument, Error> {
     self.to_bson().and_then(|bs| match bs {
       Bson::Document(doc) => Ok(doc),
-      _ => {
-        println!("Doc...");
-        Err(Error::UserSerializeError)
-      },
+      _ => Err(Error::UserSerializeError),
     })
   }
 

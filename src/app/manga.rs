@@ -12,7 +12,7 @@ pub fn is_valid_dmk_id(dmk_id: &String) -> bool {
   return DMK_ID_RE.is_match(dmk_id);
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Manga {
   dmk_id: String,
   dmk_id_base: DmkIdBase,

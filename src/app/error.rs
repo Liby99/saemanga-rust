@@ -27,6 +27,9 @@ enum_from_primitive! {
     DmkRedirectNotFoundError,
     DmkIdBaseParseError,
     DmkSearchEncodingError,
+    MangaExistedError,
+    MangaSerializeError,
+    MangaDeserializeError,
   }
 }
 
@@ -57,7 +60,10 @@ impl Error {
       Error::DmkParseError => "Unable to Parse Information from Cartoonmad Webpage",
       Error::DmkRedirectNotFoundError => "Unable to Find Redirect Information for Cartoonmad Image",
       Error::DmkIdBaseParseError => "Unable to Parse Cartoonmad Image Information",
-      Error::DmkSearchEncodingError => "Unable to Encode Search Text"
+      Error::DmkSearchEncodingError => "Unable to Encode Search Text",
+      Error::MangaExistedError => "Manga Already Existed",
+      Error::MangaSerializeError => "Unable to Serialize Manga Data",
+      Error::MangaDeserializeError => "Unable to Deserialize Manga Data",
     }
   }
 }

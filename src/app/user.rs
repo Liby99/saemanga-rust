@@ -1,5 +1,3 @@
-use super::user_session::UserSession;
-use crate::util::database::Database;
 use lazy_static::lazy_static;
 use regex::Regex;
 use mongodb::oid::ObjectId;
@@ -9,30 +7,9 @@ use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use chrono::Utc;
 
-enum_from_primitive! {
-  #[derive(Debug)]
-  pub enum UserError {
-    DatabaseError = 1000, // We start the user error from 1000
-    UserIdError,
-    UserNotFoundError,
-    UserDataError,
-    UserExistedError,
-    InvalidUsername,
-    InvalidPassword,
-  }
-}
-
-impl From<mongodb::oid::Error> for UserError {
-  fn from(_: mongodb::oid::Error) -> Self {
-    UserError::UserIdError
-  }
-}
-
-impl From<mongodb::Error> for UserError {
-  fn from(_: mongodb::Error) -> Self {
-    UserError::DatabaseError
-  }
-}
+use super::user_session::UserSession;
+use crate::util::database::Database;
+use super::user_error::UserError;
 
 #[derive(Serialize, Deserialize)]
 pub struct User {

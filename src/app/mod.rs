@@ -1,9 +1,11 @@
 pub mod genre;
 pub mod dmk;
+pub mod dmk_error;
 pub mod dmk_id_base;
 pub mod manga_status;
 pub mod manga_episode;
 pub mod manga;
+pub mod user_error;
 pub mod user_setting;
 pub mod user_session;
 pub mod user;

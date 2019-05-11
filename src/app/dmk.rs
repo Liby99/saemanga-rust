@@ -4,40 +4,13 @@ use scraper::{Selector, Html};
 use scraper::element_ref::{ElementRef, Select};
 use reqwest::RedirectPolicy;
 use reqwest::header::{CONTENT_TYPE, LOCATION, REFERER};
-use std::option::NoneError;
 use encoding::all::BIG5_2003;
 use encoding::{EncoderTrap};
 use encoding::types::Encoding;
 
 use crate::app::manga::*;
 use crate::app::genre::*;
-
-#[derive(Debug)]
-pub struct DmkScrapeError(String);
-
-impl DmkScrapeError {
-  fn new(msg: String) -> Self {
-    DmkScrapeError(msg)
-  }
-}
-
-impl std::fmt::Display for DmkScrapeError {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "Scraper Error: {}", self.0)
-  }
-}
-
-impl From<NoneError> for DmkScrapeError {
-  fn from(error: NoneError) -> Self {
-    Self::new(format!("Unwrapping none error: {:?}", error))
-  }
-}
-
-impl From<reqwest::Error> for DmkScrapeError {
-  fn from(error: reqwest::Error) -> Self {
-    Self::new(format!("Reqwesting webpage error: {:?}", error))
-  }
-}
+use super::dmk_error::*;
 
 fn extract_num_pages(font: &String) -> Option<i32> {
   lazy_static! { static ref NUM_PAGES_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
@@ -78,7 +51,7 @@ fn extract_episodes(trs: Select, start_index: usize) -> Vec<MangaEpisode> {
   }).flatten().collect::<Vec<_>>()
 }
 
-pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkScrapeError> {
+pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
 
   // Check validity of dmk_id
   assert!(is_valid_dmk_id(dmk_id), format!("Invalid dmk_id {}", dmk_id));
@@ -122,10 +95,10 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkScrapeError> {
         Some(href) => match Genre::from_dmk_genre_url(href) {
           Some(genre) => genre,
           None => {
-            return Err(DmkScrapeError::new(format!("Cannot extract genre information from url {}", href)));
+            return Err(DmkError::new(format!("Cannot extract genre information from url {}", href)));
           },
         },
-        None => { return Err(DmkScrapeError::new(format!("Genre information doesn't exist"))); }
+        None => { return Err(DmkError::new(format!("Genre information doesn't exist"))); }
       }
     };
 
@@ -236,7 +209,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkScrapeError> {
         DmkIdBase::from_dmk_image_url(&true_img_loc)?
       },
       Err(_) => {
-        return Err(DmkScrapeError::new(String::from("Not able to fetch real image location")))
+        return Err(DmkError::new(String::from("Not able to fetch real image location")))
       }
     }
   };
@@ -245,7 +218,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkScrapeError> {
   Ok(Manga::new(dmk_id.clone(), dmk_id_base, title, description, author, tags, genre, status, episodes))
 }
 
-fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -> Result<Vec<String>, DmkScrapeError> {
+fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -> Result<Vec<String>, DmkError> {
   let ids = a_elems.filter_map(|a: ElementRef| {
     match a.value().attr("href") {
       Some(href) => {
@@ -269,7 +242,7 @@ lazy_static! {
   ).unwrap();
 }
 
-fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, DmkScrapeError> {
+fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, DmkError> {
   let html_text = reqwest::get(url.as_str())?.text_with_charset("big5")?;
   let document = Html::parse_document(&html_text);
 
@@ -278,21 +251,21 @@ fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, DmkScrapeErr
   Ok(get_manga_ids_from_a_elems(a_elems)?)
 }
 
-pub fn fetch_latest_manga() -> Result<Vec<String>, DmkScrapeError> {
+pub fn fetch_latest_manga() -> Result<Vec<String>, DmkError> {
   fetch_latest_manga_with_url(&String::from("https://cartoonmad.com/"))
 }
 
-pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<String>, DmkScrapeError> {
+pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<String>, DmkError> {
   fetch_latest_manga_with_url(&genre.dmk_url())
 }
 
-pub fn search(text: &String) -> Result<Vec<String>, DmkScrapeError> {
+pub fn search(text: &String) -> Result<Vec<String>, DmkError> {
 
   // First generate the keyword. We are assuming the given text is already traditional chinese
   let keyword : String = {
     match BIG5_2003.encode(text, EncoderTrap::Ignore) {
       Ok(byte_arr) => byte_arr.into_iter().map(|b: u8| format!("%{:X}", b)).collect::<Vec<_>>().join(""),
-      Err(_) => { return Err(DmkScrapeError(String::from("Keyword encoding error"))); }
+      Err(_) => { return Err(DmkError::new(String::from("Keyword encoding error"))); }
     }
   };
 

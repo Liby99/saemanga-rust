@@ -1,7 +1,7 @@
 use rocket_contrib::templates::Template;
 use enum_primitive::FromPrimitive;
 
-use crate::app::user::UserError;
+use crate::app::user_error::UserError;
 
 #[derive(Serialize)]
 struct ErrorData<'a> {

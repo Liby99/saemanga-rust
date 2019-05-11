@@ -58,6 +58,12 @@
     <button type="submit">Setup</button>
   </form>
   <hr />
+  <h2>Add Manga</h2>
+  <form action="/admin/manga/add" method="POST">
+    <p>Add a manga by its Cartoonmad ID (e.g. 1456)</p>
+    <input name="dmk_id" placeholder="Cartoonmad ID" />
+    <button type="submit">Add</button>
+  </form>
 {{/inline}}
 
 {{~> layout/admin title="Index"}}

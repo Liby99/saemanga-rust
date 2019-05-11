@@ -4,6 +4,7 @@ use rocket::response::Redirect;
 mod index;
 mod error;
 mod user;
+mod manga;
 
 #[get("/admin")]
 pub fn root() -> Redirect {
@@ -17,6 +18,7 @@ pub fn routes() -> Vec<Route> {
       index::index,
       error::error
     ],
-    user::routes()
+    user::routes(),
+    manga::routes(),
   ].concat()
 }

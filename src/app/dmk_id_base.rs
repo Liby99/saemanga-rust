@@ -1,6 +1,8 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 
+use crate::app::error::Error;
+
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "version")]
 pub enum DmkIdBase {
@@ -61,15 +63,18 @@ fn parse_v05_image_url(url: &String) -> Option<DmkIdBase> {
 }
 
 impl DmkIdBase {
-  pub fn from_dmk_image_url(url: &String) -> Option<Self> {
+  pub fn from_dmk_image_url(url: &String) -> Result<Self, Error> {
     let functions : Vec<&Fn(&String) -> Option<Self>> = vec![
       &parse_v10_image_url, &parse_v09_image_url, &parse_v08_image_url,
       &parse_v07_image_url, &parse_v06_image_url, &parse_v05_image_url,
     ];
     for f in functions {
-      match f(url) { Some(res) => { return Some(res); }, _ => () }
+      match f(url) {
+        Some(res) => return Ok(res),
+        _ => ()
+      }
     }
-    None
+    Err(Error::DmkIdBaseParseError)
   }
 
   pub fn dmk_image_url_base(&self) -> String {

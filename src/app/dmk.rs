@@ -10,7 +10,7 @@ use encoding::types::Encoding;
 
 use crate::app::manga::*;
 use crate::app::genre::*;
-use super::dmk_error::*;
+use crate::app::error::Error;
 
 fn extract_num_pages(font: &String) -> Option<i32> {
   lazy_static! { static ref NUM_PAGES_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
@@ -51,14 +51,15 @@ fn extract_episodes(trs: Select, start_index: usize) -> Vec<MangaEpisode> {
   }).flatten().collect::<Vec<_>>()
 }
 
-pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
+pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, Error> {
 
   // Check validity of dmk_id
   assert!(is_valid_dmk_id(dmk_id), format!("Invalid dmk_id {}", dmk_id));
 
   // Generate url and make the request
   let url = format!("https://cartoonmad.com/comic/{}.html", dmk_id);
-  let html_text = reqwest::get(url.as_str())?.text_with_charset("big5")?;
+  let mut response = reqwest::get(url.as_str()).map_err(|_| Error::DmkFetchError)?;
+  let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
 
   // First go to scraper parse
   let document = Html::parse_document(&html_text);
@@ -67,12 +68,12 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
       "body > table > tbody > tr:first-child > td:nth-child(2) > table > tbody"
     ).unwrap();
   }
-  let main_tbody = document.select(&MAIN_TR_SEL).next()?;
+  let main_tbody = document.select(&MAIN_TR_SEL).next().ok_or(Error::DmkDomTraverseError)?;
 
   // Then extract the title information
   let title = {
     lazy_static!{ static ref TITLE_SEL : Selector = Selector::parse("tr:nth-child(3) > td:nth-child(2) > a:last-child").unwrap(); }
-    main_tbody.select(&TITLE_SEL).next()?.inner_html().to_string()
+    main_tbody.select(&TITLE_SEL).next().ok_or(Error::DmkDomTraverseError)?.inner_html().to_string()
   };
 
   // Then go to the info section
@@ -81,34 +82,27 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
       "tr:nth-child(4) > td > table > tbody > tr:nth-child(2) > td:nth-child(2)"
     ).unwrap();
   }
-  let info_td = main_tbody.select(&INFO_TD_SEL).next()?;
+  let info_td = main_tbody.select(&INFO_TD_SEL).next().ok_or(Error::DmkDomTraverseError)?;
 
   // Extract these information
   let (genre, author, tags, status) = {
     lazy_static!{ static ref INFO_TBODY_SEL : Selector = Selector::parse("table:first-child > tbody").unwrap(); }
-    let info_tbody = info_td.select(&INFO_TBODY_SEL).next()?;
+    let info_tbody = info_td.select(&INFO_TBODY_SEL).next().ok_or(Error::DmkDomTraverseError)?;
 
     // Extract the genre information
     let genre : &'static Genre = {
       lazy_static!{ static ref GENRE_SEL : Selector = Selector::parse("tr:nth-child(3) > td > a").unwrap(); }
-      match info_tbody.select(&GENRE_SEL).next()?.value().attr("href") {
-        Some(href) => match Genre::from_dmk_genre_url(href) {
-          Some(genre) => genre,
-          None => {
-            return Err(DmkError::new(format!("Cannot extract genre information from url {}", href)));
-          },
-        },
-        None => { return Err(DmkError::new(format!("Genre information doesn't exist"))); }
+      match info_tbody.select(&GENRE_SEL).next().ok_or(Error::DmkDomTraverseError)?.value().attr("href") {
+        Some(href) => Genre::from_dmk_genre_url(href).ok_or(Error::GenreNotFoundError)?,
+        None => return Err(Error::GenreInfoExtractionError)
       }
     };
 
     // Extract the author information
     let author : String = {
       lazy_static!{ static ref AUTHOR_SEL : Selector = Selector::parse("tr:nth-child(5) > td").unwrap(); }
-      let text = info_tbody.select(&AUTHOR_SEL).next()?.text().collect::<Vec<_>>();
-      let mut iter = text[0].trim().split_whitespace();
-      iter.next();
-      String::from(iter.next()?)
+      let text = info_tbody.select(&AUTHOR_SEL).next().ok_or(Error::DmkDomTraverseError)?.text().collect::<Vec<_>>();
+      String::from(text[0].trim().split_whitespace().nth(1).ok_or(Error::DmkParseError)?)
     };
 
     // Extract tag information
@@ -128,7 +122,8 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
       }
 
       // Get the status
-      let img_src = info_tbody.select(&STATUS_IMG_SEL).next()?.value().attr("src")?;
+      let img_elem = info_tbody.select(&STATUS_IMG_SEL).next().ok_or(Error::DmkDomTraverseError)?;
+      let img_src = img_elem.value().attr("src").ok_or(Error::DmkParseError)?;
       match img_src.find('9') {
         Some(_) => MangaStatus::Ended,
         None => MangaStatus::Updating
@@ -150,7 +145,8 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
     }
 
     // Get the description
-    info_td.select(&DESCRIPTION_SEL).next()?.text().collect::<Vec<_>>().join(" ").trim().to_string()
+    let desc_elem = info_td.select(&DESCRIPTION_SEL).next().ok_or(Error::DmkDomTraverseError)?;
+    desc_elem.text().collect::<Vec<_>>().join(" ").trim().to_string()
   };
 
   // Extract book and episode information
@@ -168,7 +164,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
     let mut tables = info_td.select(&TABLE_SEL);
 
     // Get the first table and extract it to episodes
-    let first_table = tables.next()?;
+    let first_table = tables.next().ok_or(Error::DmkDomTraverseError)?;
     match tables.next() {
       Some(second_table) => {
         let books = extract_episodes(first_table.select(&TR_SEL), 0);
@@ -184,7 +180,8 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
 
     // Get episode webpage
     let epi_url = format!("https://www.cartoonmad.com{}", &episodes[0].dmk_directory());
-    let epi_html_text = reqwest::get(epi_url.as_str())?.text_with_charset("big5")?;
+    let mut response = reqwest::get(epi_url.as_str()).map_err(|_| Error::DmkFetchError)?;
+    let epi_html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
 
     // Make the selector lazy static
     lazy_static!{
@@ -195,43 +192,29 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, DmkError> {
 
     // Parse the episode html text to dom
     let epi_document = Html::parse_document(epi_html_text.as_str());
-    let img_elem = epi_document.select(&IMG_SEL).next()?;
-    let img_src = img_elem.value().attr("src")?;
+    let img_elem = epi_document.select(&IMG_SEL).next().ok_or(Error::DmkDomTraverseError)?;
+    let img_src = img_elem.value().attr("src").ok_or(Error::DmkParseError)?;
     let full_img_url = format!("https://www.cartoonmad.com/comic/{}", img_src);
 
     // Request the image url and get the response header
-    let client = reqwest::Client::builder().redirect(RedirectPolicy::none()).build()?;
-    let res = client.get(full_img_url.as_str()).header(REFERER, epi_url).send()?;
-    match res.headers().get(LOCATION)?.to_str() {
-      Ok(s) => {
-        // Finally convert the true location into dmk id base
-        let true_img_loc = String::from(s);
-        DmkIdBase::from_dmk_image_url(&true_img_loc)?
-      },
-      Err(_) => {
-        return Err(DmkError::new(String::from("Not able to fetch real image location")))
-      }
-    }
+    let client = reqwest::Client::builder().redirect(RedirectPolicy::none()).build().unwrap(); // Using unwrap because this should be done deterministically
+    let res = client.get(full_img_url.as_str()).header(REFERER, epi_url).send().map_err(|_| Error::DmkFetchError)?;
+    let redirect = res.headers().get(LOCATION).ok_or(Error::DmkRedirectNotFoundError)?;
+    let true_img_loc = redirect.to_str().map_err(|_| Error::DmkParseError)?.to_string();
+    DmkIdBase::from_dmk_image_url(&true_img_loc)?
   };
 
   // Return the finally extracted Manga object
   Ok(Manga::new(dmk_id.clone(), dmk_id_base, title, description, author, tags, genre, status, episodes))
 }
 
-fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -> Result<Vec<String>, DmkError> {
-  let ids = a_elems.filter_map(|a: ElementRef| {
-    match a.value().attr("href") {
-      Some(href) => {
-        lazy_static! { static ref COMIC_URL_REG : Regex = Regex::new(r"comic/(\d+).html").unwrap(); }
-        match COMIC_URL_REG.captures(href) {
-          Some(cap) => Some(String::from(&cap[1])),
-          None => None
-        }
-      },
-      None => None
-    }
-  }).collect::<Vec<_>>();
-  Ok(ids)
+fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -> Result<Vec<String>, Error> {
+  Ok(a_elems.filter_map(|a: ElementRef| {
+    a.value().attr("href").and_then(|href| {
+      lazy_static! { static ref COMIC_URL_REG : Regex = Regex::new(r"comic/(\d+).html").unwrap(); }
+      COMIC_URL_REG.captures(href).map(|cap| String::from(&cap[1]))
+    })
+  }).collect::<Vec<String>>())
 }
 
 lazy_static! {
@@ -242,8 +225,9 @@ lazy_static! {
   ).unwrap();
 }
 
-fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, DmkError> {
-  let html_text = reqwest::get(url.as_str())?.text_with_charset("big5")?;
+fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, Error> {
+  let mut response = reqwest::get(url.as_str()).map_err(|_| Error::DmkFetchError)?;
+  let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
   let document = Html::parse_document(&html_text);
 
   // Select the a elements that the hrefs include the dmk_id
@@ -251,21 +235,21 @@ fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, DmkError> {
   Ok(get_manga_ids_from_a_elems(a_elems)?)
 }
 
-pub fn fetch_latest_manga() -> Result<Vec<String>, DmkError> {
+pub fn fetch_latest_manga() -> Result<Vec<String>, Error> {
   fetch_latest_manga_with_url(&String::from("https://cartoonmad.com/"))
 }
 
-pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<String>, DmkError> {
+pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<String>, Error> {
   fetch_latest_manga_with_url(&genre.dmk_url())
 }
 
-pub fn search(text: &String) -> Result<Vec<String>, DmkError> {
+pub fn search(text: &String) -> Result<Vec<String>, Error> {
 
   // First generate the keyword. We are assuming the given text is already traditional chinese
   let keyword : String = {
     match BIG5_2003.encode(text, EncoderTrap::Ignore) {
       Ok(byte_arr) => byte_arr.into_iter().map(|b: u8| format!("%{:X}", b)).collect::<Vec<_>>().join(""),
-      Err(_) => { return Err(DmkError::new(String::from("Keyword encoding error"))); }
+      Err(_) => { return Err(Error::DmkSearchEncodingError); }
     }
   };
 
@@ -275,8 +259,8 @@ pub fn search(text: &String) -> Result<Vec<String>, DmkError> {
   let mut response = client.post("https://cartoonmad.com/search.html")
     .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
     .body(query.into_bytes()) // Has to send the body using raw bytes array
-    .send()?;
-  let html_text = response.text_with_charset("big5")?;
+    .send().map_err(|_| Error::DmkFetchError)?;
+  let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
 
   // Parse the documents and get the A elements
   let document = Html::parse_document(&html_text);

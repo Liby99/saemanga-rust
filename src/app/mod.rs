@@ -1,3 +1,4 @@
+pub mod error;
 pub mod genre;
 pub mod dmk;
 pub mod dmk_error;

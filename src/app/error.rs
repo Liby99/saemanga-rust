@@ -1,11 +1,11 @@
 enum_from_primitive! {
-  #[derive(Debug)]
+  #[derive(Debug, PartialEq)]
   pub enum Error {
 
     // 1000 for basic errors
     UnknownError = 1000,
-    DatabaseError(mongodb::Error),
-    ObjectIdError(mongodb::oid::Error),
+    DatabaseError,
+    ObjectIdError,
 
     // 1100 for user related errors
     UserSerializeError = 1100,
@@ -19,6 +19,11 @@ enum_from_primitive! {
     GenreInfoExtractionError = 1200,
     GenreNotFoundError,
     DmkFetchError,
-    DmkHtmlElemNotFound,
+    DmkEncodingError,
+    DmkDomTraverseError,
+    DmkParseError,
+    DmkRedirectNotFoundError,
+    DmkIdBaseParseError,
+    DmkSearchEncodingError,
   }
 }

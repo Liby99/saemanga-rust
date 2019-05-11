@@ -9,7 +9,7 @@ fn test_fetch_manga_5893() {
       assert_eq!(manga.genre().name(), "校園", "Gotoubun no hanayome should have genre gakuen");
       assert_eq!(manga.first_episode().episode(), 0, "Gotoubun no hanayome should start with episode 0");
     },
-    Err(msg) => assert!(false, format!("Fetch manga failed: {}", msg)),
+    Err(err) => assert!(false, format!("Fetch manga failed: {:?}", err)),
   };
 }
 
@@ -22,7 +22,7 @@ fn test_fetch_manga_kaikan_shirei() {
       assert_eq!(manga.dmk_id(), "1237", "Manga 1237 should have dmk_id 1237");
       assert_eq!(manga.latest_episode().episode(), 17, "Manga 1237 Lastest episode should be 17");
     },
-    Err(msg) => assert!(false, format!("Fetch manga failed: {}", msg)),
+    Err(err) => assert!(false, format!("Fetch manga failed: {:?}", err)),
   };
 }
 
@@ -33,7 +33,7 @@ fn test_fetch_manga_shingeki_no_kyoujin() {
     Ok(manga) => {
       assert_eq!(manga.first_episode().episode(), 0, "Shingeki No Kyoujin starts with episode 0");
     },
-    Err(msg) => assert!(false, format!("Fetch manga failed: {}", msg)),
+    Err(err) => assert!(false, format!("Fetch manga failed: {:?}", err)),
   };
 }
 
@@ -44,6 +44,6 @@ fn test_fetch_manga_one_piece() {
     Ok(manga) => {
       assert!(manga.latest_episode().episode() > 900, "One piece should have at least 900 episodes");
     },
-    Err(msg) => assert!(false, format!("Fetch manga failed: {}", msg)),
+    Err(err) => assert!(false, format!("Fetch manga failed: {:?}", err)),
   };
 }

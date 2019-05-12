@@ -58,18 +58,13 @@
     <button type="submit">Setup</button>
   </form>
   <hr />
-  <h2>Add Manga</h2>
+  <h2>Manga Information</h2>
   <form action="/admin/manga/add" method="POST">
-    <p>Add a manga by its Cartoonmad ID (e.g. 1456)</p>
+    <p>Add a manga by its Cartoonmad ID (e.g. 1456). Use upsert if you want to update the manga (insert if not existed). Use Check to view the manga information.</p>
     <input name="dmk_id" placeholder="Cartoonmad ID" autocomplete="off" />
     <button type="submit">Add</button>
-  </form>
-  <hr />
-  <h2>Check Manga</h2>
-  <form action="/admin/manga/check" method="POST">
-    <p>Check a manga by its Cartoonmad ID (e.g. 1456)</p>
-    <input name="dmk_id" placeholder="Cartoonmad ID" autocomplete="off" />
-    <button type="submit">Check</button>
+    <button type="submit" formaction="/admin/manga/upsert">Upsert</button>
+    <button type="submit" formaction="/admin/manga/check">Check</button>
   </form>
   <hr />
   <h2>Manga Collection Setup</h2>

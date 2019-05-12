@@ -4,7 +4,7 @@ use saemanga::app::dmk_id_base::*;
 use saemanga::app::manga_status::*;
 use saemanga::app::manga_data::*;
 use saemanga::app::user::*;
-use saemanga::app::manga_wrapper::*;
+use saemanga::app::manga::*;
 use mongodb::{Bson, bson, doc};
 
 #[test]
@@ -89,7 +89,7 @@ fn user_ser_test() {
 #[test]
 fn manga_wrapper_ser_test() {
   match dmk::fetch_manga_data(&String::from("1234")) {
-    Ok(manga) => match MangaWrapper::new(&manga) {
+    Ok(manga) => match Manga::new(&manga) {
       Ok(wrapped) => match bson::to_bson(&wrapped) {
         Ok(doc) => println!("Serialized: {:?}", doc),
         Err(err) => println!("Unable to serialize: {:?}", err)

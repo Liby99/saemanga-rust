@@ -26,51 +26,10 @@ pub struct User {
 }
 
 impl User {
-  pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {
-    let coll = Self::coll(&conn);
-    match coll.create_index(doc! {
-      "username": 1
-    }, Some(mongodb::coll::options::IndexOptions {
-      unique: Some(true),
-      ..Default::default()
-    })) {
-      Ok(_) => Ok(()),
-      Err(_) => Err(Error::DatabaseError),
-    }
-  }
-
-  pub fn get_by_id(conn: &Database, id: &String) -> Result<Self, Error> {
-    Self::get_one(&conn, Some(doc! {
-      "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
-    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
-  }
-
-  pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, Error> {
-    Self::get_one(&conn, Some(doc! {
-      "username": username.to_lowercase()
-    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
-  }
-
-  pub fn encrypt(password: &String) -> String {
-    let mut hasher = Sha256::new();
-    hasher.input_str(&password.as_str());
-    hasher.result_str()
-  }
-
-  pub fn is_valid_username(username: &String) -> bool {
-    lazy_static!{ static ref USERNAME_REG : Regex = Regex::new(r"^[A-Za-z0-9\-_\[\]]{4,16}$").unwrap(); }
-    USERNAME_REG.is_match(&username.as_str())
-  }
-
-  pub fn is_valid_password(password: &String) -> bool {
-    lazy_static!{ static ref PASSWORD_REG : Regex = Regex::new(r"^[A-Za-z0-9\-_\.#*@]{8,32}$").unwrap(); }
-    PASSWORD_REG.is_match(&password.as_str())
-  }
-
   pub fn new(username: &String, password: &String) -> Result<Self, Error> {
     if Self::is_valid_password(&password) {
       if Self::is_valid_username(&username) {
-        let hashed_pwd = Self::encrypt(&password);
+        let hashed_pwd = Self::encrypt_password(&password);
         let now = mongodb::UtcDateTime::from(Utc::now());
         Ok(User {
           id: ObjectId::new().map_err(|_| Error::CannotCreateObjectId)?,
@@ -88,6 +47,60 @@ impl User {
     } else {
       Err(Error::InvalidPassword)
     }
+  }
+
+  pub fn id(&self) -> &ObjectId {
+    &self.id
+  }
+
+  pub fn username(&self) -> &String {
+    &self.username
+  }
+
+  pub fn register_date_time(&self) -> &bson::UtcDateTime {
+    &self.register_date_time
+  }
+
+  pub fn visit_count(&self) -> i32 {
+    self.visit_count
+  }
+
+  pub fn is_valid_username(username: &String) -> bool {
+    lazy_static!{ static ref USERNAME_REG : Regex = Regex::new(r"^[A-Za-z0-9\-_\[\]]{4,16}$").unwrap(); }
+    USERNAME_REG.is_match(&username.as_str())
+  }
+
+  pub fn is_valid_password(password: &String) -> bool {
+    lazy_static!{ static ref PASSWORD_REG : Regex = Regex::new(r"^[A-Za-z0-9\-_\.#*@]{8,32}$").unwrap(); }
+    PASSWORD_REG.is_match(&password.as_str())
+  }
+
+  pub fn encrypt_password(password: &String) -> String {
+    let mut hasher = Sha256::new();
+    hasher.input_str(&password.as_str());
+    hasher.result_str()
+  }
+
+  pub fn is_password_match(conn: &Database, id: &String, password: &String) -> Result<bool, Error> {
+    match Self::get_by_id(conn, id) {
+      Ok(user) => {
+        let hashed_pwd = Self::encrypt_password(password);
+        Ok(hashed_pwd == user.password)
+      },
+      Err(err) => Err(err)
+    }
+  }
+
+  pub fn get_by_id(conn: &Database, id: &String) -> Result<Self, Error> {
+    Self::get_one(&conn, Some(doc! {
+      "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
+    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
+  }
+
+  pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, Error> {
+    Self::get_one(&conn, Some(doc! {
+      "username": username.to_lowercase()
+    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
   }
 
   pub fn insert(conn: &Database, username: &String, password: &String) -> Result<Self, Error> {
@@ -122,7 +135,7 @@ impl User {
         "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
       }, doc! {
         "$set": {
-          "password": Self::encrypt(&new_password)
+          "password": Self::encrypt_password(&new_password)
         }
       }, None) {
         Ok(result) => match result.modified_count {
@@ -136,29 +149,16 @@ impl User {
     }
   }
 
-  pub fn is_password_match(conn: &Database, id: &String, password: &String) -> Result<bool, Error> {
-    match Self::get_by_id(conn, id) {
-      Ok(user) => {
-        let hashed_pwd = Self::encrypt(password);
-        Ok(hashed_pwd == user.password)
-      },
-      Err(err) => Err(err)
+  pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {
+    let coll = Self::coll(&conn);
+    match coll.create_index(doc! {
+      "username": 1
+    }, Some(mongodb::coll::options::IndexOptions {
+      unique: Some(true),
+      ..Default::default()
+    })) {
+      Ok(_) => Ok(()),
+      Err(_) => Err(Error::DatabaseError),
     }
-  }
-
-  pub fn id(&self) -> &ObjectId {
-    &self.id
-  }
-
-  pub fn username(&self) -> &String {
-    &self.username
-  }
-
-  pub fn register_date_time(&self) -> &bson::UtcDateTime {
-    &self.register_date_time
-  }
-
-  pub fn visit_count(&self) -> i32 {
-    self.visit_count
   }
 }

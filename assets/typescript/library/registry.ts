@@ -9,6 +9,7 @@ export default class Registry {
 
   static ATTR: string = "ctrl";
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static registry: { [key: string]: ControllerClass<any> } = {};
 
   /**

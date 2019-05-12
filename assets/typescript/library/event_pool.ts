@@ -35,7 +35,7 @@ export default class EventPool {
    * @param evt The event identifier. E.g. "event.is.triggered"
    * @param data The data associated with the event
    */
-  static emit(evt: string, data?: any) {
+  static emit<T>(evt: string, data?: T) {
     if (this.events[evt]) {
       this.events[evt].forEach((callback) => {
         callback(data);

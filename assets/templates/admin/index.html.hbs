@@ -16,9 +16,9 @@
         <th>Username</th>
         <th>#Visit</th>
         <th>Register Time</th>
-        <th>Remove User</th>
         <th>Change Password</th>
         <th>Test Password</th>
+        <th>Remove User</th>
       </tr>
     </thead>
     <tbody>
@@ -30,16 +30,16 @@
         <td>{{visit_count}}</td>
         <td>{{register_date_time}}</td>
         <td>
-          <form action="/admin/user/remove" method="POST" onsubmit="return confirm('Are you sure you want to remove user {{username}}?')">
-            <input style="display: none" name="id" value="{{id}}" />
-            <button type="submit">Remove</button>
-          </form>
-        </td>
-        <td>
           <a href="/admin/user/change_password/{{id}}">Change Password</a>
         </td>
         <td>
           <a href="/admin/user/test_password/{{id}}">Test Password</a>
+        </td>
+        <td>
+          <form action="/admin/user/remove" method="POST" onsubmit="return confirm('Are you sure you want to remove user {{username}}?')">
+            <input style="display: none" name="id" value="{{id}}" />
+            <button type="submit">Remove</button>
+          </form>
         </td>
       </tr>
       {{else}}

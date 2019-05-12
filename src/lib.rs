@@ -11,6 +11,8 @@ extern crate bson;
 extern crate crypto;
 extern crate lazy_static;
 
+#[macro_use] extern crate collection;
+
 pub mod app;
 pub mod routes;
 pub mod util;

@@ -1,9 +1,7 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 use mongodb::oid::ObjectId;
-use mongodb::ordered::OrderedDocument;
-use mongodb::coll::Collection;
-use mongodb::{Bson, bson, doc};
+use mongodb::{bson, doc};
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use chrono::Utc;
@@ -12,6 +10,7 @@ use super::user_session::UserSession;
 use crate::util::database::Database;
 use super::error::Error;
 
+#[collection("user")]
 #[derive(Serialize, Deserialize)]
 pub struct User {
   #[serde(rename="_id")]
@@ -26,10 +25,6 @@ pub struct User {
 }
 
 impl User {
-  pub fn coll(conn: &Database) -> Collection {
-    conn.collection("user")
-  }
-
   pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
     match coll.create_index(doc! {
@@ -43,60 +38,16 @@ impl User {
     }
   }
 
-  pub fn from_bson(bs: Bson) -> Result<Self, Error> {
-    match bson::from_bson::<User>(bs) {
-      Ok(user) => Ok(user),
-      Err(_) => Err(Error::UserDeserializeError)
-    }
-  }
-
-  pub fn from_doc(doc: OrderedDocument) -> Result<Self, Error> {
-    Self::from_bson(bson::Bson::Document(doc))
-  }
-
-  pub fn to_bson(&self) -> Result<Bson, Error> {
-    match bson::to_bson(&self) {
-      Ok(bs) => Ok(bs),
-      Err(_) => Err(Error::UserSerializeError),
-    }
-  }
-
-  pub fn to_doc(&self) -> Result<OrderedDocument, Error> {
-    self.to_bson().and_then(|bs| match bs {
-      Bson::Document(doc) => Ok(doc),
-      _ => Err(Error::UserSerializeError),
-    })
-  }
-
-  pub fn get_all(conn: &Database) -> Result<Vec<Self>, Error> {
-    let coll = Self::coll(&conn);
-    let cursor = coll.find(None, None).map_err(|_| Error::DatabaseError)?;
-    let users = cursor.map(|result| match result {
-      Ok(doc) => Self::from_doc(doc),
-      Err(_) => Err(Error::DatabaseError)
-    }).filter_map(Result::ok).collect::<Vec<_>>();
-    Ok(users)
-  }
-
-  pub fn get_one(conn: &Database, doc: OrderedDocument) -> Result<Self, Error> {
-    let coll = Self::coll(&conn);
-    let option_user_doc = coll.find_one(Some(doc), None).map_err(|_| Error::DatabaseError)?;
-    match option_user_doc {
-      Some(user_doc) => Self::from_doc(user_doc),
-      None => Err(Error::UserNotFoundError)
-    }
-  }
-
   pub fn get_by_id(conn: &Database, id: &String) -> Result<Self, Error> {
-    Self::get_one(&conn, doc! {
+    Self::get_one(&conn, Some(doc! {
       "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
-    })
+    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
   }
 
   pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, Error> {
-    Self::get_one(&conn, doc! {
+    Self::get_one(&conn, Some(doc! {
       "username": username.to_lowercase()
-    })
+    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
   }
 
   pub fn encrypt(password: &String) -> String {

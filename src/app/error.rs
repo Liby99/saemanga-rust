@@ -8,11 +8,13 @@ enum_from_primitive! {
     DatabaseError,
     CannotCreateObjectId,
     CannotParseObjectId,
+    SerializeError,
+    DeserializeError,
+    NoneInsertedError,
+    NoneDeletedError,
 
     // 1100 for user related errors
-    UserSerializeError = 1100,
-    UserDeserializeError,
-    UserNotFoundError,
+    UserNotFoundError = 1100,
     UserExistedError,
     InvalidUsername,
     InvalidPassword,
@@ -29,8 +31,6 @@ enum_from_primitive! {
     DmkSearchEncodingError,
     MangaExistedError,
     MangaNotFoundError,
-    MangaSerializeError,
-    MangaDeserializeError,
   }
 }
 
@@ -47,8 +47,10 @@ impl Error {
       Error::DatabaseError => "Database Error",
       Error::CannotCreateObjectId => "Cannot Create Object ID",
       Error::CannotParseObjectId => "Cannot Parse Object ID",
-      Error::UserSerializeError => "Cannot Serialize User",
-      Error::UserDeserializeError => "Cannot Deserialize User",
+      Error::SerializeError => "Unable to Serialize Data",
+      Error::DeserializeError => "Unable to Deserialize Data",
+      Error::NoneInsertedError => "Nothing is Getting Inserted",
+      Error::NoneDeletedError => "Nothing is Getting Deleted",
       Error::UserNotFoundError => "User Not Found",
       Error::UserExistedError => "User Already Existed",
       Error::InvalidUsername => "Invalid Username",
@@ -64,8 +66,6 @@ impl Error {
       Error::DmkSearchEncodingError => "Unable to Encode Search Text",
       Error::MangaNotFoundError => "Manga Not Found",
       Error::MangaExistedError => "Manga Already Existed",
-      Error::MangaSerializeError => "Unable to Serialize Manga Data",
-      Error::MangaDeserializeError => "Unable to Deserialize Manga Data",
     }
   }
 }

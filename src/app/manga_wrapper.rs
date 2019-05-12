@@ -43,7 +43,7 @@ impl MangaWrapper {
   pub fn from_bson(bs: Bson) -> Result<Self, Error> {
     match bson::from_bson::<Self>(bs) {
       Ok(user) => Ok(user),
-      Err(_) => Err(Error::MangaDeserializeError)
+      Err(_) => Err(Error::DeserializeError)
     }
   }
 
@@ -54,14 +54,14 @@ impl MangaWrapper {
   pub fn to_bson(&self) -> Result<Bson, Error> {
     match bson::to_bson(&self) {
       Ok(bs) => Ok(bs),
-      Err(_) => Err(Error::MangaSerializeError),
+      Err(_) => Err(Error::SerializeError),
     }
   }
 
   pub fn to_doc(&self) -> Result<OrderedDocument, Error> {
     self.to_bson().and_then(|bs| match bs {
       Bson::Document(doc) => Ok(doc),
-      _ => Err(Error::MangaSerializeError),
+      _ => Err(Error::SerializeError),
     })
   }
 

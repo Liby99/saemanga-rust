@@ -9,7 +9,7 @@
     "dev": "npx gulp dev",
     "build": "npx gulp build",
     "start": "cargo run",
-    "lint": "npx eslint assets/typescript/**/*.ts"
+    "lint": "npx eslint assets/typescript/**/*.ts --fix"
   },
   "repository": {
     "type": "git",

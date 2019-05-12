@@ -2,7 +2,7 @@ use saemanga;
 use saemanga::app::dmk;
 use saemanga::app::dmk_id_base::*;
 use saemanga::app::manga_status::*;
-use saemanga::app::manga::*;
+use saemanga::app::manga_data::*;
 use saemanga::app::user::*;
 use saemanga::app::manga_wrapper::*;
 use mongodb::{Bson, bson, doc};
@@ -42,7 +42,7 @@ fn status_deser_test() {
 
 #[test]
 fn manga_deser_test() {
-  let dib = bson::from_bson::<Manga>(Bson::Document(doc! {
+  let dib = bson::from_bson::<MangaData>(Bson::Document(doc! {
     "dmk_id": "1356",
     "dmk_id_base": {
       "version": "V10",

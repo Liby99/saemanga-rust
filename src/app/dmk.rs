@@ -8,7 +8,7 @@ use encoding::all::BIG5_2003;
 use encoding::{EncoderTrap};
 use encoding::types::Encoding;
 
-use crate::app::manga::*;
+use crate::app::manga_data::*;
 use crate::app::genre::*;
 use crate::util::Error;
 
@@ -51,7 +51,7 @@ fn extract_episodes(trs: Select, start_index: i32) -> Vec<MangaEpisode> {
   }).flatten().collect::<Vec<_>>()
 }
 
-pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, Error> {
+pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
 
   // Check validity of dmk_id
   assert!(is_valid_dmk_id(dmk_id), format!("Invalid dmk_id {}", dmk_id));
@@ -205,7 +205,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<Manga, Error> {
   };
 
   // Return the finally extracted Manga object
-  Ok(Manga::new(dmk_id.clone(), dmk_id_base, title, description, author, tags, genre, status, episodes))
+  Ok(MangaData::new(dmk_id.clone(), dmk_id_base, title, description, author, tags, genre, status, episodes))
 }
 
 fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -> Result<Vec<String>, Error> {

@@ -1,5 +1,5 @@
 use saemanga::app::dmk::*;
-use saemanga::app::manga::*;
+use saemanga::app::manga_data::*;
 
 #[test]
 fn test_fetch_manga_5893() {

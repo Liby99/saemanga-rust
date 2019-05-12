@@ -1,4 +1,4 @@
-use saemanga::app::manga::*;
+use saemanga::app::manga_data::*;
 
 #[test]
 fn test_parse_dmk_image_url() {

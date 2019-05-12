@@ -16,13 +16,15 @@ pub fn collection_attr(attr: TokenStream, input: TokenStream) -> Result<TokenStr
   Ok(quote! {
     #input
 
-    impl #guard_type {
-      pub fn coll(conn: &Database) -> mongodb::coll::Collection {
+    impl Collection for #guard_type {
+      fn coll(conn: &Database) -> mongodb::coll::Collection {
         conn.collection(#name)
       }
+    }
 
+    impl #guard_type {
       pub fn from_bson(bs: mongodb::Bson) -> Result<Self, Error> {
-        match bson::from_bson::<#guard_type>(bs) {
+        match bson::from_bson::<Self>(bs) {
           Ok(s) => Ok(s),
           Err(_) => Err(Error::DeserializeError)
         }

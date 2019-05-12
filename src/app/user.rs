@@ -7,8 +7,9 @@ use crypto::sha2::Sha256;
 use chrono::Utc;
 
 use super::user_session::UserSession;
-use crate::util::database::Database;
-use super::error::Error;
+use crate::util::Collection;
+use crate::util::Database;
+use crate::util::Error;
 
 #[collection("user")]
 #[derive(Serialize, Deserialize)]

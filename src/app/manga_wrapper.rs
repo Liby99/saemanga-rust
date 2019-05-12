@@ -2,9 +2,10 @@ use mongodb::oid::ObjectId;
 use mongodb::{bson, doc};
 use chrono::Utc;
 
-use crate::util::database::Database;
 use super::manga::Manga;
-use super::error::Error;
+use crate::util::Collection;
+use crate::util::Database;
+use crate::util::Error;
 
 #[collection("manga")]
 #[derive(Debug, Serialize, Deserialize)]

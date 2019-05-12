@@ -10,7 +10,7 @@ use encoding::types::Encoding;
 
 use crate::app::manga::*;
 use crate::app::genre::*;
-use crate::app::error::Error;
+use crate::util::Error;
 
 fn extract_num_pages(font: &String) -> Option<i32> {
   lazy_static! { static ref NUM_PAGES_RE : Regex = Regex::new(r"(\d+)").unwrap(); }

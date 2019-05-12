@@ -1,13 +1,12 @@
 use mongodb::oid::ObjectId;
-use mongodb::coll::Collection;
-use mongodb::ordered::OrderedDocument;
-use mongodb::{Bson, bson, doc};
+use mongodb::{bson, doc};
 use chrono::Utc;
 
-use super::error::Error;
-use super::manga::Manga;
 use crate::util::database::Database;
+use super::manga::Manga;
+use super::error::Error;
 
+#[collection("manga")]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MangaWrapper {
   #[serde(rename="_id")]
@@ -23,10 +22,6 @@ pub struct MangaWrapper {
 }
 
 impl MangaWrapper {
-  pub fn coll(conn: &Database) -> Collection {
-    conn.collection("manga")
-  }
-
   pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
     match coll.create_index(doc! {
@@ -40,31 +35,6 @@ impl MangaWrapper {
     }
   }
 
-  pub fn from_bson(bs: Bson) -> Result<Self, Error> {
-    match bson::from_bson::<Self>(bs) {
-      Ok(user) => Ok(user),
-      Err(_) => Err(Error::DeserializeError)
-    }
-  }
-
-  pub fn from_doc(doc: OrderedDocument) -> Result<Self, Error> {
-    Self::from_bson(bson::Bson::Document(doc))
-  }
-
-  pub fn to_bson(&self) -> Result<Bson, Error> {
-    match bson::to_bson(&self) {
-      Ok(bs) => Ok(bs),
-      Err(_) => Err(Error::SerializeError),
-    }
-  }
-
-  pub fn to_doc(&self) -> Result<OrderedDocument, Error> {
-    self.to_bson().and_then(|bs| match bs {
-      Bson::Document(doc) => Ok(doc),
-      _ => Err(Error::SerializeError),
-    })
-  }
-
   pub fn new(manga: &Manga) -> Result<MangaWrapper, Error> {
     let now = mongodb::UtcDateTime::from(Utc::now());
     Ok(MangaWrapper {
@@ -76,25 +46,10 @@ impl MangaWrapper {
     })
   }
 
-  pub fn get_all(conn: &Database) -> Result<Vec<Self>, Error> {
-    let coll = Self::coll(&conn);
-    let cursor = coll.find(None, None).map_err(|_| Error::DatabaseError)?;
-    let mangas = cursor.map(|result| match result {
-      Ok(doc) => Self::from_doc(doc),
-      Err(_) => Err(Error::DatabaseError)
-    }).filter_map(Result::ok).collect::<Vec<_>>();
-    Ok(mangas)
-  }
-
-  pub fn get(conn: &Database, dmk_id: &String) -> Result<Self, Error> {
-    let coll = Self::coll(&conn);
-    let option_user_doc = coll.find_one(Some(doc! {
+  pub fn get_by_dmk_id(conn: &Database, dmk_id: &String) -> Result<Self, Error> {
+    Self::get_one(&conn, Some(doc! {
       "dmk_id": dmk_id
-    }), None).map_err(|_| Error::DatabaseError)?;
-    match option_user_doc {
-      Some(user_doc) => Self::from_doc(user_doc),
-      None => Err(Error::MangaNotFoundError)
-    }
+    }), None).and_then(|res| res.ok_or(Error::MangaNotFoundError))
   }
 
   pub fn insert(conn: &Database, manga: &Manga) -> Result<Self, Error> {

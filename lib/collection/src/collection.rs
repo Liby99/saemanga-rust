@@ -22,8 +22,8 @@ pub fn collection_attr(attr: TokenStream, input: TokenStream) -> Result<TokenStr
       }
 
       pub fn from_bson(bs: mongodb::Bson) -> Result<Self, Error> {
-        match bson::from_bson::<User>(bs) {
-          Ok(user) => Ok(user),
+        match bson::from_bson::<#guard_type>(bs) {
+          Ok(s) => Ok(s),
           Err(_) => Err(Error::DeserializeError)
         }
       }

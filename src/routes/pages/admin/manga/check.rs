@@ -18,7 +18,7 @@ struct TemplateData {
 
 #[post("/admin/manga/check", data="<data>")]
 pub fn check(conn: Database, data: Form<CheckForm>) -> Result<Template, Redirect> {
-  match MangaWrapper::get(&conn, &data.dmk_id) {
+  match MangaWrapper::get_by_dmk_id(&conn, &data.dmk_id) {
     Ok(wrapper) => Ok(Template::render("admin/check_manga", &TemplateData {
       cartoonmad_url: wrapper.manga().dmk_base_url(),
       manga: wrapper,

@@ -11,6 +11,7 @@ enum_from_primitive! {
     SerializeError,
     DeserializeError,
     NoneInsertedError,
+    NoneModifiedError,
     NoneDeletedError,
     DecodeUrlError,
 
@@ -65,6 +66,7 @@ impl Error {
       Error::SerializeError => "Unable to Serialize Data",
       Error::DeserializeError => "Unable to Deserialize Data",
       Error::NoneInsertedError => "Nothing is Getting Inserted",
+      Error::NoneModifiedError => "Nothing is Getting Modified",
       Error::NoneDeletedError => "Nothing is Getting Deleted",
       Error::DecodeUrlError => "Unable to Decode Url",
       Error::UnknownLightMode => "Unknown Light Mode",

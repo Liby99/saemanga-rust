@@ -10,88 +10,94 @@ pub struct Genre {
   pub dmk_directory: &'static str,
 }
 
+pub static ALL : Genre = Genre {
+  id: "all",
+  name: "全部",
+  dmk_directory: "",
+};
+
 pub static COMBAT : Genre = Genre {
   id: "combat",
   name: "格鬥",
-  dmk_directory: "comic01",
+  dmk_directory: "comic01.html",
 };
 
 pub static MAGIC : Genre = Genre {
   id: "magic",
   name: "魔法",
-  dmk_directory: "comic02",
+  dmk_directory: "comic02.html",
 };
 
 pub static DETECTIVE : Genre = Genre {
   id: "detective",
   name: "偵探",
-  dmk_directory: "comic03",
+  dmk_directory: "comic03.html",
 };
 
 pub static SPORT : Genre = Genre {
   id: "sport",
   name: "競技",
-  dmk_directory: "comic04",
+  dmk_directory: "comic04.html",
 };
 
 pub static HORROR : Genre = Genre {
   id: "horror",
   name: "恐怖",
-  dmk_directory: "comic10",
+  dmk_directory: "comic10.html",
 };
 
 pub static SENGOKU : Genre = Genre {
   id: "sengoku",
   name: "戰國",
-  dmk_directory: "comic07",
+  dmk_directory: "comic07.html",
 };
 
 pub static MAGEN : Genre = Genre {
   id: "magen",
   name: "魔幻",
-  dmk_directory: "comic08",
+  dmk_directory: "comic08.html",
 };
 
 pub static ADV : Genre = Genre {
   id: "adv",
   name: "冒險",
-  dmk_directory: "comic09",
+  dmk_directory: "comic09.html",
 };
 
 pub static GAKUEN : Genre = Genre {
   id: "gakuen",
   name: "校園",
-  dmk_directory: "comic16",
+  dmk_directory: "comic16.html",
 };
 
 pub static COMEDY : Genre = Genre {
   id: "comedy",
   name: "搞笑",
-  dmk_directory: "comic17",
+  dmk_directory: "comic17.html",
 };
 
 pub static SHOJO : Genre = Genre {
   id: "shojo",
   name: "少女",
-  dmk_directory: "comic13",
+  dmk_directory: "comic13.html",
 };
 
 pub static SHONEN : Genre = Genre {
   id: "shonen",
   name: "少男",
-  dmk_directory: "comic14",
+  dmk_directory: "comic14.html",
 };
 
 pub static SCIFI : Genre = Genre {
   id: "scifi",
   name: "科幻",
-  dmk_directory: "comic18",
+  dmk_directory: "comic18.html",
 };
 
 pub static OTHER : Genre = Genre {
   id: "other",
   name: "其他",
-  dmk_directory: "comic22",
+  dmk_directory: "comic22.html",
 };
 
 pub static ALL_GENRES : [&'static Genre; 14] = [
@@ -112,8 +118,12 @@ pub static ALL_GENRES : [&'static Genre; 14] = [
 ];
 
 impl Genre {
-  pub fn all() -> Vec<&'static Genre> {
+  pub fn all_genres() -> Vec<&'static Genre> {
     ALL_GENRES.to_vec()
+  }
+
+  pub fn all() -> &'static Genre {
+    &ALL
   }
 
   pub fn for_id(id: &str) -> Option<&'static Genre> {
@@ -135,7 +145,7 @@ impl Genre {
   }
 
   pub fn from_dmk_genre_url(url: &str) -> Option<&'static Genre> {
-    lazy_static! { static ref DMK_GENRE_RE : Regex = Regex::new(r"^/(comic\d{2}).html$").unwrap(); }
+    lazy_static! { static ref DMK_GENRE_RE : Regex = Regex::new(r"^/(comic\d{2}\.html)$").unwrap(); }
     match DMK_GENRE_RE.captures(url) {
       Some(cap) => Self::for_dmk_directory(&cap[1]),
       None => None
@@ -151,7 +161,7 @@ impl Genre {
   }
 
   pub fn dmk_url(&self) -> String {
-    format!("https://cartoonmad.com/{}.html", self.dmk_directory)
+    format!("https://cartoonmad.com/{}", self.dmk_directory)
   }
 }
 

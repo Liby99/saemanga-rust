@@ -116,7 +116,7 @@ pub fn index(user: Option<&User>, cookies: Cookies) -> Template {
       username: user.username().clone(),
       follows: vec![],
     }),
-    genres: Genre::all().iter().map(GenreData::from).collect(),
+    genres: Genre::all_genres().iter().map(GenreData::from).collect(),
     setting: SettingData::from(UserSetting::from_cookies(&cookies))
   };
 

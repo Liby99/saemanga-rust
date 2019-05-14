@@ -3,6 +3,7 @@ use rocket::response::Redirect;
 
 use crate::util::database::Database;
 use crate::app::user::User;
+use super::AdminUser;
 
 #[derive(Serialize, Deserialize)]
 struct RegisteredUser {
@@ -30,15 +31,20 @@ struct AdminData {
 }
 
 #[get("/admin/index")]
-pub fn index(conn: Database, user: &User) -> Result<Template, Redirect> {
+pub fn index(conn: Database, admin: AdminUser) -> Result<Template, Redirect> {
   let users_res = User::get_all(&conn).map(|users: Vec<User>| {
     users.iter().map(|u| RegisteredUser::from(u)).collect()
   });
   match users_res {
     Ok(users) => Ok(Template::render("admin/index", &AdminData {
-      username: user.username().clone(),
+      username: admin.user().username().clone(),
       users: users
     })),
     Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
   }
+}
+
+#[get("/admin/index", rank=2)]
+pub fn index_fail() -> Redirect {
+  Redirect::to("/admin/login")
 }

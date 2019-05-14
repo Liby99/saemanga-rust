@@ -4,6 +4,7 @@ use rocket::response::Redirect;
 
 use crate::app::user::User;
 use crate::util::database::Database;
+use super::super::AdminUser;
 
 #[derive(Serialize)]
 struct PageData {
@@ -21,7 +22,7 @@ impl From<User> for PageData {
 }
 
 #[get("/admin/user/test_password/<id>")]
-pub fn test_password_page(conn: Database, id: String) -> Result<Template, Redirect> {
+pub fn test_password_page(_user: AdminUser, conn: Database, id: String) -> Result<Template, Redirect> {
   match User::get_by_id(&conn, &id) {
     Ok(user) => {
       let data = PageData::from(user);
@@ -29,6 +30,11 @@ pub fn test_password_page(conn: Database, id: String) -> Result<Template, Redire
     },
     Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
   }
+}
+
+#[get("/admin/user/test_password/<_id>", rank=2)]
+pub fn test_password_page_fail(_id: String) -> Redirect {
+  Redirect::to("/admin/login")
 }
 
 #[derive(FromForm)]
@@ -44,7 +50,7 @@ struct TestPasswordResult {
 }
 
 #[post("/admin/user/test_password", data="<data>")]
-pub fn test_password_submit(conn: Database, data: Form<TestPasswordForm>) -> Result<Template, Redirect> {
+pub fn test_password_submit(_user: AdminUser, conn: Database, data: Form<TestPasswordForm>) -> Result<Template, Redirect> {
   match User::get_by_id(&conn, &data.id) {
     Ok(user) => Ok(Template::render("admin/test_password_result", TestPasswordResult {
       id: data.id.clone(),

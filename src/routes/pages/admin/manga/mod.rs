@@ -11,5 +11,6 @@ pub fn routes() -> Vec<Route> {
     upsert::upsert,
     setup::setup,
     check::check,
+    check::check_fail,
   ]
 }

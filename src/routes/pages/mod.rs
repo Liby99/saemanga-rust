@@ -1,5 +1,4 @@
 use rocket::Outcome;
-use rocket::http::Status;
 use rocket::request::{self, Request, FromRequest};
 use rocket::{Route, Catcher};
 
@@ -25,7 +24,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for &'a User {
     });
     match user_result {
       Some(user) => Outcome::Success(&user),
-      None => Outcome::Failure((Status::Unauthorized, Self::Error::SessionNotFound))
+      None => Outcome::Forward(())
     }
   }
 }

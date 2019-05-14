@@ -1,7 +1,9 @@
-use crate::app::user::User;
-use crate::util::database::Database;
 use rocket::request::Form;
 use rocket::response::Redirect;
+
+use crate::util::database::Database;
+use crate::app::user::User;
+use super::super::AdminUser;
 
 #[derive(FromForm)]
 pub struct CreateUserForm {
@@ -10,7 +12,7 @@ pub struct CreateUserForm {
 }
 
 #[post("/admin/user/create", data="<info>")]
-pub fn create(conn: Database, info: Form<CreateUserForm>) -> Redirect {
+pub fn create(_user: AdminUser, conn: Database, info: Form<CreateUserForm>) -> Redirect {
   match User::insert(&conn, &info.username, &info.password) {
     Ok(_) => Redirect::to("/admin"),
     Err(err) => Redirect::to(format!("/admin/error?code={}", err as u32))

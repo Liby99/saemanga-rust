@@ -12,8 +12,10 @@ pub fn routes() -> Vec<Route> {
     create::create,
     remove::remove,
     change_password::change_password_page,
+    change_password::change_password_page_fail,
     change_password::change_password_submit,
     test_password::test_password_page,
+    test_password::test_password_page_fail,
     test_password::test_password_submit,
   ]
 }

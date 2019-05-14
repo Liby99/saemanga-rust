@@ -62,6 +62,10 @@ impl User {
     self.visit_count
   }
 
+  pub fn is_admin(&self) -> bool {
+    self.is_admin
+  }
+
   pub fn is_valid_username(username: &String) -> bool {
     lazy_static!{ static ref USERNAME_REG : Regex = Regex::new(r"^[A-Za-z0-9\-_\[\]]{4,16}$").unwrap(); }
     USERNAME_REG.is_match(&username.as_str())

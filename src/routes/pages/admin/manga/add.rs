@@ -4,6 +4,7 @@ use rocket::request::Form;
 use crate::util::database::Database;
 use crate::app::dmk;
 use crate::app::manga::Manga;
+use super::super::AdminUser;
 
 #[derive(FromForm)]
 pub struct AddMangaFormData {
@@ -11,7 +12,7 @@ pub struct AddMangaFormData {
 }
 
 #[post("/admin/manga/add", data="<data>")]
-pub fn add(conn: Database, data: Form<AddMangaFormData>) -> Redirect {
+pub fn add(_user: AdminUser, conn: Database, data: Form<AddMangaFormData>) -> Redirect {
   match dmk::fetch_manga_data(&data.dmk_id) {
     Ok(manga) => match Manga::insert(&conn, &manga) {
       Ok(_) => Redirect::to("/admin/index"),

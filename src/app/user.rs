@@ -89,7 +89,7 @@ impl User {
 
   pub fn get_by_oid(conn: &Database, id: &ObjectId) -> Result<Self, Error> {
     Self::get_one(&conn, Some(doc! {
-      "_id": id.clone()
+      "_id": id.clone(),
     }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
   }
 
@@ -100,7 +100,7 @@ impl User {
 
   pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, Error> {
     Self::get_one(&conn, Some(doc! {
-      "username": username.to_lowercase()
+      "username": username.to_lowercase(),
     }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
   }
 
@@ -129,15 +129,31 @@ impl User {
     }
   }
 
+  pub fn get_by_oid_and_touch(conn: &Database, id: &ObjectId) -> Result<Self, Error> {
+    let coll = Self::coll(&conn);
+    match coll.find_one_and_update(doc! {
+      "_id": id.clone(),
+    }, doc! {
+      "$inc": { "visit_count": 1 },
+      "$currentDate": { "last_visit_date_time": true },
+    }, None) {
+      Ok(result) => match result {
+        Some(doc) => Self::from_doc(doc),
+        None => Err(Error::UserNotFoundError)
+      },
+      Err(_) => Err(Error::DatabaseError)
+    }
+  }
+
   pub fn change_password(conn: &Database, id: &String, new_password: &String) -> Result<(), Error> {
     if Self::is_valid_password(new_password) {
       let coll = Self::coll(&conn);
       match coll.update_one(doc! {
-        "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
+        "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?,
       }, doc! {
         "$set": {
-          "password": Self::encrypt_password(&new_password)
-        }
+          "password": Self::encrypt_password(&new_password),
+        },
       }, None) {
         Ok(result) => match result.matched_count {
           1 => Ok(()),
@@ -153,7 +169,7 @@ impl User {
   pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
     match coll.create_index(doc! {
-      "username": 1
+      "username": 1,
     }, Some(mongodb::coll::options::IndexOptions {
       unique: Some(true),
       ..Default::default()

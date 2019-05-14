@@ -42,7 +42,7 @@ impl UserSession {
     Some(cookie.value().to_string())
   }
 
-  pub fn from_cookies(conn: &Database, cookies: &mut Cookies) -> Result<UserSession, Error> {
+  pub fn from_cookies_and_touch(conn: &Database, cookies: &mut Cookies) -> Result<UserSession, Error> {
     let session_id = Self::get_session_id_from_cookies(cookies).ok_or(Error::NoSession)?;
     let session = Self::get_by_session_id_and_touch(&conn, &session_id)?;
     session.store_to_cookies(cookies);
@@ -76,6 +76,10 @@ impl UserSession {
 
   pub fn user(&self, conn: &Database) -> Result<User, Error> {
     User::get_by_oid(conn, &self.user_id)
+  }
+
+  pub fn get_user_and_touch(&self, conn: &Database) -> Result<User, Error> {
+    User::get_by_oid_and_touch(conn, &self.user_id)
   }
 
   pub fn expired(&self) -> bool {

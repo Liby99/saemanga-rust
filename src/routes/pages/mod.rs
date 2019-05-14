@@ -9,6 +9,7 @@ use crate::app::user_session::UserSession;
 
 mod index;
 mod login;
+mod register;
 mod logout;
 mod error;
 mod admin;
@@ -34,6 +35,7 @@ pub fn routes() -> Vec<Route> {
     routes![
       index::index,
       login::login,
+      register::register,
       logout::logout,
       error::error,
     ],

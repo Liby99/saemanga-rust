@@ -8,7 +8,7 @@
           <a href="javascript:void(0);">{{user.username}}</a>
         {{else}}
           <span>欢迎光临，</span>
-          <a href="javascript:void(0);" onclick="User.showLogin()">点此登陆</a>
+          <a href="javascript:void(0);" ctrl="emitter" events="login.focus">点此登陆</a>
         {{/if}}
       </span>
     </p>

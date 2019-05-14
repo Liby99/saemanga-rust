@@ -4,7 +4,7 @@
     <div class="content" id="index-following-header-content">
       <div id="index-following-header-inner" class="flex wrapper">
         <h3>正在追的</h3>
-        {{#if logged_in}}
+        {{#if user}}
           <div id="index-following-menu" class="flex-fill flex right">
             <a id="index-following-manage" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
               <span>管理</span>
@@ -26,7 +26,7 @@
     </div>
   </div>
   <div id="index-following-list" class="flex wrap wrapper no-top">
-    {{#if logged_in}}
+    {{#if user}}
       {{#each user.follows}}
         <a class="mix manga following {{#if liked}}liked{{/if}}" href="{{manga.saemanga_url}}">
           <div class="cover" style="background-image: url('{{manga.cover_url}}')">

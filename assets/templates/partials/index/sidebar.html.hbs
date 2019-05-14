@@ -1,7 +1,7 @@
 {{#*inline "menu"}}
 
 <section style="padding: 15px 0">
-  {{#if logged_in }}
+  {{#if user }}
     {{> partials/sidebar/user}}
   {{else}}
     {{> partials/sidebar/login}}

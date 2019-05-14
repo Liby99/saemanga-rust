@@ -1,11 +1,12 @@
 use rocket_contrib::templates::Template;
+use rocket::http::Cookies;
 
-use crate::app::genre::*;
+use crate::app::genre::{Genre, ALL_GENRES};
+use crate::app::user_setting::*;
 use crate::app::user::User;
 
 #[derive(Serialize)]
 struct TemplateData {
-  logged_in: bool,
   latests: Vec<MangaData>,
   user: Option<UserData>,
   genres: &'static [&'static Genre; 14],
@@ -16,12 +17,24 @@ struct TemplateData {
 struct SettingData {
   is_left_hand_mode: bool,
   is_night_mode: bool,
+  is_loved_only: bool,
+  scale: f32,
+}
+
+impl From<UserSetting> for SettingData {
+  fn from(setting: UserSetting) -> Self {
+    Self {
+      is_left_hand_mode: setting.hand_mode == HandMode::Left,
+      is_night_mode: setting.light_mode == LightMode::Night,
+      is_loved_only: setting.index_display_mode == IndexDisplayMode::LovedOnly,
+      scale: setting.scale,
+    }
+  }
 }
 
 #[derive(Serialize)]
 struct UserData {
   username: String,
-  has_follows: bool,
   follows: Vec<FollowData>,
 }
 
@@ -45,16 +58,13 @@ struct MangaData {
 }
 
 #[get("/index")]
-pub fn index(user: Option<&User>) -> Template {
+pub fn index(user: Option<&User>, cookies: Cookies) -> Template {
 
-  match user {
-    Some(user) => println!("{:?}", user.id()),
-    None => println!("No user found"),
-  }
+  // Get the user settings
+  let setting = UserSetting::from_cookies(&cookies);
 
   // Create temporary data
   let data = TemplateData {
-    logged_in: true,
     latests: vec![
       MangaData {
         title: String::from("可憐可愛元氣君"),
@@ -93,31 +103,12 @@ pub fn index(user: Option<&User>) -> Template {
         ended: false,
       },
     ],
-    user: Some(UserData {
-      username: String::from("Liby99"),
-      has_follows: true,
-      follows: vec![
-        FollowData {
-          liked: true,
-          has_update: false,
-          max_read_episode: 408,
-          manga: MangaData {
-            title: String::from("家庭教師"),
-            dmk_id: String::from("1254"),
-            cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/1254.jpg"),
-            saemanga_url: String::from("http://saemanga.com/manga/1254"),
-            last_episode: 409,
-            last_episode_is_book: false,
-            ended: true
-          },
-        },
-      ],
+    user: user.map(|user| UserData {
+      username: user.username().clone(),
+      follows: vec![],
     }),
     genres: &ALL_GENRES,
-    setting: SettingData {
-      is_left_hand_mode: true,
-      is_night_mode: false,
-    }
+    setting: SettingData::from(setting)
   };
 
   // Render the data

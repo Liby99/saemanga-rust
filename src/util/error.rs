@@ -14,8 +14,13 @@ enum_from_primitive! {
     NoneDeletedError,
     DecodeUrlError,
 
-    // 1100 for user related errors
-    UserNotFoundError = 1100,
+    // 1100 for setting related errors
+    UnknownLightMode = 1100,
+    UnknownHandMode,
+    UnknownIndexDisplayMode,
+
+    // 1200 for user related errors
+    UserNotFoundError = 1200,
     UserExistedError,
     InvalidUsername,
     InvalidPassword,
@@ -25,8 +30,8 @@ enum_from_primitive! {
     UsernameOrPasswordError,
     NotAuthenticated,
 
-    // 1200 for dmk/manga related errors
-    GenreInfoExtractionError = 1200,
+    // 1300 for dmk/manga related errors
+    GenreInfoExtractionError = 1300,
     GenreNotFoundError,
     DmkFetchError,
     DmkEncodingError,
@@ -58,6 +63,9 @@ impl Error {
       Error::NoneInsertedError => "Nothing is Getting Inserted",
       Error::NoneDeletedError => "Nothing is Getting Deleted",
       Error::DecodeUrlError => "Unable to Decode Url",
+      Error::UnknownLightMode => "Unknown Light Mode",
+      Error::UnknownHandMode => "Unknown Hand Mode",
+      Error::UnknownIndexDisplayMode => "Unknown Index Display Mode",
       Error::UserNotFoundError => "User Not Found",
       Error::UserExistedError => "User Already Existed",
       Error::InvalidUsername => "Invalid Username",

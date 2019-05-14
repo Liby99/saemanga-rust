@@ -1,38 +1,82 @@
-use rocket::http::Cookies;
+use std::str::FromStr;
+use rocket::http::{Cookie, Cookies};
 
-#[derive(Debug)]
+use crate::util::error::Error;
+
+#[derive(Debug, PartialEq)]
 pub enum LightMode {
   Day,
   Night
 }
 
-#[derive(Debug)]
+impl FromStr for LightMode {
+  type Err = Error;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
+      "day" => Ok(Self::Day),
+      "night" => Ok(Self::Night),
+      _ => Err(Error::UnknownLightMode),
+    }
+  }
+}
+
+impl std::string::ToString for LightMode {
+  fn to_string(&self) -> String {
+    match self {
+      Self::Day => "day".to_string(),
+      Self::Night => "night".to_string(),
+    }
+  }
+}
+
+impl LightMode {
+  const KEY : &'static str = "light-mode";
+
+  pub fn default() -> Self {
+    Self::Day
+  }
+
+  pub fn from_cookies(cookies: &Cookies) -> Self {
+    cookies.get(Self::KEY).map_or(Self::default(), |cookie| {
+      Self::from_str(cookie.value()).map_or_else(|_| Self::default(), |v| v)
+    })
+  }
+
+  pub fn into_cookies(&self, cookies: &mut Cookies) {
+    let value = self.to_string();
+    cookies.add(Cookie::build(Self::KEY, value).path("/").finish());
+  }
+}
+
+#[derive(Debug, PartialEq)]
 pub enum HandMode {
   Left,
   Right
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum IndexDisplayMode {
   All,
   LovedOnly
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct UserSetting {
-  light_mode: LightMode,
-  hand_mode: HandMode,
-  index_display_mode: IndexDisplayMode
+  pub light_mode: LightMode,
+  pub hand_mode: HandMode,
+  pub index_display_mode: IndexDisplayMode,
+  pub scale: f32,
 }
 
-pub fn extract_light_mode(cookies: &Cookies) -> LightMode {
-  match cookies.get("light-mode") {
-    Some(c) => match c.value() {
-      "day" => LightMode::Day,
-      "night" => LightMode::Night,
-      _ => LightMode::Day
-    },
-    None => LightMode::Day
+impl UserSetting {
+  pub fn from_cookies(cookies: &Cookies) -> Self {
+    Self {
+      light_mode: LightMode::from_cookies(cookies),
+      hand_mode: extract_hand_mode(cookies),
+      index_display_mode: extract_index_display_mode(cookies),
+      scale: extract_scale(cookies)
+    }
   }
 }
 
@@ -58,10 +102,12 @@ pub fn extract_index_display_mode(cookies: &Cookies) -> IndexDisplayMode {
   }
 }
 
-pub fn extract_user_setting(cookies: &Cookies) -> UserSetting {
-  UserSetting {
-    light_mode: extract_light_mode(cookies),
-    hand_mode: extract_hand_mode(cookies),
-    index_display_mode: extract_index_display_mode(cookies)
+pub fn extract_scale(cookies: &Cookies) -> f32 {
+  match cookies.get("scale") {
+    Some(c) => match c.value().parse::<f32>() {
+      Ok(v) => v,
+      _ => 1.0
+    },
+    None => 1.0
   }
 }

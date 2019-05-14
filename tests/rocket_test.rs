@@ -12,7 +12,7 @@ use mongodb::{bson, doc};
 use mongodb::{ThreadedClient};
 use mongodb::db::ThreadedDatabase;
 
-use saemanga::app;
+use saemanga::app::user_setting::UserSetting;
 
 #[database("mongodb")]
 struct SaemangaDatabase(mongodb::db::Database);
@@ -29,7 +29,7 @@ struct IndexTemplateContext {
 
 #[get("/")]
 fn index(cookies: Cookies) -> Template {
-  println!("{:?}", app::user_setting::extract_user_setting(&cookies));
+  println!("{:?}", UserSetting::from_cookies(&cookies));
   Template::render("index", &IndexTemplateContext {
     name: "Liby"
   })

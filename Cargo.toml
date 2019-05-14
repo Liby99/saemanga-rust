@@ -30,4 +30,4 @@ collection = { path = "lib/collection" }
 [dependencies.rocket_contrib]
 version = "*"
 default-features = false
-features = ["handlebars_templates", "mongodb_pool", "serve"]
+features = ["json", "handlebars_templates", "mongodb_pool", "serve"]

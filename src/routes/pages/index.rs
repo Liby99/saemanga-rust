@@ -1,7 +1,7 @@
 use rocket_contrib::templates::Template;
 use rocket::http::Cookies;
 
-use crate::app::genre::{Genre, ALL_GENRES};
+use crate::app::genre::Genre;
 use crate::app::user_setting::*;
 use crate::app::user::User;
 
@@ -9,7 +9,7 @@ use crate::app::user::User;
 struct TemplateData {
   latests: Vec<MangaData>,
   user: Option<UserData>,
-  genres: &'static [&'static Genre; 14],
+  genres: Vec<GenreData>,
   setting: SettingData,
 }
 
@@ -57,11 +57,20 @@ struct MangaData {
   ended: bool,
 }
 
+#[derive(Serialize)]
+struct GenreData {
+  id: &'static str,
+  name: &'static str,
+}
+
+impl From<&&Genre> for GenreData {
+  fn from(genre: &&Genre) -> Self {
+    Self { id: genre.id, name: genre.name }
+  }
+}
+
 #[get("/index")]
 pub fn index(user: Option<&User>, cookies: Cookies) -> Template {
-
-  // Get the user settings
-  let setting = UserSetting::from_cookies(&cookies);
 
   // Create temporary data
   let data = TemplateData {
@@ -107,8 +116,8 @@ pub fn index(user: Option<&User>, cookies: Cookies) -> Template {
       username: user.username().clone(),
       follows: vec![],
     }),
-    genres: &ALL_GENRES,
-    setting: SettingData::from(setting)
+    genres: Genre::all().iter().map(GenreData::from).collect(),
+    setting: SettingData::from(UserSetting::from_cookies(&cookies))
   };
 
   // Render the data

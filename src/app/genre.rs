@@ -5,9 +5,9 @@ use regex::Regex;
 
 #[derive(Debug, PartialEq)]
 pub struct Genre {
-  id: &'static str,
-  name: &'static str,
-  dmk_directory: &'static str,
+  pub id: &'static str,
+  pub name: &'static str,
+  pub dmk_directory: &'static str,
 }
 
 pub static COMBAT : Genre = Genre {
@@ -112,6 +112,10 @@ pub static ALL_GENRES : [&'static Genre; 14] = [
 ];
 
 impl Genre {
+  pub fn all() -> Vec<&'static Genre> {
+    ALL_GENRES.to_vec()
+  }
+
   pub fn for_id(id: &str) -> Option<&'static Genre> {
     for genre in ALL_GENRES.iter() {
       if genre.id == id {

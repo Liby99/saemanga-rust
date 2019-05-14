@@ -12,6 +12,7 @@ enum_from_primitive! {
     DeserializeError,
     NoneInsertedError,
     NoneDeletedError,
+    DecodeUrlError,
 
     // 1100 for user related errors
     UserNotFoundError = 1100,
@@ -55,6 +56,7 @@ impl Error {
       Error::DeserializeError => "Unable to Deserialize Data",
       Error::NoneInsertedError => "Nothing is Getting Inserted",
       Error::NoneDeletedError => "Nothing is Getting Deleted",
+      Error::DecodeUrlError => "Unable to Decode Url",
       Error::UserNotFoundError => "User Not Found",
       Error::UserExistedError => "User Already Existed",
       Error::InvalidUsername => "Invalid Username",

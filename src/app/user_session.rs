@@ -37,9 +37,13 @@ impl UserSession {
     })
   }
 
+  pub fn get_session_id_from_cookies(cookies: &Cookies) -> Option<String> {
+    let cookie = cookies.get(Self::key())?;
+    Some(cookie.value().to_string())
+  }
+
   pub fn from_cookies(conn: &Database, cookies: &mut Cookies) -> Result<UserSession, Error> {
-    let cookie = cookies.get(Self::key()).ok_or(Error::NoSession)?;
-    let session_id = cookie.value().to_string();
+    let session_id = Self::get_session_id_from_cookies(cookies).ok_or(Error::NoSession)?;
     let session = Self::get_by_session_id_and_touch(&conn, &session_id)?;
     session.store_to_cookies(cookies);
     Ok(session)
@@ -47,10 +51,19 @@ impl UserSession {
 
   pub fn store_to_cookies(&self, cookies: &mut Cookies) {
     let dur = Duration::days(30);
-    let expire = time::now() + dur;
     let builder = Cookie::build(Self::key(), self.session_id());
-    let cookie = builder.expires(expire).max_age(dur).secure(false).path("/").finish();
+    let cookie = builder.max_age(dur).secure(false).path("/").finish();
     cookies.add(cookie);
+  }
+
+  pub fn remove_from_cookies(conn: &Database, cookies: &mut Cookies) -> Result<(), Error> {
+    match Self::get_session_id_from_cookies(cookies) {
+      Some(session_id) => {
+        cookies.remove(Cookie::named(Self::key()));
+        Self::remove(conn, &session_id)
+      },
+      None => Err(Error::NoSession)
+    }
   }
 
   pub fn session_id(&self) -> String {

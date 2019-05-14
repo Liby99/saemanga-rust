@@ -10,6 +10,8 @@ use crate::app::user_session::UserSession;
 
 mod index;
 mod login;
+mod logout;
+mod error;
 mod admin;
 
 impl<'a, 'r> FromRequest<'a, 'r> for &'a User {
@@ -33,6 +35,8 @@ pub fn routes() -> Vec<Route> {
     routes![
       index::index,
       login::login,
+      logout::logout,
+      error::error,
     ],
     admin::routes(),
   ].concat()

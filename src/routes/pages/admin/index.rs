@@ -25,6 +25,7 @@ impl From<&User> for RegisteredUser {
 
 #[derive(Serialize)]
 struct AdminData {
+  username: String,
   users: Vec<RegisteredUser>
 }
 
@@ -34,7 +35,10 @@ pub fn index(conn: Database, user: &User) -> Result<Template, Redirect> {
     users.iter().map(|u| RegisteredUser::from(u)).collect()
   });
   match users_res {
-    Ok(users) => Ok(Template::render("admin/index", &AdminData { users: users })),
+    Ok(users) => Ok(Template::render("admin/index", &AdminData {
+      username: user.username().clone(),
+      users: users
+    })),
     Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
   }
 }

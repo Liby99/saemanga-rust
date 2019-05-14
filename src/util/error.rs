@@ -20,6 +20,7 @@ enum_from_primitive! {
     InvalidPassword,
     NoSession,
     SessionNotFound,
+    SessionExpired,
     UsernameOrPasswordError,
 
     // 1200 for dmk/manga related errors
@@ -60,6 +61,7 @@ impl Error {
       Error::InvalidPassword => "Invalid Password",
       Error::NoSession => "No Session Presented",
       Error::SessionNotFound => "Unable to find Session",
+      Error::SessionExpired => "Session Expred",
       Error::UsernameOrPasswordError => "Wrong Username or Password",
       Error::GenreInfoExtractionError => "Cannot Extract Genre Information",
       Error::GenreNotFoundError => "Unable to find Genre",

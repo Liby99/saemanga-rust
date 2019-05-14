@@ -18,12 +18,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for &'a User {
   fn from_request(request: &'a Request<'r>) -> request::Outcome<&'a User, Self::Error> {
     let user_result = request.local_cache(|| -> Option<User> {
       let db = request.guard::<Database>().succeeded()?;
-      println!("{:?}", "ahahaha");
-      let cookie = request.cookies().get_private(UserSession::key())?;
-      println!("{:?}", cookie);
-      let session_id = cookie.value().to_string();
-      println!("session_id: {:?}", session_id);
-      let session = UserSession::get_by_session_id(&db, &session_id).ok()?;
+      let session = UserSession::from_cookies(&db, &mut request.cookies()).ok()?;
       session.user(&db).ok()
     });
     match user_result {

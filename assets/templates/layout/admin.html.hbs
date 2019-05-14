@@ -6,7 +6,15 @@
   </head>
   <body>
     <nav>
-      <strong>Saemanga - Admin (Test)</strong>
+      <div>
+        <strong>Saemanga - Admin (Test)</strong>
+      </div>
+      {{#if username}}
+        <div>
+          <span>Welcome back, Admin {{username}}</span>
+          <a href="/logout?redir=%3Fadmin">Logout</a>
+        </div>
+      {{/if}}
     </nav>
     <main>
       {{~> main}}

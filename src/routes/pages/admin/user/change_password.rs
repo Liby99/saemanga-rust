@@ -7,25 +7,21 @@ use crate::app::user::User;
 use super::super::AdminUser;
 
 #[derive(Serialize)]
-struct PageData {
-  id: String,
-  username: String,
-}
-
-impl From<User> for PageData {
-  fn from(user: User) -> Self {
-    PageData {
-      id: user.id().to_hex(),
-      username: user.username().clone(),
-    }
-  }
+struct PageData<'a> {
+  admin_username: &'a String,
+  id: &'a String,
+  username: &'a String,
 }
 
 #[get("/admin/user/change_password/<id>")]
-pub fn change_password_page(_user: AdminUser, conn: Database, id: String) -> Result<Template, Redirect> {
+pub fn change_password_page(admin: AdminUser, conn: Database, id: String) -> Result<Template, Redirect> {
   match User::get_by_id(&conn, &id) {
     Ok(user) => {
-      let data = PageData::from(user);
+      let data = PageData {
+        admin_username: admin.user().username(),
+        id: &id,
+        username: user.username(),
+      };
       Ok(Template::render("admin/user/change_password", &data))
     },
     Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))

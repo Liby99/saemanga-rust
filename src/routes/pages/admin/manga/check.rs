@@ -1,3 +1,5 @@
+#![allow(non_snake_case)] // TODO: Turn this off when rocket issue #1003 resolved
+
 use rocket::response::Redirect;
 use rocket_contrib::templates::Template;
 
@@ -7,7 +9,8 @@ use crate::app::manga::Manga;
 use super::super::AdminUser;
 
 #[derive(Serialize)]
-struct TemplateData {
+struct PageData {
+  admin_username: String,
   cartoonmad_url: String,
   add_date_time: String,
   update_date_time: String,
@@ -16,9 +19,10 @@ struct TemplateData {
 }
 
 #[get("/admin/manga/check?<dmk_id>")]
-pub fn check(_user: AdminUser, conn: Database, dmk_id: String) -> Result<Template, Redirect> {
+pub fn check(admin: AdminUser, conn: Database, dmk_id: String) -> Result<Template, Redirect> {
   match Manga::get_by_dmk_id(&conn, &dmk_id).and_then(|maybe_manga| maybe_manga.ok_or(Error::MangaNotFoundError)) {
-    Ok(manga) => Ok(Template::render("admin/manga/check", &TemplateData {
+    Ok(manga) => Ok(Template::render("admin/manga/check", &PageData {
+      admin_username: admin.user().username().clone(),
       cartoonmad_url: manga.data().dmk_base_url(),
       add_date_time: manga.add_date_time().to_rfc3339(),
       update_date_time: manga.update_date_time().to_rfc3339(),
@@ -29,7 +33,6 @@ pub fn check(_user: AdminUser, conn: Database, dmk_id: String) -> Result<Templat
   }
 }
 
-#[allow(non_snake_case)]
 #[get("/admin/manga/check?<_id>", rank=2)]
 pub fn check_fail(_id: String) -> Redirect {
   Redirect::to("/admin/login")

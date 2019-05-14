@@ -11,12 +11,11 @@ use crate::app::user_session::UserSession;
 pub struct LoginForm {
   username: String,
   password: String,
-  redir: Option<String>,
 }
 
-#[post("/login", data="<data>")]
-pub fn login(conn: Database, mut cookies: Cookies, data: Form<LoginForm>) -> Redirect {
-  let redir = match &data.redir { Some(u) => u.clone(), None => String::from("/") };
+#[post("/login?<redir>", data="<data>")]
+pub fn login(conn: Database, mut cookies: Cookies, data: Form<LoginForm>, redir: Option<String>) -> Redirect {
+  let redir = match redir { Some(u) => u, None => String::from("/") };
   match User::get_by_username(&conn, &data.username) {
     Ok(user) => match user.is_password_match(&data.password) {
       true => match UserSession::insert(&conn, &user) {

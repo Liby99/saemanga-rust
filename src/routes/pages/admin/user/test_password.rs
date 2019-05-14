@@ -26,7 +26,7 @@ pub fn test_password_page(_user: AdminUser, conn: Database, id: String) -> Resul
   match User::get_by_id(&conn, &id) {
     Ok(user) => {
       let data = PageData::from(user);
-      Ok(Template::render("admin/test_password", &data))
+      Ok(Template::render("admin/user/test_password", &data))
     },
     Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
   }

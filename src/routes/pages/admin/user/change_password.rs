@@ -26,7 +26,7 @@ pub fn change_password_page(_user: AdminUser, conn: Database, id: String) -> Res
   match User::get_by_id(&conn, &id) {
     Ok(user) => {
       let data = PageData::from(user);
-      Ok(Template::render("admin/change_password", &data))
+      Ok(Template::render("admin/user/change_password", &data))
     },
     Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
   }

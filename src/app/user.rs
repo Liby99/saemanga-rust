@@ -145,11 +145,11 @@ impl User {
     }
   }
 
-  pub fn change_password(conn: &Database, id: &String, new_password: &String) -> Result<(), Error> {
+  pub fn change_password_by_oid(conn: &Database, id: &ObjectId, new_password: &String) -> Result<(), Error> {
     if Self::is_valid_password(new_password) {
       let coll = Self::coll(&conn);
       match coll.update_one(doc! {
-        "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?,
+        "_id": id.clone()
       }, doc! {
         "$set": {
           "password": Self::encrypt_password(&new_password),
@@ -164,6 +164,15 @@ impl User {
     } else {
       Err(Error::InvalidPassword)
     }
+  }
+
+  pub fn change_password_by_id(conn: &Database, id: &String, new_password: &String) -> Result<(), Error> {
+    let oid = ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?;
+    Self::change_password_by_oid(conn, &oid, new_password)
+  }
+
+  pub fn change_password(&self, conn: &Database, new_password: &String) -> Result<(), Error> {
+    Self::change_password_by_oid(conn, self.id(), new_password)
   }
 
   pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {

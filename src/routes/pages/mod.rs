@@ -10,6 +10,7 @@ use crate::app::user_session::UserSession;
 mod index;
 mod login;
 mod register;
+mod change_password;
 mod logout;
 mod error;
 mod admin;
@@ -36,6 +37,7 @@ pub fn routes() -> Vec<Route> {
       index::index,
       login::login,
       register::register,
+      change_password::change_password,
       logout::logout,
       error::error,
     ],

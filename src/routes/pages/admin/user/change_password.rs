@@ -41,7 +41,7 @@ pub struct ChangePasswordForm {
 
 #[post("/admin/user/change_password", data="<data>")]
 pub fn change_password_submit(_user: AdminUser, conn: Database, data: Form<ChangePasswordForm>) -> Redirect {
-  match User::change_password(&conn, &data.id, &data.new_password) {
+  match User::change_password_by_id(&conn, &data.id, &data.new_password) {
     Ok(()) => Redirect::to("/admin"),
     Err(err) => Redirect::to(format!("/admin/error?code={}", err as u32))
   }

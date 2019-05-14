@@ -28,6 +28,7 @@ enum_from_primitive! {
     SessionNotFound,
     SessionExpired,
     UsernameOrPasswordError,
+    IncorrectOldPassword,
     NotAuthenticated,
 
     // 1300 for dmk/manga related errors
@@ -75,6 +76,7 @@ impl Error {
       Error::SessionNotFound => "Unable to find Session",
       Error::SessionExpired => "Session Expred",
       Error::UsernameOrPasswordError => "Wrong Username or Password",
+      Error::IncorrectOldPassword => "Incorrect Old Password",
       Error::GenreInfoExtractionError => "Cannot Extract Genre Information",
       Error::GenreNotFoundError => "Unable to find Genre",
       Error::DmkFetchError => "Unable to Fetch Cartoonmad Webpage",

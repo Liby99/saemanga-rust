@@ -12,6 +12,7 @@ mod login;
 mod error;
 mod user;
 mod manga;
+mod latest;
 
 pub struct AdminUser<'a>(&'a User);
 
@@ -50,5 +51,6 @@ pub fn routes() -> Vec<Route> {
     ],
     user::routes(),
     manga::routes(),
+    latest::routes(),
   ].concat()
 }

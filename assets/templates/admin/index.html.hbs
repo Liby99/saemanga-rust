@@ -67,6 +67,13 @@
     <button type="submit" formaction="/admin/manga/check" formmethod="get">Check</button>
   </form>
   <hr />
+  <h2>Manga Update</h2>
+  <form>
+    <p>Click the buttons below to update mangas accordingly</p>
+    <button formaction="/admin/latest/fetch_overall" formmethod="post">Fetch Overall Latest Updates</button>
+    {{!-- <button formaction="/admin/latest/fetch_genre" formmethod="post">Fetch Latest All Genre</button> --}}
+  </form>
+  <hr />
   <h2>Manga Collection Setup</h2>
   <form action="/admin/manga/setup" method="POST">
     <p>Click the button below to setup the <code>dmk_id</code> index (After this you will no longer be able to have duplicate <code>dmk_id</code>)</p>

@@ -66,43 +66,46 @@ impl Manga {
     }
   }
 
-  pub fn upsert(conn: &Database, data: &MangaData) -> Result<bool, Error> {
+  pub fn upsert(conn: &Database, data: &MangaData) -> Result<Self, Error> {
     let dmk_id = data.dmk_id();
     match Self::get_by_dmk_id(conn, dmk_id)? {
       Some(manga) => {
         if manga.data == *data {
-          println!("Same...!");
-          Self::touch(conn, dmk_id).map(|_| false)
+          Self::touch(conn, dmk_id)
         } else {
-          println!("Not Same...!");
           let coll = Self::coll(&conn);
-          match coll.update_one(doc! { "dmk_id": dmk_id }, doc! {
+          match coll.find_one_and_update(doc! {
+            "dmk_id": dmk_id
+          }, doc! {
             "$set": bson::to_bson(&data).map_err(|_| Error::SerializeError)?,
             "$currentDate": {
               "refresh_date_time": true,
               "update_date_time": true,
             }
           }, None) {
-            Ok(result) => Ok(result.modified_count == 1),
+            Ok(result) => match result {
+              Some(doc) => Self::from_doc(doc),
+              None => Err(Error::MangaNotFoundError)
+            },
             Err(_) => Err(Error::DatabaseError)
           }
         }
       },
-      None => {
-        Self::insert(conn, data)?;
-        Ok(true)
-      }
+      None => Self::insert(conn, data)
     }
   }
 
-  pub fn touch(conn: &Database, dmk_id: &String) -> Result<(), Error> {
+  pub fn touch(conn: &Database, dmk_id: &String) -> Result<Self, Error> {
     let coll = Self::coll(&conn);
-    match coll.update_one(doc! { "dmk_id": dmk_id }, doc! {
-      "$currentDate": {
-        "refresh_date_time": true
-      }
+    match coll.find_one_and_update(doc! {
+      "dmk_id": dmk_id
+    }, doc! {
+      "$currentDate": { "refresh_date_time": true }
     }, None) {
-      Ok(_) => Ok(()),
+      Ok(result) => match result {
+        Some(doc) => Self::from_doc(doc),
+        None => Err(Error::MangaNotFoundError)
+      },
       Err(_) => Err(Error::DatabaseError)
     }
   }

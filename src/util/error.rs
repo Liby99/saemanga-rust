@@ -43,6 +43,9 @@ enum_from_primitive! {
     DmkSearchEncodingError,
     MangaExistedError,
     MangaNotFoundError,
+
+    // 1400 for latest info related errors
+
   }
 }
 

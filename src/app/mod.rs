@@ -5,6 +5,7 @@ pub mod manga_status;
 pub mod manga_episode;
 pub mod manga_data;
 pub mod manga;
+pub mod latest_manga;
 pub mod user_setting;
 pub mod user_session;
 pub mod user;

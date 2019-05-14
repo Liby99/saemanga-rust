@@ -18,6 +18,9 @@ enum_from_primitive! {
     UserExistedError,
     InvalidUsername,
     InvalidPassword,
+    NoSession,
+    SessionNotFound,
+    UsernameOrPasswordError,
 
     // 1200 for dmk/manga related errors
     GenreInfoExtractionError = 1200,
@@ -55,6 +58,9 @@ impl Error {
       Error::UserExistedError => "User Already Existed",
       Error::InvalidUsername => "Invalid Username",
       Error::InvalidPassword => "Invalid Password",
+      Error::NoSession => "No Session Presented",
+      Error::SessionNotFound => "Unable to find Session",
+      Error::UsernameOrPasswordError => "Wrong Username or Password",
       Error::GenreInfoExtractionError => "Cannot Extract Genre Information",
       Error::GenreNotFoundError => "Unable to find Genre",
       Error::DmkFetchError => "Unable to Fetch Cartoonmad Webpage",

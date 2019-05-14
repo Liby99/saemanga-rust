@@ -10,6 +10,7 @@
 extern crate bson;
 extern crate crypto;
 extern crate lazy_static;
+extern crate time;
 
 #[macro_use] extern crate collection;
 

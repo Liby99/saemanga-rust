@@ -45,8 +45,11 @@ struct TestPasswordResult {
 
 #[post("/admin/user/test_password", data="<data>")]
 pub fn test_password_submit(conn: Database, data: Form<TestPasswordForm>) -> Result<Template, Redirect> {
-  match User::is_password_match(&conn, &data.id, &data.password) {
-    Ok(passed) => Ok(Template::render("admin/test_password_result", TestPasswordResult { id: data.id.clone(), passed })),
+  match User::get_by_id(&conn, &data.id) {
+    Ok(user) => Ok(Template::render("admin/test_password_result", TestPasswordResult {
+      id: data.id.clone(),
+      passed: User::is_password_match(&user, &data.password)
+    })),
     Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
   }
 }

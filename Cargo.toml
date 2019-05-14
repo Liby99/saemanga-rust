@@ -23,6 +23,7 @@ enum_primitive = "0.1"
 bson = "0.13"
 devise = "0.2"
 quote = "0.6"
+time = "0.1"
 reqwest = { git = "https://github.com/liby99/reqwest" }
 collection = { path = "lib/collection" }
 

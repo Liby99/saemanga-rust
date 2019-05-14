@@ -6,7 +6,6 @@ use crypto::digest::Digest;
 use crypto::sha2::Sha256;
 use chrono::Utc;
 
-use super::user_session::UserSession;
 use crate::util::Collection;
 use crate::util::Database;
 use crate::util::Error;
@@ -22,7 +21,6 @@ pub struct User {
   visit_count: i32,
   register_date_time: bson::UtcDateTime,
   last_visit_date_time: bson::UtcDateTime,
-  sessions: Vec<UserSession>,
 }
 
 impl User {
@@ -39,7 +37,6 @@ impl User {
           visit_count: 0,
           register_date_time: now,
           last_visit_date_time: now,
-          sessions: vec![]
         })
       } else {
         Err(Error::InvalidUsername)
@@ -81,20 +78,20 @@ impl User {
     hasher.result_str()
   }
 
-  pub fn is_password_match(conn: &Database, id: &String, password: &String) -> Result<bool, Error> {
-    match Self::get_by_id(conn, id) {
-      Ok(user) => {
-        let hashed_pwd = Self::encrypt_password(password);
-        Ok(hashed_pwd == user.password)
-      },
-      Err(err) => Err(err)
-    }
+  pub fn is_password_match(&self, password: &String) -> bool {
+    let hashed_pwd = Self::encrypt_password(password);
+    hashed_pwd == self.password
+  }
+
+  pub fn get_by_oid(conn: &Database, id: &ObjectId) -> Result<Self, Error> {
+    Self::get_one(&conn, Some(doc! {
+      "_id": id.clone()
+    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
   }
 
   pub fn get_by_id(conn: &Database, id: &String) -> Result<Self, Error> {
-    Self::get_one(&conn, Some(doc! {
-      "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
-    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
+    let oid = ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?;
+    Self::get_by_oid(conn, &oid)
   }
 
   pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, Error> {
@@ -138,7 +135,7 @@ impl User {
           "password": Self::encrypt_password(&new_password)
         }
       }, None) {
-        Ok(result) => match result.modified_count {
+        Ok(result) => match result.matched_count {
           1 => Ok(()),
           _ => Err(Error::UserNotFoundError)
         },

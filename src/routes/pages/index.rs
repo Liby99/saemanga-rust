@@ -1,7 +1,7 @@
 use rocket_contrib::templates::Template;
 
 use crate::app::genre::*;
-// use crate::app::user_setting::*;
+use crate::app::user::User;
 
 #[derive(Serialize)]
 struct TemplateData {
@@ -45,7 +45,12 @@ struct MangaData {
 }
 
 #[get("/index")]
-pub fn index() -> Template {
+pub fn index(user: Option<&User>) -> Template {
+
+  match user {
+    Some(user) => println!("{:?}", user.id()),
+    None => println!("No user found"),
+  }
 
   // Create temporary data
   let data = TemplateData {

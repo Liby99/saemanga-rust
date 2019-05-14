@@ -29,7 +29,7 @@ struct AdminData {
 }
 
 #[get("/admin/index")]
-pub fn index(conn: Database) -> Result<Template, Redirect> {
+pub fn index(conn: Database, user: &User) -> Result<Template, Redirect> {
   let users_res = User::get_all(&conn).map(|users: Vec<User>| {
     users.iter().map(|u| RegisteredUser::from(u)).collect()
   });

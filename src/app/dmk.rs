@@ -209,7 +209,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
 }
 
 fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -> Result<Vec<String>, Error> {
-  Ok(a_elems.filter_map(|a: ElementRef| {
+  Ok(a_elems.take(20).filter_map(|a: ElementRef| {
     a.value().attr("href").and_then(|href| {
       lazy_static! { static ref COMIC_URL_REG : Regex = Regex::new(r"comic/(\d+).html").unwrap(); }
       COMIC_URL_REG.captures(href).map(|cap| String::from(&cap[1]))

@@ -11,7 +11,7 @@ pub struct ChangePasswordForm {
   new_password: String,
 }
 
-#[post("/change_password?<redir>", data="<data>")]
+#[post("/user/change_password?<redir>", data="<data>")]
 pub fn change_password(conn: Database, user: &User, data: Form<ChangePasswordForm>, redir: Option<String>) -> Redirect {
   let redir = match redir { Some(u) => u, None => String::from("/") };
   match user.is_password_match(&data.old_password) {

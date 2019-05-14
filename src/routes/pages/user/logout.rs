@@ -6,7 +6,7 @@ use crate::util::database::Database;
 use crate::util::error::Error;
 use crate::app::user_session::UserSession;
 
-#[get("/logout?<redir>")]
+#[get("/user/logout?<redir>")]
 pub fn logout(conn: Database, mut cookies: Cookies, redir: Option<String>) -> Redirect {
   match UserSession::remove_from_cookies(&conn, &mut cookies) {
     Ok(()) => {

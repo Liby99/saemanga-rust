@@ -12,7 +12,7 @@ pub struct RegisterForm {
   password: String,
 }
 
-#[post("/register?<redir>", data="<data>")]
+#[post("/user/register?<redir>", data="<data>")]
 pub fn register(conn: Database, mut cookies: Cookies, data: Form<RegisterForm>, redir: Option<String>) -> Redirect {
   let redir = match redir { Some(u) => u, None => String::from("/") };
   match User::insert(&conn, &data.username, &data.password) {

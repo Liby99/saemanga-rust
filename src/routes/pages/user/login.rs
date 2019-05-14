@@ -13,7 +13,7 @@ pub struct LoginForm {
   password: String,
 }
 
-#[post("/login?<redir>", data="<data>")]
+#[post("/user/login?<redir>", data="<data>")]
 pub fn login(conn: Database, mut cookies: Cookies, data: Form<LoginForm>, redir: Option<String>) -> Redirect {
   let redir = match redir { Some(u) => u, None => String::from("/") };
   match User::get_by_username(&conn, &data.username) {

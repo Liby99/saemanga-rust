@@ -8,11 +8,8 @@ use crate::app::user::User;
 use crate::app::user_session::UserSession;
 
 mod index;
-mod login;
-mod register;
-mod change_password;
-mod logout;
 mod error;
+mod user;
 mod admin;
 
 impl<'a, 'r> FromRequest<'a, 'r> for &'a User {
@@ -35,12 +32,9 @@ pub fn routes() -> Vec<Route> {
   [
     routes![
       index::index,
-      login::login,
-      register::register,
-      change_password::change_password,
-      logout::logout,
       error::error,
     ],
+    user::routes(),
     admin::routes(),
   ].concat()
 }

@@ -1,3 +1,5 @@
+use std::thread;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use scraper::{Selector, Html};
@@ -15,7 +17,10 @@ use crate::util::Error;
 fn extract_num_pages(font: &String) -> Option<i32> {
   lazy_static! { static ref NUM_PAGES_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
   match NUM_PAGES_RE.captures(font) {
-    Some(cap) => match String::from(&cap[1]).parse::<i32>() { Ok(i) => Some(i), Err(_) => None },
+    Some(cap) => match String::from(&cap[1]).parse::<i32>() {
+      Ok(i) => Some(i),
+      Err(_) => None
+    },
     None => None,
   }
 }
@@ -23,7 +28,10 @@ fn extract_num_pages(font: &String) -> Option<i32> {
 fn extract_episode(a: &String) -> Option<(i32, bool)> {
   lazy_static! { static ref EPISODE_RE : Regex = Regex::new(r"(\d+)").unwrap(); }
   match EPISODE_RE.captures(a) {
-    Some(cap) => match String::from(&cap[1]).parse::<i32>() { Ok(i) => Some((i, a.contains("卷"))), Err(_) => None },
+    Some(cap) => match String::from(&cap[1]).parse::<i32>() {
+      Ok(i) => Some((i, a.contains("卷"))),
+      Err(_) => None
+    },
     None => None
   }
 }
@@ -225,7 +233,7 @@ lazy_static! {
   ).unwrap();
 }
 
-fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, Error> {
+fn fetch_manga_ids_with_url(url: &String) -> Result<Vec<String>, Error> {
   let mut response = reqwest::get(url.as_str()).map_err(|_| Error::DmkFetchError)?;
   let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
   let document = Html::parse_document(&html_text);
@@ -236,11 +244,73 @@ fn fetch_latest_manga_with_url(url: &String) -> Result<Vec<String>, Error> {
 }
 
 pub fn fetch_latest_manga() -> Result<Vec<String>, Error> {
-  fetch_latest_manga_with_url(&String::from("https://cartoonmad.com/"))
+  fetch_manga_ids_with_url(&String::from("https://cartoonmad.com/"))
 }
 
 pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<String>, Error> {
-  fetch_latest_manga_with_url(&genre.dmk_url())
+  fetch_manga_ids_with_url(&genre.dmk_url())
+}
+
+fn dmk_ended_index_url(page: i32) -> String {
+  format!("https://www.cartoonmad.com/endcm.{:02}.html", page)
+}
+
+pub fn fetch_ended() -> Result<Vec<String>, Error> {
+
+  // Static selectors for this page
+  lazy_static! {
+    static ref LAST_PAGINATION_SEL : Selector = Selector::parse(
+      "body > table > tbody > tr:first-child > td:nth-child(2) > table > tbody > tr:nth-child(3) > \
+      td > table:nth-child(3) > tbody > tr > td:nth-child(2) > a:last-child"
+    ).unwrap();
+    static ref ENDED_INDEX_A_SEL : Selector = Selector::parse(
+      "body > table > tbody > tr:first-child > \
+      td:nth-child(2) > table > tbody > tr:nth-child(3) > td > table > tbody > tr:nth-child(2) > \
+      td:nth-child(2) > table > tbody > tr > td > table > tbody > tr > td > a"
+    ).unwrap();
+  }
+
+  // First get the first page data
+  let first_page_url = dmk_ended_index_url(1);
+  let mut response = reqwest::get(first_page_url.as_str()).map_err(|_| Error::DmkFetchError)?;
+  let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
+  let document = Html::parse_document(&html_text);
+
+  // Then get the data on the first page
+  let a_elems = document.select(&ENDED_INDEX_A_SEL);
+  let first_page_ids = get_manga_ids_from_a_elems(a_elems)?;
+
+  // Then get the last page count
+  let pagi_elem = document.select(&LAST_PAGINATION_SEL).next().ok_or(Error::DmkDomTraverseError)?;
+  let pagi_text = pagi_elem.text().next().ok_or(Error::DmkParseError)?;
+  let last_page : i32 = pagi_text.parse().map_err(|_| Error::DmkParseError)?;
+
+  type FetchHandle = thread::JoinHandle<Result<Vec<String>, Error>>;
+
+  // For each page, create a new thread to fetch
+  let handles : Vec<FetchHandle> = (2..last_page).into_iter().map(|page| {
+    let url = dmk_ended_index_url(page);
+    thread::spawn(move || {
+      let mut response = reqwest::get(url.as_str()).map_err(|_| Error::DmkFetchError)?;
+      let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
+      let document = Html::parse_document(&html_text);
+      let a_elems = document.select(&ENDED_INDEX_A_SEL);
+      Ok(get_manga_ids_from_a_elems(a_elems)?)
+    })
+  }).collect();
+
+  let ids : Vec<String> = handles.into_iter().filter_map(|handle| -> Option<Vec<String>> {
+    let result = handle.join().ok()?;
+    match result {
+      Ok(ids) => Some(ids),
+      Err(err) => {
+        println!("Error when fetching ended ids {}: {}", err.code(), err.msg());
+        None
+      }
+    }
+  }).flatten().collect();
+
+  Ok([&first_page_ids[..], &ids[..]].concat())
 }
 
 pub fn search(text: &String) -> Result<Vec<String>, Error> {

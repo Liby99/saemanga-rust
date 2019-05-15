@@ -75,4 +75,10 @@ impl Latest {
   pub fn fetch_overall(conn: &Database) -> Result<Vec<Manga>, Error> {
     Self::fetch_latest(conn, vec![Genre::all()])
   }
+
+  pub fn fetch_ended(_: &Database) -> Result<Vec<Manga>, Error> {
+    let ids = dmk::fetch_ended()?;
+    println!("{:?}", ids);
+    Err(Error::NotImplementedError)
+  }
 }

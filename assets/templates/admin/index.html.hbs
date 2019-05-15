@@ -68,8 +68,9 @@
   </form>
   <hr />
   <h2>Manga Update</h2>
-  <form>
+  <form ctrl="disabler">
     <p>Click the buttons below to update mangas accordingly</p>
+    <p>Make sure you are able to wait a while for these tasks to be finished running</p>
     <button formaction="/admin/latest/fetch_overall" formmethod="post">Fetch Overall Latest Mangas</button>
     <button formaction="/admin/latest/fetch_genres" formmethod="post">Fetch Latest Manga of All Genres</button>
     <button formaction="/admin/latest/fetch_ended" formmethod="post">Fetch Ended Manga</button>

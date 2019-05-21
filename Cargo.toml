@@ -26,6 +26,7 @@ quote = "0.6"
 time = "0.1"
 reqwest = { git = "https://github.com/liby99/reqwest" }
 collection = { path = "lib/collection" }
+# cookie_value = { path = "lib/cookie_value" }
 
 [dependencies.rocket_contrib]
 version = "*"

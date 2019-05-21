@@ -1,5 +1,9 @@
 use std::thread;
 
+// TODO: Find out reason why when doing scraping
+// https://github.com/servo/html5ever/blob/45b2fca5c600b5bb8f284d60075a6ecf23820427/html5ever/src/tree_builder/mod.rs#L1150
+// Would raise warning
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use scraper::{Selector, Html};

@@ -1,5 +1,4 @@
 use rocket_contrib::templates::Template;
-use rocket::http::Cookies;
 
 use crate::app::genre::Genre;
 use crate::app::user_setting::*;
@@ -70,7 +69,7 @@ impl From<&&Genre> for GenreData {
 }
 
 #[get("/index")]
-pub fn index(user: Option<&User>, cookies: Cookies) -> Template {
+pub fn index(user: Option<&User>, setting: UserSetting) -> Template {
 
   // Create temporary data
   let data = TemplateData {
@@ -117,7 +116,7 @@ pub fn index(user: Option<&User>, cookies: Cookies) -> Template {
       follows: vec![],
     }),
     genres: Genre::all_genres().iter().map(GenreData::from).collect(),
-    setting: SettingData::from(UserSetting::from_cookies(&cookies))
+    setting: SettingData::from(setting)
   };
 
   // Render the data

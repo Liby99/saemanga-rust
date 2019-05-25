@@ -6,6 +6,7 @@ use crate::util::Database;
 use crate::util::Error;
 use crate::app::user::User;
 use crate::app::session::Session;
+use crate::app::user_setting::UserSetting;
 
 mod index;
 mod manga;
@@ -29,11 +30,20 @@ impl<'a, 'r> FromRequest<'a, 'r> for &'a User {
   }
 }
 
+impl<'a, 'r> FromRequest<'a, 'r> for UserSetting {
+  type Error = Error;
+
+  fn from_request(request: &'a Request<'r>) -> request::Outcome<UserSetting, Self::Error> {
+    Outcome::Success(UserSetting::from_cookies(&request.cookies()))
+  }
+}
+
 pub fn routes() -> Vec<Route> {
   [
     routes![
       index::index,
       manga::manga,
+      manga::manga_with_epi,
       error::error,
     ],
     user::routes(),

@@ -242,11 +242,11 @@ impl MangaData {
   }
 
   pub fn saemanga_url(&self) -> String {
-    format!("http://saemanga.com/manga/{}", self.dmk_id)
+    format!("/manga/{}", self.dmk_id)
   }
 
-  pub fn saemanga_episode_url(&self, episode: u32) -> String {
-    format!("http://saemanga.com/manga/{}/{}", self.dmk_id, episode)
+  pub fn saemanga_episode_url(&self, episode: i32) -> String {
+    format!("/manga/{}/{}", self.dmk_id, episode)
   }
 
   pub fn dmk_base_url(&self) -> String {
@@ -257,7 +257,7 @@ impl MangaData {
     format!("http://cartoonmad.com/cartoonimgs/coimg/{}.jpg", self.dmk_id)
   }
 
-  pub fn dmk_image_url(&self, episode: u32, page: u32) -> String {
+  pub fn dmk_image_url(&self, episode: i32, page: i32) -> String {
     format!("{}/{}/{:03}/{:03}.jpg", self.dmk_id_base.dmk_image_url_base(), self.dmk_id, episode, page)
   }
 }

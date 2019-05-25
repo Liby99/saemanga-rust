@@ -16,8 +16,8 @@ pub fn add(_user: AdminUser, conn: Database, data: Form<AddMangaFormData>) -> Re
   match dmk::fetch_manga_data(&data.dmk_id) {
     Ok(manga) => match Manga::insert(&conn, &manga) {
       Ok(_) => Redirect::to("/admin/index"),
-      Err(err) => Redirect::to(format!("/admin/error?code={}", err.code()))
+      Err(err) => err.redirect_to_admin()
     },
-    Err(err) => Redirect::to(format!("/admin/error?code={}", err.code()))
+    Err(err) => err.redirect_to_admin()
   }
 }

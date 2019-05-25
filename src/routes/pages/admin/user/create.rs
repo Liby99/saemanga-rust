@@ -15,6 +15,6 @@ pub struct CreateUserForm {
 pub fn create(_user: AdminUser, conn: Database, info: Form<CreateUserForm>) -> Redirect {
   match User::insert(&conn, &info.username, &info.password) {
     Ok(_) => Redirect::to("/admin"),
-    Err(err) => Redirect::to(format!("/admin/error?code={}", err as u32))
+    Err(err) => err.redirect_to_admin()
   }
 }

@@ -1,7 +1,14 @@
 use rocket_contrib::templates::Template;
+use rocket::response::Redirect;
 use enum_primitive::FromPrimitive;
 
 use crate::util::Error;
+
+impl Error {
+  pub fn redirect_to_admin(&self) -> Redirect {
+    Redirect::to(format!("/admin/error?code={}", self.code()))
+  }
+}
 
 #[derive(Serialize)]
 struct ErrorData<'a> {

@@ -8,6 +8,6 @@ use super::super::AdminUser;
 pub fn fetch_genres(_admin: AdminUser, conn: Database) -> Redirect {
   match Manga::fetch_all_genres(&conn) {
     Ok(_) => Redirect::to("/admin"),
-    Err(err) => Redirect::to(format!("/admin/error?code={}", err.code()))
+    Err(err) => err.redirect_to_admin()
   }
 }

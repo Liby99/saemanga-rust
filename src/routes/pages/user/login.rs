@@ -22,13 +22,13 @@ pub fn login(conn: Database, mut cookies: Cookies, data: Form<LoginForm>, redir:
           session.store_to_cookies(&mut cookies);
           Redirect::to(redir)
         },
-        Err(err) => Redirect::to(format!("/admin/error?code={}", err.code()))
+        Err(err) => err.redirect(Some(redir.as_str()))
       },
-      false => Redirect::to(format!("/admin/error?code={}", Error::UsernameOrPasswordError.code())),
+      false => Error::UsernameOrPasswordError.redirect(Some(redir.as_str())),
     },
     Err(err) => match err {
-      Error::UserNotFoundError => Redirect::to(format!("/admin/error?code={}", Error::UsernameOrPasswordError.code())),
-      _ => Redirect::to(format!("/admin/error?code={}", err.code()))
+      Error::UserNotFoundError => Error::UsernameOrPasswordError.redirect(Some(redir.as_str())),
+      _ => err.redirect(Some(redir.as_str()))
     }
   }
 }

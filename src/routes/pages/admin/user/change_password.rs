@@ -24,7 +24,7 @@ pub fn change_password_page(admin: AdminUser, conn: Database, id: String) -> Res
       };
       Ok(Template::render("admin/user/change_password", &data))
     },
-    Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
+    Err(err) => Err(err.redirect_to_admin())
   }
 }
 
@@ -43,6 +43,6 @@ pub struct ChangePasswordForm {
 pub fn change_password_submit(_user: AdminUser, conn: Database, data: Form<ChangePasswordForm>) -> Redirect {
   match User::change_password_by_id(&conn, &data.id, &data.new_password) {
     Ok(()) => Redirect::to("/admin"),
-    Err(err) => Redirect::to(format!("/admin/error?code={}", err as u32))
+    Err(err) => err.redirect_to_admin()
   }
 }

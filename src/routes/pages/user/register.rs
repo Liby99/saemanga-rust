@@ -21,8 +21,8 @@ pub fn register(conn: Database, mut cookies: Cookies, data: Form<RegisterForm>, 
         session.store_to_cookies(&mut cookies);
         Redirect::to(redir)
       },
-      Err(err) => Redirect::to(format!("/error?code={}", err.code()))
+      Err(err) => err.redirect(Some(redir.as_str()))
     },
-    Err(err) => Redirect::to(format!("/error?code={}", err.code()))
+    Err(err) => err.redirect(Some(redir.as_str()))
   }
 }

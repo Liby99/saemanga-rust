@@ -42,6 +42,8 @@ struct SettingData {
 
 #[derive(Serialize)]
 struct PageData<'a> {
+  url: String,
+  user: Option<&'a User>,
   manga: &'a Manga,
   episode: EpisodeData,
   setting: SettingData,
@@ -59,9 +61,8 @@ impl From<UserSetting> for SettingData {
 
 #[get("/manga/<dmk_id>")]
 pub fn manga(
-  user: Option<&User>,
+  // user: Option<&User>,
   conn: Database,
-  setting: UserSetting,
   dmk_id: String
 ) -> Redirect {
   match Manga::get_by_dmk_id(&conn, &dmk_id) {
@@ -92,6 +93,8 @@ pub fn manga_with_epi(
   let prev_episode = data.prev_episode_of(&episode);
 
   Template::render("manga", PageData {
+    url: data.saemanga_episode_url(episode.episode()),
+    user: user,
     manga: &manga,
     episode: EpisodeData {
       episode: episode.episode(),

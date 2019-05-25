@@ -1,9 +1,17 @@
 use rocket_contrib::templates::Template;
 use rocket::response::Redirect;
 use enum_primitive::FromPrimitive;
-use rocket::http::uri::Uri;
 
 use crate::util::Error;
+
+impl Error {
+  pub fn redirect<'a>(&self, redir: Option<&'a str>) -> Redirect {
+    Redirect::to(format!("/error?code={}{}", self.code(), match redir {
+      Some(s) => format!("&redir={}", s),
+      None => format!("")
+    }))
+  }
+}
 
 #[derive(Serialize)]
 struct ErrorData<'a> {
@@ -14,15 +22,7 @@ struct ErrorData<'a> {
 
 #[get("/error?<code>&<redir>")]
 pub fn error(code: Option<i32>, redir: Option<String>) -> Result<Template, Redirect> {
-  let back = match redir {
-    Some(url) => match Uri::percent_decode(url.as_bytes()) {
-      Ok(decoded) => String::from(decoded),
-      Err(_) => {
-        return Err(Redirect::to(format!("/error?code={}", Error::DecodeUrlError.code())))
-      }
-    },
-    None => String::from("/")
-  };
+  let back = match redir { Some(url) => url, None => String::from("/") };
   let data : ErrorData = match code {
     Some(c) => match Error::from_i32(c) {
       Some(e) => ErrorData { code: e.code(), msg: e.msg(), back: back.as_str() },

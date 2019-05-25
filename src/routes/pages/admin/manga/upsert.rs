@@ -15,6 +15,6 @@ pub struct UpsertMangaFormData {
 pub fn upsert(_user: AdminUser, conn: Database, data: Form<UpsertMangaFormData>) -> Redirect {
   match dmk::fetch_manga_data(&data.dmk_id).and_then(|manga| Manga::upsert(&conn, &manga)) {
     Ok(_) => Redirect::to("/admin/index"),
-    Err(err) => Redirect::to(format!("/admin/error?code={}", err.code()))
+    Err(err) => err.redirect_to_admin()
   }
 }

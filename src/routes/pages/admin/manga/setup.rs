@@ -8,6 +8,6 @@ use super::super::AdminUser;
 pub fn setup(_user: AdminUser, conn: Database) -> Redirect {
   match Manga::setup_collection_index(&conn) {
     Ok(_) => Redirect::to("/admin/index"),
-    Err(err) => Redirect::to(format!("/admin/error?code={}", err as u32))
+    Err(err) => err.redirect_to_admin()
   }
 }

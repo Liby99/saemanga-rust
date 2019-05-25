@@ -14,6 +14,6 @@ pub struct RemoveUserForm {
 pub fn remove(_user: AdminUser, conn: Database, info: Form<RemoveUserForm>) -> Redirect {
   match User::remove(&conn, &info.id) {
     Ok(_) => Redirect::to("/admin"),
-    Err(err) => Redirect::to(format!("/admin/error?code={}", err as u32))
+    Err(err) => err.redirect_to_admin()
   }
 }

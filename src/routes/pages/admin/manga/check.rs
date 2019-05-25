@@ -28,7 +28,7 @@ pub fn check(admin: AdminUser, conn: Database, dmk_id: String) -> Result<Templat
       refresh_date_time: manga.refresh_date_time().to_rfc3339(),
       manga: manga,
     })),
-    Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err.code())))
+    Err(err) => Err(err.redirect_to_admin())
   }
 }
 

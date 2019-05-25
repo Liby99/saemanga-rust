@@ -16,8 +16,8 @@ pub fn change_password(conn: Database, user: &User, data: Form<ChangePasswordFor
   match user.is_password_match(&data.old_password) {
     true => match user.change_password(&conn, &data.new_password) {
       Ok(()) => Redirect::to(redir),
-      Err(err) => Redirect::to(format!("/error?code={}", err.code()))
+      Err(err) => err.redirect(Some(redir.as_str()))
     },
-    false => Redirect::to(format!("/error?code={}", Error::IncorrectOldPassword.code()))
+    false => Error::IncorrectOldPassword.redirect(Some(redir.as_str()))
   }
 }

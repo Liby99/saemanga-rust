@@ -24,7 +24,7 @@ pub fn test_password_page(admin: AdminUser, conn: Database, id: String) -> Resul
       };
       Ok(Template::render("admin/user/test_password", &data))
     },
-    Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
+    Err(err) => Err(err.redirect_to_admin())
   }
 }
 
@@ -52,6 +52,6 @@ pub fn test_password_submit(_user: AdminUser, conn: Database, data: Form<TestPas
       id: data.id.clone(),
       passed: User::is_password_match(&user, &data.password)
     })),
-    Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
+    Err(err) => Err(err.redirect_to_admin())
   }
 }

@@ -40,7 +40,7 @@ pub fn index(conn: Database, admin: AdminUser) -> Result<Template, Redirect> {
       admin_username: admin.user().username(),
       users: users
     })),
-    Err(err) => Err(Redirect::to(format!("/admin/error?code={}", err as u32)))
+    Err(err) => Err(err.redirect_to_admin())
   }
 }
 

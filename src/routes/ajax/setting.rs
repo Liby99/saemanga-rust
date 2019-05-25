@@ -4,7 +4,6 @@ use rocket_contrib::json::Json;
 
 use crate::util::cookie_value::CookieValue;
 
-use std::str::FromStr;
 use crate::app::user_setting::*;
 
 pub fn routes() -> Vec<Route> {

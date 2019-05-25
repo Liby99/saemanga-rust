@@ -14,6 +14,7 @@ extern crate lazy_static;
 extern crate time;
 
 #[macro_use] extern crate collection;
+#[macro_use] extern crate cookie_value;
 
 pub mod app;
 pub mod routes;

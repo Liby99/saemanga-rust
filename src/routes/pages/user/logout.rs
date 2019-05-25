@@ -3,11 +3,11 @@ use rocket::http::{Cookies};
 use rocket::http::uri::Uri;
 
 use crate::util::{Error, Database};
-use crate::app::user_session::UserSession;
+use crate::app::session::Session;
 
 #[get("/user/logout?<redir>")]
 pub fn logout(conn: Database, mut cookies: Cookies, redir: Option<String>) -> Redirect {
-  match UserSession::remove_from_cookies(&conn, &mut cookies) {
+  match Session::remove_from_cookies(&conn, &mut cookies) {
     Ok(()) => {
       let redir = match redir {
         Some(url) => match Uri::percent_decode(url.as_bytes()) {

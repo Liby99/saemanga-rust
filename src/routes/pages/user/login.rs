@@ -4,7 +4,7 @@ use rocket::request::Form;
 
 use crate::util::{Error, Database};
 use crate::app::user::User;
-use crate::app::user_session::UserSession;
+use crate::app::session::Session;
 
 #[derive(FromForm)]
 pub struct LoginForm {
@@ -17,7 +17,7 @@ pub fn login(conn: Database, mut cookies: Cookies, data: Form<LoginForm>, redir:
   let redir = match redir { Some(u) => u, None => String::from("/") };
   match User::get_by_username(&conn, &data.username) {
     Ok(user) => match user.is_password_match(&data.password) {
-      true => match UserSession::insert(&conn, &user) {
+      true => match Session::insert(&conn, &user) {
         Ok(session) => {
           session.store_to_cookies(&mut cookies);
           Redirect::to(redir)

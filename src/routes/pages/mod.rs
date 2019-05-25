@@ -5,7 +5,7 @@ use rocket::{Route, Catcher};
 use crate::util::Database;
 use crate::util::Error;
 use crate::app::user::User;
-use crate::app::user_session::UserSession;
+use crate::app::session::Session;
 
 mod index;
 mod error;
@@ -18,7 +18,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for &'a User {
   fn from_request(request: &'a Request<'r>) -> request::Outcome<&'a User, Self::Error> {
     let user_result = request.local_cache(|| -> Option<User> {
       let db = request.guard::<Database>().succeeded()?;
-      let session = UserSession::from_cookies_and_touch(&db, &mut request.cookies()).ok()?;
+      let session = Session::from_cookies_and_touch(&db, &mut request.cookies()).ok()?;
       session.get_user_and_touch(&db).ok()
     });
     match user_result {

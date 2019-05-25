@@ -11,7 +11,7 @@ use crate::util::Error;
 
 #[collection("session")]
 #[derive(Serialize, Deserialize)]
-pub struct UserSession {
+pub struct Session {
   #[serde(rename="_id")]
   session_id: mongodb::oid::ObjectId,
   user_id: mongodb::oid::ObjectId,
@@ -20,15 +20,15 @@ pub struct UserSession {
   expire_date_time: bson::UtcDateTime,
 }
 
-impl UserSession {
+impl Session {
   pub fn key<'a>() -> &'a str {
     "session"
   }
 
-  pub fn new(user: &User) -> Result<UserSession, Error> {
+  pub fn new(user: &User) -> Result<Session, Error> {
     let now = mongodb::UtcDateTime::from(Utc::now());
     let expire = mongodb::UtcDateTime::from(Utc::now() + Duration::days(30));
-    Ok(UserSession {
+    Ok(Session {
       session_id: ObjectId::new().map_err(|_| Error::CannotCreateObjectId)?,
       user_id: user.id().clone(),
       start_date_time: now,
@@ -42,7 +42,7 @@ impl UserSession {
     Some(cookie.value().to_string())
   }
 
-  pub fn from_cookies_and_touch(conn: &Database, cookies: &mut Cookies) -> Result<UserSession, Error> {
+  pub fn from_cookies_and_touch(conn: &Database, cookies: &mut Cookies) -> Result<Session, Error> {
     let session_id = Self::get_session_id_from_cookies(cookies).ok_or(Error::NoSession)?;
     let session = Self::get_by_session_id_and_touch(&conn, &session_id)?;
     session.store_to_cookies(cookies);
@@ -117,7 +117,7 @@ impl UserSession {
     }
   }
 
-  pub fn insert(conn: &Database, user: &User) -> Result<UserSession, Error> {
+  pub fn insert(conn: &Database, user: &User) -> Result<Session, Error> {
     let coll = Self::coll(&conn);
     let session = Self::new(user)?;
     match coll.insert_one(session.to_doc()?, None) {

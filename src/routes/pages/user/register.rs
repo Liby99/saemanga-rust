@@ -4,7 +4,7 @@ use rocket::request::Form;
 
 use crate::util::Database;
 use crate::app::user::User;
-use crate::app::user_session::UserSession;
+use crate::app::session::Session;
 
 #[derive(FromForm)]
 pub struct RegisterForm {
@@ -16,7 +16,7 @@ pub struct RegisterForm {
 pub fn register(conn: Database, mut cookies: Cookies, data: Form<RegisterForm>, redir: Option<String>) -> Redirect {
   let redir = match redir { Some(u) => u, None => String::from("/") };
   match User::insert(&conn, &data.username, &data.password) {
-    Ok(user) => match UserSession::insert(&conn, &user) {
+    Ok(user) => match Session::insert(&conn, &user) {
       Ok(session) => {
         session.store_to_cookies(&mut cookies);
         Redirect::to(redir)

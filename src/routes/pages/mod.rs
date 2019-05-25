@@ -8,6 +8,7 @@ use crate::app::user::User;
 use crate::app::session::Session;
 
 mod index;
+mod manga;
 mod error;
 mod user;
 mod admin;
@@ -32,6 +33,7 @@ pub fn routes() -> Vec<Route> {
   [
     routes![
       index::index,
+      manga::manga,
       error::error,
     ],
     user::routes(),

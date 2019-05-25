@@ -1,0 +1,17 @@
+{{#*inline "main"}}
+
+{{> partials/manga/header}}
+
+{{/inline}}
+
+{{#*inline "panels"}}
+
+{{> partials/panels/manga}}
+
+{{/inline}}
+
+{{~> layout/layout
+  redir="%2Fmanga"
+  title=(concat manga_title "冴え漫画")
+  sidebar="partials/manga/sidebar"
+~}}

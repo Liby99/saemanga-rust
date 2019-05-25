@@ -1,6 +1,6 @@
 use rocket::http::{Cookies};
 
-use crate::util::cookie_value::CookieValue;
+use crate::util::CookieValue;
 
 mod light_mode;
 mod hand_mode;

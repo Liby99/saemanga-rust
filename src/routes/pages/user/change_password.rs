@@ -1,8 +1,7 @@
 use rocket::response::Redirect;
 use rocket::request::Form;
 
-use crate::util::database::Database;
-use crate::util::error::Error;
+use crate::util::{Error, Database};
 use crate::app::user::User;
 
 #[derive(FromForm)]

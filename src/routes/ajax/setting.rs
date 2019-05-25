@@ -2,7 +2,7 @@ use rocket::Route;
 use rocket::http::Cookies;
 use rocket_contrib::json::Json;
 
-use crate::util::cookie_value::CookieValue;
+use crate::util::CookieValue;
 
 use crate::app::user_setting::*;
 

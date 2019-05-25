@@ -4,7 +4,7 @@ use rocket::Outcome;
 use rocket::http::Status;
 use rocket::request::{self, Request, FromRequest};
 
-use crate::util::error::Error;
+use crate::util::Error;
 use crate::app::user::User;
 
 mod index;

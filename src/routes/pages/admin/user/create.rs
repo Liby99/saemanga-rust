@@ -1,7 +1,7 @@
 use rocket::request::Form;
 use rocket::response::Redirect;
 
-use crate::util::database::Database;
+use crate::util::Database;
 use crate::app::user::User;
 use super::super::AdminUser;
 

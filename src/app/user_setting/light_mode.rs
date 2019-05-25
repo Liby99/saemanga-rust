@@ -1,7 +1,6 @@
 use rocket::http::{Cookie, Cookies};
 
-use crate::util::cookie_value::CookieValue;
-use crate::util::error::Error;
+use crate::util::{CookieValue, Error};
 
 #[derive(Debug, PartialEq, CookieValue)]
 pub enum LightMode {

@@ -1,7 +1,5 @@
 use saemanga;
 use saemanga::app::dmk;
-use saemanga::app::dmk_id_base::*;
-use saemanga::app::manga_status::*;
 use saemanga::app::manga_data::*;
 use saemanga::app::user::*;
 use saemanga::app::manga::*;

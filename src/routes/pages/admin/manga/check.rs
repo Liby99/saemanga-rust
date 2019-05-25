@@ -3,8 +3,7 @@
 use rocket::response::Redirect;
 use rocket_contrib::templates::Template;
 
-use crate::util::database::Database;
-use crate::util::Error;
+use crate::util::{Error, Database};
 use crate::app::manga::Manga;
 use super::super::AdminUser;
 

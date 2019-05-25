@@ -2,7 +2,7 @@ use rocket::response::Redirect;
 use rocket::http::{Cookies};
 use rocket::request::Form;
 
-use crate::util::database::Database;
+use crate::util::Database;
 use crate::app::user::User;
 use crate::app::user_session::UserSession;
 

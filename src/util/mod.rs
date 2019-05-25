@@ -3,7 +3,7 @@ pub mod template;
 pub mod static_files;
 pub mod collection;
 pub mod error;
-// pub mod cookie_value;
+pub mod cookie_value;
 
 pub use database::{database, Database};
 pub use template::template;

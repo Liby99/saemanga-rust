@@ -1,20 +1,20 @@
-// use std::str::FromStr;
-// use std::string::ToString;
-// use rocket::http::Cookies;
+use rocket::http::Cookies;
 
-// use super::error::Error;
+use super::Error;
 
-// pub trait CookieValue: FromStr + ToString {
-//   const KEY : &'static str;
+pub trait CookieValue {
+  type Data;
 
-//   // FromStr
-//   fn from_str(s: &str) -> Result<Self, Error>;
+  const KEY : &'static str;
 
-//   // ToString
-//   fn to_string(&self) -> String;
+  // FromStr
+  fn from_str(s: &str) -> Result<Self::Data, Error>;
 
-//   // Cookie values
-//   fn default() -> Self;
-//   fn from_cookies(cookies: &Cookies) -> Self;
-//   fn into_cookies(&self, cookies: &mut Cookies);
-// }
+  // ToString
+  fn to_string(&self) -> String;
+
+  // Cookie values
+  fn default() -> Self;
+  fn from_cookies(cookies: &Cookies) -> Self::Data;
+  fn into_cookies(&self, cookies: &mut Cookies);
+}

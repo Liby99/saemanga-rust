@@ -1,6 +1,6 @@
-use std::str::FromStr;
 use rocket::http::{Cookie, Cookies};
 
+use crate::util::cookie_value::CookieValue;
 use crate::util::error::Error;
 
 #[derive(Debug, PartialEq)]
@@ -9,41 +9,37 @@ pub enum IndexDisplayMode {
   LovedOnly
 }
 
-impl FromStr for IndexDisplayMode {
-  type Err = Error;
+impl CookieValue for IndexDisplayMode {
+  type Data = Self;
 
-  fn from_str(s: &str) -> Result<Self, Self::Err> {
+  const KEY : &'static str = "index-display-mode";
+
+  fn from_str(s: &str) -> Result<Self::Data, Error> {
     match s {
-      "left" => Ok(Self::All),
-      "right" => Ok(Self::LovedOnly),
+      "all" => Ok(Self::All),
+      "loved" => Ok(Self::LovedOnly),
       _ => Err(Error::UnknownIndexDisplayMode),
     }
   }
-}
 
-impl std::string::ToString for IndexDisplayMode {
   fn to_string(&self) -> String {
     match self {
-      Self::All => "left".to_string(),
-      Self::LovedOnly => "right".to_string(),
+      Self::All => "all".to_string(),
+      Self::LovedOnly => "loved".to_string(),
     }
   }
-}
 
-impl IndexDisplayMode {
-  const KEY : &'static str = "index-display-mode";
-
-  pub fn default() -> Self {
+  fn default() -> Self {
     Self::All
   }
 
-  pub fn from_cookies(cookies: &Cookies) -> Self {
+  fn from_cookies(cookies: &Cookies) -> Self::Data {
     cookies.get(Self::KEY).map_or(Self::default(), |cookie| {
       Self::from_str(cookie.value()).map_or_else(|_| Self::default(), |v| v)
     })
   }
 
-  pub fn into_cookies(&self, cookies: &mut Cookies) {
+  fn into_cookies(&self, cookies: &mut Cookies) {
     let value = self.to_string();
     cookies.add(Cookie::build(Self::KEY, value).path("/").finish());
   }

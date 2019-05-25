@@ -10,7 +10,7 @@
 | `last_login_time` | `DateTime` | Last Login TIme | |
 | `is_admin` | `bool` | Is administrator flag | |
 
-# Login Session
+# Session
 
 | Field | Type | Description | Unique |
 |-------|------|-------------|--------|

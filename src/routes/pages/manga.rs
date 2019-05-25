@@ -6,10 +6,22 @@ use crate::app::user::User;
 use crate::app::manga::Manga;
 
 #[derive(Serialize)]
+struct NeighborEpisodeData {
+  is_book: bool,
+  url: String,
+}
+
+#[derive(Serialize)]
 struct EpisodeData {
+
+  // Basic information about the current episode
   episode: i32,
   is_book: bool,
   pages: Vec<String>,
+
+  // Neighbor episodes
+  prev: Option<NeighborEpisodeData>,
+  next: Option<NeighborEpisodeData>,
 }
 
 #[derive(Serialize)]
@@ -32,7 +44,9 @@ pub fn manga(
       is_book: false,
       pages: vec![
         format!("http://www.cartoonmad.com/home75458/6037/011/001.jpg")
-      ]
+      ],
+      next: None,
+      prev: None,
     }
   })
 }

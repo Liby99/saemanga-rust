@@ -1,0 +1,25 @@
+<section id="manga-navigation-section" class="flex" style="padding: 15px 0">
+  {{#if episode.prev}}
+    <a href="{{episode.prev.url}}" class="black center flex-fill">
+      上一{{#if episode.prev.is_book}}卷{{else}}话{{/if}}
+      <i class="fa fa-angle-right"></i>
+    </a>
+  {{else}}
+    <a href="javascript:void(0)" class="disabled black center flex-fill">
+      最前一{{#if episode.is_book}}卷{{else}}话{{/if}}了哦
+    </a>
+  {{/if}}
+  <a href="index.html" class="black center flex-fill">
+    返回我的书架
+  </a>
+  {{#if episode.next}}
+    <a href="{{episode.next.url}}" class="black center flex-fill">
+      下一{{#if episode.next.is_book}}卷{{else}}话{{/if}}
+      <i class="fa fa-angle-right"></i>
+    </a>
+  {{else}}
+    <a href="javascript:void(0)" class="disabled black center flex-fill">
+      最新一{{#if episode.is_book}}卷{{else}}话{{/if}}了哦
+    </a>
+  {{/if}}
+</section>

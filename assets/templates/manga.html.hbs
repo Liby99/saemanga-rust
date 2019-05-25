@@ -1,6 +1,8 @@
 {{#*inline "main"}}
 
 {{> partials/manga/header}}
+{{> partials/manga/content}}
+{{> partials/manga/navigation}}
 
 {{/inline}}
 
@@ -12,6 +14,6 @@
 
 {{~> layout/layout
   redir="%2Fmanga"
-  title=(concat manga_title "冴え漫画")
+  title=(concat manga.title " - 冴え漫画")
   sidebar="partials/manga/sidebar"
 ~}}

@@ -1,10 +1,18 @@
 import $ from 'jquery';
+import Axios, { AxiosResponse } from 'axios';
+
 import Controller from '../../library/controller';
 import DiscoverManga, { DiscoverMangaData } from '../../templates/discover_manga';
 
 type DiscoverState = {
   show: boolean,
   mangas: DiscoverMangaData[],
+};
+
+type GetLatestMangaResponse = {
+  success: boolean,
+  message: string,
+  data: Array<DiscoverMangaData>,
 };
 
 export default class Discover extends Controller<DiscoverState> {
@@ -58,19 +66,29 @@ export default class Discover extends Controller<DiscoverState> {
   }
 
   fetch(genre: string, callback: (mangas: DiscoverMangaData[]) => void) {
-    setTimeout(() => {
-      callback([{
-        "title": "五等分的花嫁",
-        "dmk_id": "5893",
-        "cover_url": "http://cartoonmad.com/cartoonimgs/coimg/5893.jpg",
-        "saemanga_url": "http://saemanga.com/manga/5893",
-      }, {
-        "title": "雖然我也想脫宅",
-        "dmk_id": "7702",
-        "cover_url": "http://cartoonmad.com/cartoonimgs/coimg/7702.jpg",
-        "saemanga_url": "http://saemanga.com/manga/7702",
-      }]);
-    }, 2000);
+    Axios.get(`/ajax/get_latest_manga${genre == "" ? "" : `?genre=${genre}`}`).then((response: AxiosResponse<GetLatestMangaResponse>) => {
+      const { success, message, data } = response.data;
+      if (success) {
+        callback(data);
+      } else {
+        alert(message);
+      }
+    }).catch((err) => {
+      alert("Cannot connect to the server");
+    });
+    // setTimeout(() => {
+    //   callback([{
+    //     "title": "五等分的花嫁",
+    //     "dmk_id": "5893",
+    //     "cover_url": "http://cartoonmad.com/cartoonimgs/coimg/5893.jpg",
+    //     "saemanga_url": "http://saemanga.com/manga/5893",
+    //   }, {
+    //     "title": "雖然我也想脫宅",
+    //     "dmk_id": "7702",
+    //     "cover_url": "http://cartoonmad.com/cartoonimgs/coimg/7702.jpg",
+    //     "saemanga_url": "http://saemanga.com/manga/7702",
+    //   }]);
+    // }, 2000);
   }
 
   scrollToLeft() {

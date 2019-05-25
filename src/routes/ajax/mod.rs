@@ -1,9 +1,11 @@
 use rocket::Route;
 
+mod index;
 mod setting;
 
 pub fn routes() -> Vec<Route> {
   [
-    setting::routes()
+    index::routes(),
+    setting::routes(),
   ].concat()
 }

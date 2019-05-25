@@ -76,7 +76,7 @@ pub fn index(user: Option<&User>, conn: Database, setting: UserSetting) -> Templ
 
   // Create temporary data
   let data = TemplateData {
-    latests: Manga::get_latest_10(&conn).unwrap().into_iter().map(|m| {
+    latests: Manga::get_latest_10(&conn, None).unwrap().into_iter().map(|m| {
       let data = m.data();
       MangaData {
         title: data.title().clone(),

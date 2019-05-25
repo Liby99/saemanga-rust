@@ -214,20 +214,11 @@ impl Manga {
     }).flatten().collect())
   }
 
-  pub fn get_latest_10(conn: &Database) -> Result<Vec<Self>, Error> {
-    Self::get(conn, None, Some(mongodb::coll::options::FindOptions {
-      sort: Some(doc! {
-        "update_date_time": -1,
-      }),
-      limit: Some(10),
-      ..Default::default()
-    }))
-  }
-
-  pub fn get_latest_10_of_genre(conn: &Database, genre: &'static Genre) -> Result<Vec<Self>, Error> {
-    Self::get(conn, Some(doc! {
-      "genre": genre.id,
-    }), Some(mongodb::coll::options::FindOptions {
+  pub fn get_latest_10(conn: &Database, genre: Option<&'static Genre>) -> Result<Vec<Self>, Error> {
+    Self::get(conn, match genre {
+      Some(genre) => Some(doc!{ "genre": genre.id }),
+      None => None,
+    }, Some(mongodb::coll::options::FindOptions {
       sort: Some(doc! {
         "update_date_time": -1,
       }),

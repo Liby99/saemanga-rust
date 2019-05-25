@@ -1,5 +1,8 @@
 use rocket_contrib::templates::Template;
 
+use crate::util::Database;
+
+use crate::app::manga::Manga;
 use crate::app::genre::Genre;
 use crate::app::user_setting::*;
 use crate::app::user::User;
@@ -51,7 +54,7 @@ struct MangaData {
   dmk_id: String,
   cover_url: String,
   saemanga_url: String,
-  last_episode: u32,
+  last_episode: i32,
   last_episode_is_book: bool,
   ended: bool,
 }
@@ -69,48 +72,22 @@ impl From<&&Genre> for GenreData {
 }
 
 #[get("/index")]
-pub fn index(user: Option<&User>, setting: UserSetting) -> Template {
+pub fn index(user: Option<&User>, conn: Database, setting: UserSetting) -> Template {
 
   // Create temporary data
   let data = TemplateData {
-    latests: vec![
+    latests: Manga::get_latest_10(&conn).unwrap().into_iter().map(|m| {
+      let data = m.data();
       MangaData {
-        title: String::from("可憐可愛元氣君"),
-        dmk_id: String::from("8193"),
-        cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/8193.jpg"),
-        saemanga_url: String::from("/manga/8193"),
-        last_episode: 7,
-        last_episode_is_book: false,
-        ended: false,
-      },
-      MangaData {
-        title: String::from("家庭教師"),
-        dmk_id: String::from("1254"),
-        cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/1254.jpg"),
-        saemanga_url: String::from("/manga/1254"),
-        last_episode: 409,
-        last_episode_is_book: false,
-        ended: true,
-      },
-      MangaData {
-        title: String::from("聖癖✟櫻之丘"),
-        dmk_id: String::from("5901"),
-        cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/5901.jpg"),
-        saemanga_url: String::from("/manga/5901"),
-        last_episode: 26,
-        last_episode_is_book: false,
-        ended: false,
-      },
-      MangaData {
-        title: String::from("田中君總是如此慵懶"),
-        dmk_id: String::from("4159"),
-        cover_url: String::from("http://cartoonmad.com/cartoonimgs/coimg/4159.jpg"),
-        saemanga_url: String::from("/manga/4159"),
-        last_episode: 26,
-        last_episode_is_book: false,
-        ended: false,
-      },
-    ],
+        title: data.title().clone(),
+        dmk_id: data.dmk_id().clone(),
+        cover_url: data.dmk_cover_url(),
+        saemanga_url: data.saemanga_url(),
+        last_episode: data.latest_episode().episode(),
+        last_episode_is_book: data.latest_episode().is_book(),
+        ended: data.ended()
+      }
+    }).collect(),
     user: user.map(|user| UserData {
       username: user.username().clone(),
       follows: vec![],

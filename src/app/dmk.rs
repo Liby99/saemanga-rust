@@ -226,7 +226,7 @@ fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -
       lazy_static! { static ref COMIC_URL_REG : Regex = Regex::new(r"comic/(\d+).html").unwrap(); }
       COMIC_URL_REG.captures(href).map(|cap| String::from(&cap[1]))
     })
-  }).collect::<Vec<String>>())
+  }).collect::<Vec<String>>().into_iter().rev().collect::<Vec<String>>())
 }
 
 lazy_static! {

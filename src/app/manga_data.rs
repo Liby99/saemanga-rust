@@ -71,7 +71,7 @@ pub enum DmkIdBase {
 }
 
 fn parse_v10_image_url(url: &String) -> Option<DmkIdBase> {
-  lazy_static! { static ref IMG_RE_10 : Regex = Regex::new(r"(web\d+)\.cartoonmad\.com/(home\d+)/(\d+)/\d+/\d+\.jpg").unwrap(); }
+  lazy_static! { static ref IMG_RE_10 : Regex = Regex::new(r"(web\d*)\.cartoonmad\.com/(home\d+)/(\d+)/\d+/\d+\.jpg").unwrap(); }
   match IMG_RE_10.captures(url.as_str()) {
     Some(cap) => Some(DmkIdBase::V10 { dmk_id_web: cap[1].to_string(), dmk_id_home: cap[2].to_string() }),
     None => None
@@ -193,6 +193,10 @@ impl MangaData {
 
   pub fn status(&self) -> &MangaStatus {
     &self.status
+  }
+
+  pub fn ended(&self) -> bool {
+    self.status == MangaStatus::Ended
   }
 
   pub fn has_book(&self) -> bool {

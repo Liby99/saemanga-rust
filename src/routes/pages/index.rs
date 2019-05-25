@@ -27,7 +27,7 @@ impl From<UserSetting> for SettingData {
       is_left_hand_mode: setting.hand_mode == HandMode::Left,
       is_night_mode: setting.light_mode == LightMode::Night,
       is_loved_only: setting.index_display_mode == IndexDisplayMode::LovedOnly,
-      scale: setting.scale,
+      scale: setting.scale.get(),
     }
   }
 }

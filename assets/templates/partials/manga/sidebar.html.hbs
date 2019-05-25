@@ -1,0 +1,69 @@
+{{#*inline "menu"}}
+
+<section style="padding: 15px 0">
+  {{#if user }}
+    {{> partials/sidebar/user}}
+  {{else}}
+    <section style="padding-bottom: 15px; margin-bottom: 15px;">
+      {{> partials/sidebar/login}}
+    </section>
+  {{/if}}
+  <ul class="sidebar-btn-list">
+    <li class="full">
+      <a href="/index" class="black">返回我的书架</a>
+    </li>
+    <li class="full">
+      <a href="javascript:void(0)" ctrl="emitter" events="panel.manga.show" class="black">关于该漫画</a>
+    </li>
+    <li class="full">
+      <a id="share-url-button" href="javascript:void(0)" data-clipboard-target="#share-url-input" class="black flex">
+        <div class="flex full">分享漫画链接</div>
+        <div id="copied-tag" class="hidden">
+          <div class="tag">
+            Copied
+            <i class="fa fa-caret-right"></i>
+          </div>
+        </div>
+        <div>
+          <i class="fa fa-share pink"></i>
+        </div>
+      </a>
+      <input id="share-url-input" value="{{manga.saemanga_full_url}}" readonly="readonly" />
+    </li>
+    {{#if user}}
+      <li class="full">
+        <span id="like" {{#if follow.liked}}hidden="hidden"{{/if}}>
+          <a href="javascript:void(0)" ctrl="emitter" events="manga.like" class="black flex">
+            <div class="flex full">喜爱该漫画</div>
+            <div>
+              <i class="fa fa-heart-o pink"></i>
+            </div>
+          </a>
+        </span>
+        <span id="unlike" {{#unless follow.liked}}hidden="hidden"{{/unless}}>
+          <a href="javascript:void(0)" ctrl="emitter" events="manga.unlike" class="black flex">
+            <div class="flex full">取消喜爱该漫画</div>
+            <div>
+              <i class="fa fa-heart pink"></i>
+            </div>
+          </a>
+        </span>
+      </li>
+    {{/if}}
+  </ul>
+</section>
+
+<section>
+  <ul class="sidebar-btn-list" style="padding: 10px 0">
+    <li class="full flex">
+      {{> partials/manga/prev_episode}}
+      {{> partials/manga/next_episode}}
+    </li>
+  </ul>
+</section>
+
+{{> partials/sidebar/settings}}
+
+{{/inline}}
+
+{{~> layout/sidebar}}

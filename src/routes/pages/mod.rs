@@ -1,5 +1,6 @@
 use rocket::Outcome;
 use rocket::request::{self, Request, FromRequest};
+use rocket::response::Redirect;
 use rocket::{Route, Catcher};
 
 use crate::util::Database;
@@ -35,6 +36,12 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserSetting {
 
   fn from_request(request: &'a Request<'r>) -> request::Outcome<UserSetting, Self::Error> {
     Outcome::Success(UserSetting::from_cookies(&request.cookies()))
+  }
+}
+
+impl Error {
+  pub fn redirect<'a>(&self, redir: Option<&'a str>) -> Redirect {
+    Redirect::to(format!("/error?code={}", self.code()))
   }
 }
 

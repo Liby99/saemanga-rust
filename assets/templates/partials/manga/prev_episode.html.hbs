@@ -1,0 +1,10 @@
+{{#if episode.prev}}
+  <a href="{{episode.prev.url}}" class="black center flex-fill">
+    <i class="fa fa-angle-left"></i>
+    上一{{#if episode.prev.is_book}}卷{{else}}话{{/if}}
+  </a>
+{{else}}
+  <a href="javascript:void(0)" class="disabled black center flex-fill">
+    最前一{{#if episode.is_book}}卷{{else}}话{{/if}}了哦
+  </a>
+{{/if}}

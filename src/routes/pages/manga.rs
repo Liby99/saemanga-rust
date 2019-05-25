@@ -1,6 +1,7 @@
 use rocket_contrib::templates::Template;
+use rocket::response::Redirect;
 
-use crate::util::Database;
+use crate::util::{Error, Database};
 use crate::app::user::User;
 use crate::app::manga::Manga;
 use crate::app::manga_data::{MangaData, MangaEpisode};
@@ -40,8 +41,8 @@ struct SettingData {
 }
 
 #[derive(Serialize)]
-struct PageData {
-  manga: Manga,
+struct PageData<'a> {
+  manga: &'a Manga,
   episode: EpisodeData,
   setting: SettingData,
 }
@@ -62,20 +63,18 @@ pub fn manga(
   conn: Database,
   setting: UserSetting,
   dmk_id: String
-) -> Template {
-  Template::render("manga", PageData {
-    manga: Manga::get_by_dmk_id(&conn, &dmk_id).unwrap().unwrap(),
-    episode: EpisodeData {
-      episode: 1,
-      is_book: false,
-      pages: vec![
-        format!("http://www.cartoonmad.com/home75458/6037/011/001.jpg")
-      ],
-      next: None,
-      prev: None,
+) -> Redirect {
+  match Manga::get_by_dmk_id(&conn, &dmk_id) {
+    Ok(maybe_manga) => match maybe_manga {
+      Some(manga) => {
+        let data = manga.data();
+        let first_epi = data.first_episode();
+        Redirect::to(data.saemanga_episode_url(first_epi.episode()))
+      },
+      None => Error::MangaNotFoundError.redirect(None)
     },
-    setting: SettingData::from(setting)
-  })
+    Err(err) => err.redirect(None)
+  }
 }
 
 #[get("/manga/<dmk_id>/<epi>")]
@@ -93,7 +92,7 @@ pub fn manga_with_epi(
   let prev_episode = data.prev_episode_of(&episode);
 
   Template::render("manga", PageData {
-    manga: Manga::get_by_dmk_id(&conn, &dmk_id).unwrap().unwrap(),
+    manga: &manga,
     episode: EpisodeData {
       episode: episode.episode(),
       is_book: episode.is_book(),

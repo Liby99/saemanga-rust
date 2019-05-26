@@ -24,10 +24,7 @@ export default class Main extends Controller<State> {
     this.updateFrame();
 
     // Listen to resize event to refresh the frame
-    $(window).resize(() => {
-      console.log("resize");
-      this.updateFrame();
-    });
+    $(window).resize(() => this.updateFrame());
 
     // Also listen to set scale event
     EventPool.listen("setting.scale.set", (scale: number) => {
@@ -36,7 +33,6 @@ export default class Main extends Controller<State> {
         width: newWidth,
         actualWidth: this.clamp(newWidth),
       });
-      this.updateWidthCookie();
       this.emitWidthSetEvent();
     });
   }
@@ -67,10 +63,6 @@ export default class Main extends Controller<State> {
 
     // Then send out update message
     this.emitWidthSetEvent();
-  }
-
-  updateWidthCookie() {
-    // TODO
   }
 
   emitWidthSetEvent() {

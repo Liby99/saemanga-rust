@@ -3,7 +3,7 @@ use rocket::http::{Cookie, Cookies};
 use crate::util::{CookieValue, Error};
 
 #[derive(Debug, PartialEq)]
-pub struct Scale(f32);
+pub struct Scale(pub f32);
 
 impl Scale {
   pub fn get(&self) -> f32 {

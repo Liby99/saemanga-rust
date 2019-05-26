@@ -10,10 +10,11 @@ pub fn routes() -> Vec<Route> {
   routes![
     set_light_mode,
     set_hand_mode,
+    set_scale,
   ]
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 struct ChangeSettingResult<'a> {
   success: bool,
   message: &'a str,
@@ -44,4 +45,16 @@ fn set_hand_mode<'a>(mut cookies: Cookies, data: Json<ChangeModeData>) -> Json<C
     },
     Err(err) => Json(ChangeSettingResult { success: false, message: err.msg() })
   }
+}
+
+#[derive(Deserialize)]
+struct ChangeScaleData {
+  scale: f32,
+}
+
+#[post("/ajax/set_scale", data="<data>")]
+fn set_scale<'a>(mut cookies: Cookies, data: Json<ChangeScaleData>) -> Json<ChangeSettingResult<'a>> {
+  let scale = Scale(data.scale);
+  scale.into_cookies(&mut cookies);
+  Json(ChangeSettingResult { success: true, message: "" })
 }

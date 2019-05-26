@@ -7,11 +7,11 @@
     <a {{#if setting.is_left_hand_mode}}class="active"{{/if}} href="javascript:void(0);" value="left">左手模式</a>
     <a {{#unless setting.is_left_hand_mode}}class="active"{{/unless}} href="javascript:void(0);" value="right">右手模式</a>
   </div>
-  <div id="zoom" class="zoom">
+  <div id="zoom" class="zoom" ctrl="zoom">
     <a class="minus" href="javascript:void(0);">
       <i class="fa fa-minus"></i>
     </a>
-    <a class="data" href="javascript:void(0)">100</a>
+    <a class="data" href="javascript:void(0)">{{setting.scale_percentage}}</a>
     <a class="plus" href="javascript:void(0);">
       <i class="fa fa-plus"></i>
     </a>

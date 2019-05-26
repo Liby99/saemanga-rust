@@ -37,7 +37,8 @@ struct EpisodeData {
 struct SettingData {
   is_left_hand_mode: bool,
   is_night_mode: bool,
-  scale: f32,
+  scale_percentage: f32,
+  main_width: f32,
 }
 
 #[derive(Serialize)]
@@ -51,10 +52,12 @@ struct PageData<'a> {
 
 impl From<UserSetting> for SettingData {
   fn from(setting: UserSetting) -> Self {
+    let s : f32 = setting.scale.get();
     Self {
       is_left_hand_mode: setting.hand_mode == HandMode::Left,
       is_night_mode: setting.light_mode == LightMode::Night,
-      scale: setting.scale.get(),
+      scale_percentage: (s * 100.0).round(),
+      main_width: 768.0 * s,
     }
   }
 }

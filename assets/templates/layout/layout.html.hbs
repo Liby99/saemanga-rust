@@ -10,7 +10,7 @@
 
 <body class="{{#if setting.is_left_hand_mode}}left{{/if}} {{#if setting.is_night_mode}}night{{/if}}" ctrl="body">
   {{> (sidebar)}}
-  <main>
+  <main ctrl="main" style="max-width: {{setting.main_width}}px">
     {{~> main}}
     {{> partials/footer}}
   </main>

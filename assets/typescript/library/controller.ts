@@ -43,6 +43,10 @@ export default class Controller<State> {
     if (!noUpdate) this.update(callback);
   }
 
+  protected forceUpdate() {
+    this.update();
+  }
+
   protected update(_callback?: () => void) {
     // Do nothing
   }

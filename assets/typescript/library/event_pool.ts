@@ -36,10 +36,14 @@ export default class EventPool {
    * @param data The data associated with the event
    */
   static emit<T>(evt: string, data?: T) {
-    if (this.events[evt]) {
-      this.events[evt].forEach((callback) => {
-        callback(data);
-      });
-    }
+
+    // Use set time out to delay the execution of these events
+    setTimeout(() => {
+      if (this.events[evt]) {
+        this.events[evt].forEach((callback) => {
+          callback(data);
+        });
+      }
+    }, 0);
   }
 }

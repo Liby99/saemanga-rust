@@ -12,18 +12,22 @@ import Registry from "./library/registry";
 // Components
 import {
   Body,
+  Main,
   Sidebar,
   Login,
   LightModeSelect,
   HandModeSelect,
-  Panel
+  Zoom,
+  Panel,
 } from './controllers/common/mod';
-import { Emitter } from './controllers/helpers/mod';
+import {
+  Emitter,
+} from './controllers/helpers/mod';
 import {
   SearchBar,
   SearchResult,
   Discover,
-  Genres
+  Genres,
 } from './controllers/index/mod';
 
 // Initialize all the components
@@ -31,10 +35,12 @@ $(document).ready(() => {
 
   // First register all the common components
   Registry.register("body", Body);
+  Registry.register("main", Main);
   Registry.register("sidebar", Sidebar);
   Registry.register("login", Login);
   Registry.register("light-mode-select", LightModeSelect);
   Registry.register("hand-mode-select", HandModeSelect);
+  Registry.register("zoom", Zoom);
   Registry.register("panel", Panel);
   Registry.register("emitter", Emitter);
 

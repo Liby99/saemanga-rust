@@ -65,6 +65,7 @@ fn from_episodes(manga: &Manga, episodes: Vec<&MangaEpisode>, curr_epi: i32) -> 
 #[derive(Serialize)]
 struct PageMangaData<'a> {
   dmk_id: &'a String,
+  cover_url: String,
   title: &'a String,
   description: &'a String,
   author: &'a String,
@@ -82,6 +83,7 @@ fn from_manga<'a>(manga: &'a Manga, curr_epi: i32) -> PageMangaData<'a> {
   let episodes = from_episodes(manga, data.episodes(), curr_epi);
   PageMangaData {
     dmk_id: data.dmk_id(),
+    cover_url: data.dmk_cover_url(),
     title: data.title(),
     description: data.description(),
     author: data.author(),

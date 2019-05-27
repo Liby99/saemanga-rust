@@ -33,7 +33,7 @@ module.exports = {
         'sass-loader',
       ]
     }, {
-      test: /images\/.+\.(svg|png|jpg|jpeg|gif)/,
+      test: /images\/.+\.(svg|png|jpg|jpeg|gif|ico)/,
       use: [{
         loader: "file-loader",
         options: {

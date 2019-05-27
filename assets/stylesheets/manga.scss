@@ -44,10 +44,11 @@
 #manga-body-section img {
   display: block;
   width: 100%;
+  margin-bottom: 5px;
 }
 
-#manga-body-section img + img {
-  margin-top: 5px;
+#manga-body-section img:last-child {
+  margin: 0;
 }
 
 #manga-navigation-section a {

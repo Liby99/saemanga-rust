@@ -20,6 +20,12 @@ export default class FixBody extends Controller<State> {
     this.listen("sidebar.closed", () => {
       this.setState({ fixed: false });
     });
+
+    this.listen("body.fix_at", (scrollTop: number) => {
+      console.log(`fixing at ${scrollTop}`);
+      this.scrollTop = scrollTop;
+      this.root.css({ "margin-top": -this.scrollTop });
+    });
   }
 
   initialState() : State {
@@ -31,7 +37,7 @@ export default class FixBody extends Controller<State> {
     if (fixed) {
       if (!this.root.hasClass("fixed")) {
         this.scrollTop = $(window).scrollTop() || 0;
-        $("body").addClass("fixed").css({
+        this.root.addClass("fixed").css({
           "margin-top": -this.scrollTop,
           "position": "fixed"
         });

@@ -1,4 +1,5 @@
 export { default as Body } from "./body";
+export { default as FixBody } from "./fix_body";
 export { default as Main } from "./main";
 export { default as Sidebar } from "./sidebar";
 export { default as Login } from "./login";

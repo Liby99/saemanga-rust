@@ -12,6 +12,7 @@ import Registry from "./library/registry";
 // Components
 import {
   Body,
+  FixBody,
   Main,
   Sidebar,
   Login,
@@ -38,6 +39,7 @@ $(document).ready(() => {
 
   // First register all the common components
   Registry.register("body", Body);
+  Registry.register("fix-body", FixBody);
   Registry.register("main", Main);
   Registry.register("sidebar", Sidebar);
   Registry.register("login", Login);

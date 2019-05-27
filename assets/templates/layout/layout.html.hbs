@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/css/index.css" />
 </head>
 
-<body class="{{#if setting.is_left_hand_mode}}left{{/if}} {{#if setting.is_night_mode}}night{{/if}}" ctrl="body">
+<body class="{{#if setting.is_left_hand_mode}}left{{/if}} {{#if setting.is_night_mode}}night{{/if}}" ctrl="body fix-body">
   {{> (sidebar)}}
   <main ctrl="main" style="max-width: {{setting.main_width}}px">
     {{~> main}}

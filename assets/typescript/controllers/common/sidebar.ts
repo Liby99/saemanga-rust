@@ -1,4 +1,5 @@
 import Controller from "../../library/controller";
+import EventPool from "../../library/event_pool";
 
 type SidebarState = {
   active: boolean,
@@ -51,11 +52,15 @@ export default class Sidebar extends Controller<SidebarState> {
     if (active) {
       this.root.addClass("active");
       this.$rotationToggle.addClass("active");
-      this.$mask.fadeIn(200);
+      this.$mask.fadeIn(200, () => {
+        EventPool.emit("sidebar.opened");
+      });
     } else {
       this.root.removeClass("active");
       this.$rotationToggle.removeClass("active");
-      this.$mask.fadeOut(200);
+      this.$mask.fadeOut(200, () => {
+        EventPool.emit("sidebar.closed");
+      });
     }
   }
 }

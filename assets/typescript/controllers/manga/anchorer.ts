@@ -8,6 +8,9 @@ type State = {
 };
 
 export default class Anchorer extends Controller<State> {
+
+  static MARGIN : number = 5;
+
   constructor(root: JQuery<HTMLElement>) {
     super(root);
 
@@ -16,7 +19,7 @@ export default class Anchorer extends Controller<State> {
       const scrollTop = $(window).scrollTop() || 0;
       this.root.children().each((index, elem) => {
         const off = $(elem).offset(), top = off ? off.top : 0, height = $(elem).height() || 0;
-        if (scrollTop >= top && scrollTop <= top + height) {
+        if (scrollTop >= top && scrollTop <= top + height + Anchorer.MARGIN) {
           changed = true;
           this.setState({ page: index, percInPage: (scrollTop - top) / height });
         }

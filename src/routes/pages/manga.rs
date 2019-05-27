@@ -1,8 +1,9 @@
 use rocket_contrib::templates::Template;
 use rocket::response::Redirect;
 
-use crate::util::Database;
+use crate::util::{Error, Database};
 use crate::app::user::User;
+use crate::app::follow::Follow;
 use crate::app::manga::Manga;
 use crate::app::manga_data::{MangaData, MangaEpisode};
 use crate::app::user_setting::*;
@@ -63,11 +64,17 @@ impl From<UserSetting> for SettingData {
 }
 
 #[get("/manga/<dmk_id>")]
-pub fn manga(
-  // user: Option<&User>,
-  conn: Database,
-  dmk_id: String
-) -> Redirect {
+pub fn manga(user: &User, conn: Database, dmk_id: String) -> Redirect {
+  match Follow::get_or_upsert(&conn, user, &dmk_id, None) {
+    Ok((follow, _)) => {
+      Redirect::to(format!("/manga/{}/{}", dmk_id, follow.max_episode()))
+    },
+    Err(err) => err.redirect(None),
+  }
+}
+
+#[get("/manga/<dmk_id>", rank=2)]
+pub fn manga_without_user(conn: Database, dmk_id: String) -> Redirect {
   match Manga::get_or_fetch_by_dmk_id(&conn, &dmk_id) {
     Ok(manga) => {
       let data = manga.data();
@@ -78,21 +85,17 @@ pub fn manga(
   }
 }
 
-#[get("/manga/<dmk_id>/<epi>")]
-pub fn manga_with_epi(
+fn render_page(
   user: Option<&User>,
-  conn: Database,
   setting: UserSetting,
-  dmk_id: String,
-  epi: i32,
-) -> Template {
-  let manga = Manga::get_or_fetch_by_dmk_id(&conn, &dmk_id).unwrap();
-  let data = &manga.data();
-  let episode = data.find_episode(epi).unwrap();
+  manga: &Manga,
+  epi: i32
+) -> Result<Template, Redirect> {
+  let data = manga.data();
+  let episode = data.find_episode(epi).ok_or(Error::InvalidEpisode.redirect(None))?;
   let next_episode = data.next_episode_of(&episode);
   let prev_episode = data.prev_episode_of(&episode);
-
-  Template::render("manga", PageData {
+  Ok(Template::render("manga", PageData {
     url: data.saemanga_episode_url(episode.episode()),
     user: user,
     manga: &manga,
@@ -106,5 +109,31 @@ pub fn manga_with_epi(
       prev: prev_episode.map(|epi| to_neighbor_episode_data(data, epi)),
     },
     setting: SettingData::from(setting),
-  })
+  }))
+}
+
+#[get("/manga/<dmk_id>/<epi>")]
+pub fn manga_with_epi(
+  conn: Database,
+  user: &User,
+  setting: UserSetting,
+  dmk_id: String,
+  epi: i32,
+) -> Result<Template, Redirect> {
+  let (_, manga) = match Follow::get_or_upsert(&conn, user, &dmk_id, Some(epi)) {
+    Ok(result) => result,
+    Err(err) => return Err(err.redirect(None))
+  };
+  render_page(Some(user), setting, &manga, epi)
+}
+
+#[get("/manga/<dmk_id>/<epi>", rank=2)]
+pub fn manga_with_epi_without_user(
+  conn: Database,
+  setting: UserSetting,
+  dmk_id: String,
+  epi: i32,
+) -> Result<Template, Redirect> {
+  let manga = Manga::get_or_fetch_by_dmk_id(&conn, &dmk_id).map_err(|err| err.redirect(None))?;
+  render_page(None, setting, &manga, epi)
 }

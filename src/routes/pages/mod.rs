@@ -43,7 +43,9 @@ pub fn routes() -> Vec<Route> {
     routes![
       index::index,
       manga::manga,
+      manga::manga_without_user,
       manga::manga_with_epi,
+      manga::manga_with_epi_without_user,
       error::error,
     ],
     user::routes(),

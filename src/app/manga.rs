@@ -60,7 +60,7 @@ impl Manga {
   }
 
   pub fn get_by_dmk_id(conn: &Database, dmk_id: &String) -> Result<Option<Self>, Error> {
-    Self::get_one(&conn, Some(doc! { "dmk_id": dmk_id }), None)
+    Self::get_one(conn, Some(doc! { "dmk_id": dmk_id }), None)
   }
 
   pub fn get_or_fetch_by_dmk_id(conn: &Database, dmk_id: &String) -> Result<Self, Error> {

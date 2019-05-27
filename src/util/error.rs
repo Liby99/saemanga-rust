@@ -45,8 +45,10 @@ enum_from_primitive! {
     MangaExistedError,
     MangaNotFoundError,
 
-    // 1400 for latest info related errors
-
+    // 1400 for follow related errors
+    FollowNotFoundError = 1400,
+    FollowExistedError,
+    InvalidEpisode,
   }
 }
 
@@ -93,6 +95,9 @@ impl Error {
       Error::DmkSearchEncodingError => "Unable to Encode Search Text",
       Error::MangaNotFoundError => "Manga Not Found",
       Error::MangaExistedError => "Manga Already Existed",
+      Error::FollowNotFoundError => "Follow Not Found",
+      Error::FollowExistedError => "Follow Already Existed",
+      Error::InvalidEpisode => "Invalid Episode",
     }
   }
 }

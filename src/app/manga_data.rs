@@ -249,6 +249,10 @@ impl MangaData {
     &self.episodes[self.episodes.len() - 1]
   }
 
+  pub fn is_latest_episode(&self, epi: i32) -> bool {
+    self.latest_episode().episode() == epi
+  }
+
   pub fn num_episodes(&self) -> usize {
     self.episodes.len()
   }

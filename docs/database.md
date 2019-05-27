@@ -8,7 +8,7 @@
   "is_admin": "<boolean>",
   "visit_count": "<int>",
   "register_date_time": "<Date>",
-  "last_login_date_time": "<Date>",
+  "last_login_date_time": "<Date>"
 }
 ```
 
@@ -20,7 +20,7 @@
   "user_id": "<ObjectId>",
   "start_date_time": "<Date>",
   "last_login_date_time": "<Date>",
-  "expire_date_time": "<Date>",
+  "expire_date_time": "<Date>"
 }
 ```
 
@@ -55,3 +55,16 @@
 ```
 
 # Follow
+
+``` json
+{
+  "_id": "<ObjectId>",
+  "user_id": "<ObjectId>, Index",
+  "manga_dmk_id": "<ObjectId>, Index",
+  "start_date_time": "<Date>",
+  "update_date_time": "<Date>",
+  "current_episode": "<int>",
+  "max_episode": "<int>",
+  "is_up_to_date": "<boolean>"
+}
+```

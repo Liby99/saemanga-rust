@@ -1,14 +1,23 @@
+import Axios, { AxiosResponse } from 'axios';
+
 import Controller from '../../library/controller';
 import EventPool from '../../library/event_pool';
+import Chinese from '../../library/chinese';
 import DiscoverManga, { DiscoverMangaData } from '../../templates/discover_manga';
 
-type SearchResultData = {
+type State = {
   result: DiscoverMangaData[],
+};
+
+type SearchResponse = {
+  success: boolean,
+  message: string,
+  data: DiscoverMangaData[],
 };
 
 type FetchCallback = (err: Error | undefined, result: DiscoverMangaData[]) => void;
 
-export default class SearchResult extends Controller<SearchResultData> {
+export default class SearchResult extends Controller<State> {
   $outer: JQuery<HTMLElement>;
   $result: JQuery<HTMLElement>;
 
@@ -28,6 +37,7 @@ export default class SearchResult extends Controller<SearchResultData> {
           if (mangas.length) {
             EventPool.emit("search.result.fetched", mangas);
             this.setState({ result: mangas }, () => {
+              this.scrollToLeft();
               EventPool.emit("search.result.opened");
             });
           } else {
@@ -46,25 +56,26 @@ export default class SearchResult extends Controller<SearchResultData> {
     });
   }
 
-  initialState() : SearchResultData {
+  initialState() : State {
     return { result: [] };
   }
 
   fetch(searchText: string, callback: FetchCallback) {
-    setTimeout(() => {
-      callback(undefined, [{
-        "title": "五等分的花嫁",
-        "dmk_id": "5893",
-        "cover_url": "http://cartoonmad.com/cartoonimgs/coimg/5893.jpg",
-        "saemanga_url": "http://saemanga.com/manga/5893",
-      }, {
-        "title": "雖然我也想脫宅",
-        "dmk_id": "7702",
-        "cover_url": "http://cartoonmad.com/cartoonimgs/coimg/7702.jpg",
-        "saemanga_url": "http://saemanga.com/manga/7702",
-      }]);
-      // callback(new Error("Server side asflas lasj la lka sldf"), []);
-    }, 1000);
+    const traditionalized = Chinese.traditionalize(searchText);
+    Axios.get(`/ajax/search?text=${traditionalized}`).then((response: AxiosResponse<SearchResponse>) => {
+      const data = response.data;
+      if (data.success) {
+        callback(undefined, data.data);
+      } else {
+        callback(new Error(data.message), []);
+      }
+    }).catch((reason) => {
+      callback(reason, []);
+    });
+  }
+
+  scrollToLeft() {
+    this.$outer.animate({ scrollLeft: 0 }, 500);
   }
 
   updateResult(callback: () => void) {

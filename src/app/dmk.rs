@@ -220,13 +220,15 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
   Ok(MangaData::new(dmk_id.clone(), dmk_id_base, title, description, author, tags, genre, status, episodes))
 }
 
-fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -> Result<Vec<String>, Error> {
+fn get_manga_ids_from_a_elems<'a>(a_elems: impl Iterator<Item=ElementRef<'a>>) -> Result<Vec<(String, String)>, Error> {
   Ok(a_elems.filter_map(|a: ElementRef| {
-    a.value().attr("href").and_then(|href| {
+    let dmk_id = a.value().attr("href").and_then(|href| {
       lazy_static! { static ref COMIC_URL_REG : Regex = Regex::new(r"comic/(\d+).html").unwrap(); }
       COMIC_URL_REG.captures(href).map(|cap| String::from(&cap[1]))
-    })
-  }).collect::<Vec<String>>().into_iter().rev().collect::<Vec<String>>())
+    })?;
+    let title = a.value().attr("title")?.to_string();
+    Some((dmk_id, title))
+  }).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>())
 }
 
 lazy_static! {
@@ -237,7 +239,7 @@ lazy_static! {
   ).unwrap();
 }
 
-fn fetch_manga_ids_with_url(url: &String) -> Result<Vec<String>, Error> {
+fn fetch_manga_ids_with_url(url: &String) -> Result<Vec<(String, String)>, Error> {
   let mut response = reqwest::get(url.as_str()).map_err(|_| Error::DmkFetchError)?;
   let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
   let document = Html::parse_document(&html_text);
@@ -247,11 +249,11 @@ fn fetch_manga_ids_with_url(url: &String) -> Result<Vec<String>, Error> {
   Ok(get_manga_ids_from_a_elems(a_elems)?)
 }
 
-pub fn fetch_latest_manga() -> Result<Vec<String>, Error> {
+pub fn fetch_latest_manga() -> Result<Vec<(String, String)>, Error> {
   fetch_manga_ids_with_url(&String::from("https://cartoonmad.com/"))
 }
 
-pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<String>, Error> {
+pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<(String, String)>, Error> {
   fetch_manga_ids_with_url(&genre.dmk_url())
 }
 
@@ -259,7 +261,7 @@ fn dmk_ended_index_url(page: i32) -> String {
   format!("https://www.cartoonmad.com/endcm.{:02}.html", page)
 }
 
-pub fn fetch_ended() -> Result<Vec<String>, Error> {
+pub fn fetch_ended() -> Result<Vec<(String, String)>, Error> {
 
   // Static selectors for this page
   lazy_static! {
@@ -289,7 +291,7 @@ pub fn fetch_ended() -> Result<Vec<String>, Error> {
   let pagi_text = pagi_elem.text().next().ok_or(Error::DmkParseError)?;
   let last_page : i32 = pagi_text.parse().map_err(|_| Error::DmkParseError)?;
 
-  type FetchHandle = thread::JoinHandle<Result<Vec<String>, Error>>;
+  type FetchHandle = thread::JoinHandle<Result<Vec<(String, String)>, Error>>;
 
   // For each page, create a new thread to fetch
   let handles : Vec<FetchHandle> = (2..last_page).into_iter().map(|page| {
@@ -303,7 +305,7 @@ pub fn fetch_ended() -> Result<Vec<String>, Error> {
     })
   }).collect();
 
-  let ids : Vec<String> = handles.into_iter().filter_map(|handle| -> Option<Vec<String>> {
+  let ids : Vec<(String, String)> = handles.into_iter().filter_map(|handle| {
     let result = handle.join().ok()?;
     match result {
       Ok(ids) => Some(ids),
@@ -317,7 +319,7 @@ pub fn fetch_ended() -> Result<Vec<String>, Error> {
   Ok([&first_page_ids[..], &ids[..]].concat())
 }
 
-pub fn search(text: &String) -> Result<Vec<String>, Error> {
+pub fn search(text: &String) -> Result<Vec<(String, String)>, Error> {
 
   // First generate the keyword. We are assuming the given text is already traditional chinese
   let keyword : String = {

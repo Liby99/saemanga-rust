@@ -112,7 +112,9 @@ export default class SearchResult extends Controller<SearchBarState> {
   update() {
     const { text, focused, loading, clearShowing } = this.state;
 
-    this.$input.val(text);
+    if (text.trim() === "") {
+      this.$input.val(text);
+    }
 
     if (focused) this.$form.addClass("focus");
     else this.$form.removeClass("focus");

@@ -158,6 +158,14 @@ pub struct MangaData {
   episodes: Vec<MangaEpisode>,
 }
 
+pub fn dmk_cover_url(dmk_id: &String) -> String {
+  format!("http://cartoonmad.com/cartoonimgs/coimg/{}.jpg", dmk_id)
+}
+
+pub fn saemanga_url(dmk_id: &String) -> String {
+  format!("/manga/{}", dmk_id)
+}
+
 impl MangaData {
   pub fn new(
     dmk_id: String, dmk_id_base: DmkIdBase,
@@ -246,7 +254,7 @@ impl MangaData {
   }
 
   pub fn saemanga_url(&self) -> String {
-    format!("/manga/{}", self.dmk_id)
+    saemanga_url(&self.dmk_id)
   }
 
   pub fn saemanga_episode_url(&self, episode: i32) -> String {
@@ -258,7 +266,7 @@ impl MangaData {
   }
 
   pub fn dmk_cover_url(&self) -> String {
-    format!("http://cartoonmad.com/cartoonimgs/coimg/{}.jpg", self.dmk_id)
+    dmk_cover_url(&self.dmk_id)
   }
 
   pub fn dmk_image_url(&self, episode: i32, page: i32) -> String {

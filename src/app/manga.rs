@@ -143,8 +143,8 @@ impl Manga {
     let genre_handles : Vec<FetchGenreHandle> = genres.into_iter().map(|genre| {
       thread::spawn(move || -> Result<Vec<MangaData>, Error> {
         let ids = dmk::fetch_latest_manga_with_genre(genre)?;
-        let manga_handles : Vec<FetchMangaHandle> = ids.into_iter().take(20).map(|id| {
-          thread::spawn(move || dmk::fetch_manga_data(&id))
+        let manga_handles : Vec<FetchMangaHandle> = ids.into_iter().take(20).map(|manga| {
+          thread::spawn(move || dmk::fetch_manga_data(&manga.0))
         }).collect();
         Ok(manga_handles.into_iter().filter_map(|handle| {
           handle.join().ok().and_then(|res| match res {
@@ -199,10 +199,10 @@ impl Manga {
   }
 
   pub fn fetch_ended(conn: &Database) -> Result<Vec<Self>, Error> {
-    let ids : Vec<String> = dmk::fetch_ended()?;
-    Ok(ids.chunks(50).map(|chunk: &[String]| -> Vec<Self> { // A single chunk has size of 50
-      let handles : Vec<FetchMangaHandle> = chunk.to_owned().into_iter().map(|id| {
-        thread::spawn(move || dmk::fetch_manga_data(&id))
+    let ids : Vec<(String, String)> = dmk::fetch_ended()?;
+    Ok(ids.chunks(50).map(|chunk: &[(String, String)]| -> Vec<Self> { // A single chunk has size of 50
+      let handles : Vec<FetchMangaHandle> = chunk.to_owned().into_iter().map(|manga| {
+        thread::spawn(move || dmk::fetch_manga_data(&manga.0))
       }).collect();
       handles.into_iter().filter_map(|handle| {
         let manga_data = handle.join().ok().and_then(|res| match res {
@@ -225,5 +225,13 @@ impl Manga {
       limit: Some(10),
       ..Default::default()
     }))
+  }
+
+  pub fn search(conn: &Database, text: &String) -> Result<Vec<Self>, Error> {
+    Self::get(conn, Some(doc! {
+      "title": {
+        "$regex": format!(".*{}.*", text)
+      }
+    }), None)
   }
 }

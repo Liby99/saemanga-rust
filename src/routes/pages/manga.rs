@@ -43,10 +43,62 @@ struct SettingData {
 }
 
 #[derive(Serialize)]
+struct PageEpisodeData {
+  episode: i32,
+  is_curr_episode: bool,
+  saemanga_url: String,
+}
+
+fn episode_map(manga: &Manga, epi: &MangaEpisode, curr_epi: i32) -> PageEpisodeData {
+  let epi = epi.episode();
+  PageEpisodeData {
+    episode: epi,
+    is_curr_episode: curr_epi == epi,
+    saemanga_url: manga.data().saemanga_episode_url(epi)
+  }
+}
+
+fn from_episodes(manga: &Manga, episodes: Vec<&MangaEpisode>, curr_epi: i32) -> Vec<PageEpisodeData> {
+  episodes.into_iter().map(|epi| episode_map(manga, epi, curr_epi)).collect::<Vec<_>>()
+}
+
+#[derive(Serialize)]
+struct PageMangaData<'a> {
+  dmk_id: &'a String,
+  title: &'a String,
+  description: &'a String,
+  author: &'a String,
+  tags: &'a Vec<String>,
+  genre: String,
+  is_ended: bool,
+  has_books: bool,
+  books: Vec<PageEpisodeData>,
+  episodes: Vec<PageEpisodeData>,
+}
+
+fn from_manga<'a>(manga: &'a Manga, curr_epi: i32) -> PageMangaData<'a> {
+  let data = manga.data();
+  let books = from_episodes(manga, data.books(), curr_epi);
+  let episodes = from_episodes(manga, data.episodes(), curr_epi);
+  PageMangaData {
+    dmk_id: data.dmk_id(),
+    title: data.title(),
+    description: data.description(),
+    author: data.author(),
+    tags: data.tags(),
+    genre: data.genre().name(),
+    is_ended: data.status().ended(),
+    has_books: books.len() > 0,
+    books: books,
+    episodes: episodes,
+  }
+}
+
+#[derive(Serialize)]
 struct PageData<'a> {
   url: String,
   user: Option<&'a User>,
-  manga: &'a Manga,
+  manga: PageMangaData<'a>,
   episode: EpisodeData,
   setting: SettingData,
 }
@@ -98,7 +150,7 @@ fn render_page(
   Ok(Template::render("manga", PageData {
     url: data.saemanga_episode_url(episode.episode()),
     user: user,
-    manga: &manga,
+    manga: from_manga(manga, episode.episode()),
     episode: EpisodeData {
       episode: episode.episode(),
       is_book: episode.is_book(),

@@ -64,6 +64,42 @@
 
 {{> partials/sidebar/settings}}
 
+{{#if manga.has_books}}
+  <section class="wrapper">
+    <ul class="book-list">
+      {{#each manga.books}}
+        <li>
+          <a href="{{saemanga_url}}" class="btn {{#if is_curr_episode}}active{{/if}}">
+            第 {{episode}} 卷
+          </a>
+        </li>
+      {{/each}}
+    </ul>
+  </section>
+{{/if}}
+
+<section class="wrapper no-border">
+  <ul class="episode-list">
+    {{#each manga.episodes}}
+      <li>
+        <a href="{{saemanga_url}}" class="btn {{#if is_curr_episode}}active{{/if}}">
+          {{episode}}
+        </a>
+      </li>
+    {{/each}}
+  </ul>
+</section>
+
+{{#if user}}
+  <section class="no-border" style="padding: 15px 0; border-top: 1px solid var(--line)">
+    <ul class="sidebar-btn-list">
+      <li class="full center">
+        <a href="javascript:void(0)" onclick="Page.unfollow()" class="red">取消关注该漫画</a>
+      </li>
+    </ul>
+  </section>
+{{/if}}
+
 {{/inline}}
 
 {{~> layout/sidebar}}

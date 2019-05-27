@@ -12,25 +12,33 @@
   padding: 0;
 }
 
-.book-list li,
-.episode-list li {
-  margin-bottom: 10px;
+.book-list {
+  li {
+    width: 33.3333%;
+  }
+
+  li + li + li + li {
+    margin-top: 10px;
+  }
 }
 
-.book-list li {
-  width: 33.3333%;
+.episode-list {
+  li {
+    width: 25%;
+  }
+
+  li + li + li + li + li {
+    margin-top: 10px;
+  }
 }
 
-.episode-list li {
-  width: 25%;
-}
-
-.book-list li a,
-.episode-list li a {
-  display: block;
-  margin-right: 10px;
-  text-align: center;
-  line-height: 20px;
+.book-list, .episode-list {
+  li a {
+    display: block;
+    margin-right: 10px;
+    text-align: center;
+    line-height: 20px;
+  }
 }
 
 #manga-body-section img {

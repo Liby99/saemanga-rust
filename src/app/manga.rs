@@ -63,6 +63,16 @@ impl Manga {
     Self::get_one(&conn, Some(doc! { "dmk_id": dmk_id }), None)
   }
 
+  pub fn get_or_fetch_by_dmk_id(conn: &Database, dmk_id: &String) -> Result<Self, Error> {
+    Self::get_by_dmk_id(conn, dmk_id).and_then(|maybe_self| match maybe_self {
+      Some(manga) => Ok(manga),
+      None => match dmk::fetch_manga_data(dmk_id) {
+        Ok(data) => Self::insert(conn, &data),
+        Err(err) => Err(err)
+      }
+    })
+  }
+
   pub fn insert(conn: &Database, data: &MangaData) -> Result<Self, Error> {
     let coll = Self::coll(&conn);
     let wrapped = Self::new(data)?;

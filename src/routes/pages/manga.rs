@@ -1,7 +1,7 @@
 use rocket_contrib::templates::Template;
 use rocket::response::Redirect;
 
-use crate::util::{Error, Database};
+use crate::util::Database;
 use crate::app::user::User;
 use crate::app::manga::Manga;
 use crate::app::manga_data::{MangaData, MangaEpisode};
@@ -68,14 +68,11 @@ pub fn manga(
   conn: Database,
   dmk_id: String
 ) -> Redirect {
-  match Manga::get_by_dmk_id(&conn, &dmk_id) {
-    Ok(maybe_manga) => match maybe_manga {
-      Some(manga) => {
-        let data = manga.data();
-        let first_epi = data.first_episode();
-        Redirect::to(data.saemanga_episode_url(first_epi.episode()))
-      },
-      None => Error::MangaNotFoundError.redirect(None)
+  match Manga::get_or_fetch_by_dmk_id(&conn, &dmk_id) {
+    Ok(manga) => {
+      let data = manga.data();
+      let first_epi = data.first_episode();
+      Redirect::to(data.saemanga_episode_url(first_epi.episode()))
     },
     Err(err) => err.redirect(None)
   }
@@ -89,7 +86,7 @@ pub fn manga_with_epi(
   dmk_id: String,
   epi: i32,
 ) -> Template {
-  let manga = Manga::get_by_dmk_id(&conn, &dmk_id).unwrap().unwrap();
+  let manga = Manga::get_or_fetch_by_dmk_id(&conn, &dmk_id).unwrap();
   let data = &manga.data();
   let episode = data.find_episode(epi).unwrap();
   let next_episode = data.next_episode_of(&episode);

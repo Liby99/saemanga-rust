@@ -29,6 +29,8 @@ import {
   SearchResult,
   Discover,
   Genres,
+  LikedOnly,
+  FollowingManga,
 } from './controllers/index/mod';
 import {
   Anchorer,
@@ -55,6 +57,8 @@ $(document).ready(() => {
   Registry.register("search-result", SearchResult);
   Registry.register("discover", Discover);
   Registry.register("genres", Genres);
+  Registry.register("liked-only", LikedOnly);
+  Registry.register("following-manga", FollowingManga);
 
   // Then register all the manga related components
   Registry.register("anchorer", Anchorer);

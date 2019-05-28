@@ -10,6 +10,7 @@ pub fn routes() -> Vec<Route> {
   routes![
     set_light_mode,
     set_hand_mode,
+    set_liked_only,
     set_scale,
   ]
 }
@@ -39,6 +40,17 @@ fn set_light_mode<'a>(mut cookies: Cookies, data: Json<ChangeModeData>) -> Json<
 #[post("/ajax/set_hand_mode", data="<data>")]
 fn set_hand_mode<'a>(mut cookies: Cookies, data: Json<ChangeModeData>) -> Json<ChangeSettingResult<'a>> {
   match HandMode::from_str(data.mode.as_str()) {
+    Ok(mode) => {
+      mode.into_cookies(&mut cookies);
+      Json(ChangeSettingResult { success: true, message: "" })
+    },
+    Err(err) => Json(ChangeSettingResult { success: false, message: err.msg() })
+  }
+}
+
+#[post("/ajax/set_liked_only", data="<data>")]
+fn set_liked_only<'a>(mut cookies: Cookies, data: Json<ChangeModeData>) -> Json<ChangeSettingResult<'a>> {
+  match LikedOnlyMode::from_str(data.mode.as_str()) {
     Ok(mode) => {
       mode.into_cookies(&mut cookies);
       Json(ChangeSettingResult { success: true, message: "" })

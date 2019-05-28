@@ -21,7 +21,7 @@ struct TemplateData {
 struct SettingData {
   is_left_hand_mode: bool,
   is_night_mode: bool,
-  is_loved_only: bool,
+  is_liked_only: bool,
   scale_percentage: f32,
   main_width: f32,
 }
@@ -32,7 +32,7 @@ impl From<UserSetting> for SettingData {
     Self {
       is_left_hand_mode: setting.hand_mode == HandMode::Left,
       is_night_mode: setting.light_mode == LightMode::Night,
-      is_loved_only: setting.index_display_mode == IndexDisplayMode::LovedOnly,
+      is_liked_only: setting.liked_only_mode == LikedOnlyMode::On,
       scale_percentage: (s * 100.0).round(),
       main_width: 768.0 * s,
     }

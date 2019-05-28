@@ -13,9 +13,15 @@
                 <i class="fa fa-check"></i>
               </i>
             </a>
-            <a id="index-following-only-liked" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
+            <a
+              id="index-following-only-liked"
+              href="javascript:void(0);"
+              class="btn rounded {{#if setting.is_liked_only}}active{{/if}}"
+              style="padding-right: 5px"
+              ctrl="liked-only"
+            >
               <span>仅喜爱</span>
-              <i class="fa-rotation-toggle">
+              <i class="fa-rotation-toggle {{#if setting.is_liked_only}}active{{/if}}">
                 <i class="fa fa-heart-o"></i>
                 <i class="fa fa-heart"></i>
               </i>
@@ -28,13 +34,18 @@
   <div id="index-following-list" class="flex wrap wrapper no-top">
     {{#if user}}
       {{#each user.follows}}
-        <a class="mix manga following {{#if liked}}liked{{/if}}" href="{{manga.saemanga_url}}">
+        <a
+          class="mix manga following {{#if is_liked}}liked{{/if}}"
+          href="{{manga.saemanga_url}}"
+          ctrl="following-manga"
+          {{#if (and (not is_liked) ../setting.is_liked_only)}}hidden="hidden"{{/if}}
+        >
           <div class="cover" style="background-image: url('{{manga.cover_url}}')">
             <span class="badge {{#unless has_update}}hidden{{/unless}}"></span>
             <span class="remove btn circle grey solid">
               <i class="fa fa-times"></i>
             </span>
-            {{#if liked}}
+            {{#if is_liked}}
               <span class="like">
                 <i class="fa fa-heart"></i>
               </span>

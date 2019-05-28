@@ -257,6 +257,10 @@ impl MangaData {
     self.episodes.len()
   }
 
+  pub fn saemanga_full_url(&self) -> String {
+    format!("http://saemanga.com/manga/{}", self.dmk_id)
+  }
+
   pub fn saemanga_url(&self) -> String {
     saemanga_url(&self.dmk_id)
   }

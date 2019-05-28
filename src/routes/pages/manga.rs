@@ -66,6 +66,7 @@ fn from_episodes(manga: &Manga, episodes: Vec<&MangaEpisode>, curr_epi: i32) -> 
 struct PageMangaData<'a> {
   dmk_id: &'a String,
   cover_url: String,
+  saemanga_full_url: String,
   title: &'a String,
   description: &'a String,
   author: &'a String,
@@ -84,6 +85,7 @@ fn from_manga<'a>(manga: &'a Manga, curr_epi: i32) -> PageMangaData<'a> {
   PageMangaData {
     dmk_id: data.dmk_id(),
     cover_url: data.dmk_cover_url(),
+    saemanga_full_url: data.saemanga_full_url(),
     title: data.title(),
     description: data.description(),
     author: data.author(),

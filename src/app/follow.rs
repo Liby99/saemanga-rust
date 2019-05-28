@@ -30,6 +30,12 @@ pub struct Follow {
   is_liked: bool,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct AggregateFollow {
+  pub follow: Follow,
+  pub manga: Manga,
+}
+
 impl Follow {
   pub fn new(user: &User, manga: &Manga) -> Result<Self, Error> {
     let now = mongodb::UtcDateTime::from(Utc::now());
@@ -47,8 +53,88 @@ impl Follow {
     })
   }
 
+  pub fn is_up_to_date(&self) -> bool {
+    self.is_up_to_date
+  }
+
+  pub fn is_liked(&self) -> bool {
+    self.is_liked
+  }
+
   pub fn max_episode(&self) -> i32 {
     self.max_episode
+  }
+
+  pub fn get_by_user(conn: &Database, user: &User) -> Result<Vec<AggregateFollow>, Error> {
+    let coll = Self::coll(&conn);
+    let cursor = coll.aggregate(vec![
+      doc! {
+        "$match": {
+          "user_id": user.id().clone(),
+        }
+      },
+      doc! {
+        "$replaceRoot": {
+          "newRoot": {
+            "follow": "$$ROOT",
+          }
+        }
+      },
+      doc! {
+        "$lookup": {
+          "from": "manga",
+          "localField": "follow.manga_dmk_id",
+          "foreignField": "dmk_id",
+          "as": "manga",
+        }
+      },
+      doc! {
+        "$unwind": "$manga",
+      },
+      doc! {
+        "$addFields": {
+          "latest_episode": { "$slice": ["$manga.episodes", -1] },
+          "up_to_date_int": { "$cond": { "if": "$follow.is_up_to_date", "then": 1, "else": 0 } }
+        }
+      },
+      doc! {
+        "$unwind": "$latest_episode"
+      },
+      doc! {
+        "$addFields": {
+          "priority": { "$multiply": [ "$up_to_date_int", { "$subtract": [ "$latest_episode.episode", "$follow.max_episode" ] } ] }
+        }
+      },
+      doc! {
+        "$sort": {
+          "priority": -1,
+          "follow.update_date_time": -1
+        }
+      },
+      doc! {
+        "$project": {
+          "priority": 0,
+          "latest_episode": 0,
+          "up_to_date_int": 0,
+        }
+      }
+    ], None).map_err(|err| {
+      println!("{:?}", err);
+      Error::DatabaseError
+    })?;
+    Ok(cursor.map(|result| match result {
+      Ok(doc) => match bson::from_bson::<AggregateFollow>(mongodb::Bson::Document(doc)) {
+        Ok(s) => Ok(s),
+        Err(err) => {
+          println!("{:?}", err);
+          Err(Error::DeserializeError)
+        }
+      },
+      Err(err) => {
+        println!("{:?}", err);
+        Err(Error::DatabaseError)
+      }
+    }).filter_map(Result::ok).collect::<Vec<_>>())
   }
 
   pub fn get_by_user_and_manga(conn: &Database, user: &User, manga: &Manga) -> Result<Option<Self>, Error> {

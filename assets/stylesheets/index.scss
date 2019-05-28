@@ -28,10 +28,10 @@
 }
 
 .manga.following {
-  display: inline;
   vertical-align: top;
   position: relative;
-  // width: calc(33.3333% - 40px);
+  box-sizing: content-box;
+  width: calc(33.3333% - 40px);
 }
 
 .manga.search .cover,

@@ -1,11 +1,13 @@
 use rocket_contrib::templates::Template;
+use rocket::response::Redirect;
 
 use crate::util::Database;
 
+use crate::app::user::User;
+use crate::app::follow::{Follow, AggregateFollow};
 use crate::app::manga::Manga;
 use crate::app::genre::Genre;
 use crate::app::user_setting::*;
-use crate::app::user::User;
 
 #[derive(Serialize)]
 struct TemplateData {
@@ -45,9 +47,9 @@ struct UserData {
 
 #[derive(Serialize)]
 struct FollowData {
-  liked: bool,
+  is_liked: bool,
   has_update: bool,
-  max_read_episode: u32,
+  max_read_episode: i32,
   manga: MangaData,
 }
 
@@ -75,7 +77,7 @@ impl From<&&Genre> for GenreData {
 }
 
 #[get("/index")]
-pub fn index(user: Option<&User>, conn: Database, setting: UserSetting) -> Template {
+pub fn index(user: Option<&User>, conn: Database, setting: UserSetting) -> Result<Template, Redirect> {
 
   // Create temporary data
   let data = TemplateData {
@@ -91,14 +93,35 @@ pub fn index(user: Option<&User>, conn: Database, setting: UserSetting) -> Templ
         ended: data.ended()
       }
     }).collect(),
-    user: user.map(|user| UserData {
-      username: user.username().clone(),
-      follows: vec![],
-    }),
+    user: match user {
+      Some(user) => Some(UserData {
+        username: user.username().clone(),
+        follows: Follow::get_by_user(&conn, &user).map_err(|err| err.redirect(None))?.into_iter().map(|agg_follow| {
+          let AggregateFollow { follow, manga } = agg_follow;
+          let data = manga.data();
+          let latest_episode = data.latest_episode();
+          FollowData {
+            is_liked: follow.is_liked(),
+            has_update: follow.is_up_to_date() && follow.max_episode() < data.latest_episode().episode(),
+            max_read_episode: follow.max_episode(),
+            manga: MangaData {
+              title: data.title().clone(),
+              dmk_id: data.dmk_id().clone(),
+              cover_url: data.dmk_cover_url(),
+              saemanga_url: data.saemanga_url(),
+              last_episode: latest_episode.episode(),
+              last_episode_is_book: latest_episode.is_book(),
+              ended: data.ended(),
+            },
+          }
+        }).collect::<Vec<_>>(),
+      }),
+      None => None,
+    },
     genres: Genre::all_genres().iter().map(GenreData::from).collect(),
     setting: SettingData::from(setting)
   };
 
   // Render the data
-  Template::render("index", &data)
+  Ok(Template::render("index", &data))
 }

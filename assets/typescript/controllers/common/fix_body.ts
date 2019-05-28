@@ -22,7 +22,6 @@ export default class FixBody extends Controller<State> {
     });
 
     this.listen("body.fix_at", (scrollTop: number) => {
-      console.log(`fixing at ${scrollTop}`);
       this.scrollTop = scrollTop;
       this.root.css({ "margin-top": -this.scrollTop });
     });

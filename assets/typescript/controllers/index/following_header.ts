@@ -8,7 +8,6 @@ export default class FollowingHeader extends StickTop {
   constructor(root: JQuery<HTMLElement>) {
     super(root);
     this.$inner = this.$content.children();
-    console.log(this.$inner);
     this.listen("setting.scale.update", () => this.resize());
   }
 

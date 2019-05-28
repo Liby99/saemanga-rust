@@ -1,3 +1,5 @@
+# Config Files
+
 # Rust related
 /target
 **/*.rs.bk

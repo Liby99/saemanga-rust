@@ -104,7 +104,6 @@ export default class Genres extends Controller<GenresState> {
         if (activeOffset && parentOffset && tagsOuterWidth && activeWidth) {
           const offset = activeOffset.left - parentOffset.left;
           const scrollLeft = -(tagsOuterWidth - activeWidth - offset);
-          console.log(scrollLeft);
           this.$tagsHolder.css({
             width: $active.outerWidth() || 0,
             marginRight: 10

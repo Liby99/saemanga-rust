@@ -6,6 +6,7 @@
 
 # Webpack, JavaScript related
 public
+templates
 node_modules
 
 # Dev Env related

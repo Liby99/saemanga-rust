@@ -2,8 +2,8 @@
 template_dir = "assets/templates"
 
 [production]
-template_dir = "assets/templates"
-port = 8193
+template_dir = "/templates"
+port = 8200
 
 [global.databases.mongodb]
 url = "mongodb://localhost:27017/saemanga"

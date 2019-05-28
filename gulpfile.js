@@ -4,12 +4,25 @@ require('colors');
 // Imports
 const gulp = require('gulp');
 const nodemon = require('gulp-nodemon');
+const htmlmin = require('gulp-htmlmin');
 const watch = require('gulp-watch');
 const buildTask = require('./scripts/gulp_build_task');
 
 gulp.task("build-cargo", buildTask('cargo', 'cargo build --color always'));
 
 gulp.task("build-webpack", buildTask('webpack', 'npx webpack --colors'));
+
+gulp.task("build-templates", (done) => {
+  var hbAttrWrapOpen = /\{\{#.*\}\}/;
+  var hbAttrWrapClose = /\{\{\/.*\}\}/;
+  var hbAttrWrapPair = [hbAttrWrapOpen, hbAttrWrapClose];
+  return gulp.src('assets/templates/**/*.html.hbs')
+    .pipe(htmlmin({
+      collapseWhitespace: true,
+      customAttrSurround: [hbAttrWrapPair],
+    }))
+    .pipe(gulp.dest('templates/'));
+});
 
 gulp.task('build', gulp.series(
   "build-cargo",

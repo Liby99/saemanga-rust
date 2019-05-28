@@ -4,4 +4,6 @@ export { default as Discover } from './discover';
 export { default as Genres } from './genres';
 export { default as LikedOnly } from './liked_only';
 export { default as FollowingHeader } from './following_header';
+export { default as FollowingManageToggle } from './following_manage_toggle';
 export { default as FollowingManga } from './following_manga';
+export { default as FollowingList } from './following_list';

@@ -33,7 +33,9 @@ import {
   Genres,
   LikedOnly,
   FollowingHeader,
+  FollowingManageToggle,
   FollowingManga,
+  FollowingList,
 } from './controllers/index/mod';
 import {
   Anchorer,
@@ -64,7 +66,9 @@ $(document).ready(() => {
   Registry.register("liked-only", LikedOnly);
   Registry.register("stick-top", StickTop);
   Registry.register("following-header", FollowingHeader);
+  Registry.register("following-manage-toggle", FollowingManageToggle);
   Registry.register("following-manga", FollowingManga);
+  Registry.register("following-list", FollowingList);
 
   // Then register all the manga related components
   Registry.register("anchorer", Anchorer);

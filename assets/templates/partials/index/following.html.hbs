@@ -6,7 +6,13 @@
         <h3>正在追的</h3>
         {{#if user}}
           <div id="index-following-menu" class="flex-fill flex right">
-            <a id="index-following-manage" href="javascript:void(0);" class="btn rounded" style="padding-right: 5px">
+            <a
+              id="index-following-manage"
+              href="javascript:void(0);"
+              class="btn rounded"
+              style="padding-right: 5px"
+              ctrl="following-manage-toggle"
+            >
               <span>管理</span>
               <i class="fa-rotation-toggle">
                 <i class="fa fa-pencil"></i>
@@ -31,11 +37,12 @@
       </div>
     </div>
   </div>
-  <div id="index-following-list" class="flex wrap wrapper no-top">
+  <div id="index-following-list" class="flex wrap wrapper no-top" ctrl="following-list">
     {{#if user}}
       {{#each user.follows}}
         <a
           class="mix manga following {{#if is_liked}}liked{{/if}}"
+          data-dmk-id="{{manga.dmk_id}}"
           href="{{manga.saemanga_url}}"
           ctrl="following-manga"
           {{#if (and (not is_liked) ../setting.is_liked_only)}}hidden="hidden"{{/if}}
@@ -68,11 +75,7 @@
           </center>
         </a>
       {{else}}
-        <div class="flex-fill wrapper">
-          <center>
-            <p>您还没有关注任何漫画呢！</p>
-          </center>
-        </div>
+        {{> partials/index/not_following_manga}}
       {{/each}}
     {{else}}
       <div class="flex-fill wrapper">

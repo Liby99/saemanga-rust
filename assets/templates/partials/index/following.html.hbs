@@ -1,6 +1,6 @@
 <section id="index-following-section">
-  <div id="index-following-header" class="stick-top">
-    <div class="placeholder"></div>
+  <div id="index-following-header" ctrl="following-header">
+    <div class="placeholder" style="display: none"></div>
     <div class="content" id="index-following-header-content">
       <div id="index-following-header-inner" class="flex wrapper">
         <h3>正在追的</h3>
@@ -85,9 +85,9 @@
             。
           </p>
           <p>
-            <a class="btn solid rounded big" href="javascript:void(0);" ctrl="emitter" events="login.focus">登录已有账户</a>
+            <button class="btn solid rounded big" ctrl="emitter" events="login.focus">登录已有账户</button>
             <span style="margin: 0 5px">或</span>
-            <a class="btn rounded big" href="javascript:void(0);" ctrl="emitter" events="panel.register.open">注册新账户</a>
+            <button class="btn rounded big" ctrl="emitter" events="panel.register.open">注册新账户</button>
           </p>
         </center>
       </div>

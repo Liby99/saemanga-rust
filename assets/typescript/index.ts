@@ -15,6 +15,7 @@ import {
   FixBody,
   Main,
   Sidebar,
+  SidebarToggle,
   Login,
   LightModeSelect,
   HandModeSelect,
@@ -23,6 +24,7 @@ import {
 } from './controllers/common/mod';
 import {
   Emitter,
+  StickTop,
 } from './controllers/helpers/mod';
 import {
   SearchBar,
@@ -30,6 +32,7 @@ import {
   Discover,
   Genres,
   LikedOnly,
+  FollowingHeader,
   FollowingManga,
 } from './controllers/index/mod';
 import {
@@ -45,6 +48,7 @@ $(document).ready(() => {
   Registry.register("fix-body", FixBody);
   Registry.register("main", Main);
   Registry.register("sidebar", Sidebar);
+  Registry.register("sidebar-toggle", SidebarToggle);
   Registry.register("login", Login);
   Registry.register("light-mode-select", LightModeSelect);
   Registry.register("hand-mode-select", HandModeSelect);
@@ -58,6 +62,8 @@ $(document).ready(() => {
   Registry.register("discover", Discover);
   Registry.register("genres", Genres);
   Registry.register("liked-only", LikedOnly);
+  Registry.register("stick-top", StickTop);
+  Registry.register("following-header", FollowingHeader);
   Registry.register("following-manga", FollowingManga);
 
   // Then register all the manga related components

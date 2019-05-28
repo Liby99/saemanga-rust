@@ -100,6 +100,7 @@ fn from_manga<'a>(manga: &'a Manga, curr_epi: i32) -> PageMangaData<'a> {
 struct PageData<'a> {
   url: String,
   user: Option<&'a User>,
+  follow: Option<&'a Follow>,
   manga: PageMangaData<'a>,
   episode: EpisodeData,
   setting: SettingData,
@@ -142,6 +143,7 @@ pub fn manga_without_user(conn: Database, dmk_id: String) -> Redirect {
 fn render_page(
   user: Option<&User>,
   setting: UserSetting,
+  follow: Option<&Follow>,
   manga: &Manga,
   epi: i32
 ) -> Result<Template, Redirect> {
@@ -152,6 +154,7 @@ fn render_page(
   Ok(Template::render("manga", PageData {
     url: data.saemanga_episode_url(episode.episode()),
     user: user,
+    follow: follow,
     manga: from_manga(manga, episode.episode()),
     episode: EpisodeData {
       episode: episode.episode(),
@@ -174,11 +177,11 @@ pub fn manga_with_epi(
   dmk_id: String,
   epi: i32,
 ) -> Result<Template, Redirect> {
-  let (_, manga) = match Follow::get_or_upsert(&conn, user, &dmk_id, Some(epi)) {
+  let (follow, manga) = match Follow::get_or_upsert(&conn, user, &dmk_id, Some(epi)) {
     Ok(result) => result,
     Err(err) => return Err(err.redirect(None))
   };
-  render_page(Some(user), setting, &manga, epi)
+  render_page(Some(user), setting, Some(&follow), &manga, epi)
 }
 
 #[get("/manga/<dmk_id>/<epi>", rank=2)]
@@ -189,5 +192,13 @@ pub fn manga_with_epi_without_user(
   epi: i32,
 ) -> Result<Template, Redirect> {
   let manga = Manga::get_or_fetch_by_dmk_id(&conn, &dmk_id).map_err(|err| err.redirect(None))?;
-  render_page(None, setting, &manga, epi)
+  render_page(None, setting, None, &manga, epi)
+}
+
+#[get("/manga/unfollow?<dmk_id>")]
+pub fn unfollow<'a>(conn: Database, user: &User, dmk_id: String) -> Redirect {
+  match Follow::unfollow(&conn, user, &dmk_id) {
+    Ok(_) => Redirect::to("/index"),
+    Err(err) => err.redirect(None)
+  }
 }

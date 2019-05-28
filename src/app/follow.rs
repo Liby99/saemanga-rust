@@ -26,6 +26,8 @@ pub struct Follow {
   current_episode: i32,
   max_episode: i32,
   is_up_to_date: bool,
+
+  is_liked: bool,
 }
 
 impl Follow {
@@ -41,6 +43,7 @@ impl Follow {
       current_episode: epi,
       max_episode: epi,
       is_up_to_date: epi == manga.data().latest_episode().episode(),
+      is_liked: false,
     })
   }
 
@@ -109,6 +112,49 @@ impl Follow {
       },
       Err(_) => Err(Error::DatabaseError)
     }
+  }
+
+  pub fn unfollow(conn: &Database, user: &User, dmk_id: &String) -> Result<(), Error> {
+    let coll = Self::coll(&conn);
+    match coll.delete_one(doc! {
+      "user_id": user.id().clone(),
+      "manga_dmk_id": dmk_id,
+    }, None) {
+      Ok(result) => match result.deleted_count {
+        1 => Ok(()),
+        _ => Err(Error::FollowNotFoundError)
+      },
+      Err(_) => Err(Error::DatabaseError)
+    }
+  }
+
+  pub fn update_like(conn: &Database, user: &User, dmk_id: &String, like: bool) -> Result<(), Error> {
+    let coll = Self::coll(&conn);
+    match coll.update_one(doc! {
+      "user_id": user.id().clone(),
+      "manga_dmk_id": dmk_id,
+    }, doc! {
+      "$set": {
+        "is_liked": like
+      }
+    }, None) {
+      Ok(result) => match result.matched_count {
+        1 => Ok(()),
+        _ => Err(Error::FollowNotFoundError)
+      },
+      Err(err) => {
+        println!("{:?}", err);
+        Err(Error::DatabaseError)
+      }
+    }
+  }
+
+  pub fn like(conn: &Database, user: &User, dmk_id: &String) -> Result<(), Error> {
+    Self::update_like(conn, user, dmk_id, true)
+  }
+
+  pub fn unlike(conn: &Database, user: &User, dmk_id: &String) -> Result<(), Error> {
+    Self::update_like(conn, user, dmk_id, false)
   }
 
   pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {

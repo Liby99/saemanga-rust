@@ -32,6 +32,7 @@ import {
 } from './controllers/index/mod';
 import {
   Anchorer,
+  Like,
 } from './controllers/manga/mod';
 
 // Initialize all the components
@@ -57,6 +58,7 @@ $(document).ready(() => {
 
   // Then register all the manga related components
   Registry.register("anchorer", Anchorer);
+  Registry.register("like", Like);
 
   // Then build the registry
   Registry.build();

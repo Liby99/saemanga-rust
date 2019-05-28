@@ -31,17 +31,17 @@
       <input id="share-url-input" value="{{manga.saemanga_full_url}}" readonly="readonly" />
     </li>
     {{#if user}}
-      <li class="full">
-        <span id="like" {{#if follow.liked}}hidden="hidden"{{/if}}>
-          <a href="javascript:void(0)" ctrl="emitter" events="manga.like" class="black flex">
+      <li class="full" ctrl="like" data-dmk-id="{{manga.dmk_id}}">
+        <span id="like" {{#if follow.is_liked}}hidden="hidden"{{/if}}>
+          <a href="javascript:void(0)" class="black flex">
             <div class="flex full">喜爱该漫画</div>
             <div>
               <i class="fa fa-heart-o pink"></i>
             </div>
           </a>
         </span>
-        <span id="unlike" {{#unless follow.liked}}hidden="hidden"{{/unless}}>
-          <a href="javascript:void(0)" ctrl="emitter" events="manga.unlike" class="black flex">
+        <span id="unlike" {{#unless follow.is_liked}}hidden="hidden"{{/unless}}>
+          <a href="javascript:void(0)" class="black flex">
             <div class="flex full">取消喜爱该漫画</div>
             <div>
               <i class="fa fa-heart pink"></i>
@@ -94,7 +94,9 @@
   <section class="no-border" style="padding: 15px 0; border-top: 1px solid var(--line)">
     <ul class="sidebar-btn-list">
       <li class="full center">
-        <a href="javascript:void(0)" onclick="Page.unfollow()" class="red">取消关注该漫画</a>
+        <a class="red" href="/manga/unfollow?dmk_id={{manga.dmk_id}}" onclick="return confirm('您确定要取消关注 {{manga.title}} 吗？')">
+          取消关注该漫画
+        </a>
       </li>
     </ul>
   </section>

@@ -2,7 +2,8 @@
 template_dir = "assets/templates"
 
 [production]
-template_dir = "/templates"
+address = "127.0.0.1"
+template_dir = "templates"
 port = 8200
 
 [global.databases.mongodb]

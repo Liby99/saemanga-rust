@@ -66,7 +66,9 @@ fn extract_episodes(trs: Select, start_index: i32) -> Vec<MangaEpisode> {
 pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
 
   // Check validity of dmk_id
-  assert!(is_valid_dmk_id(dmk_id), format!("Invalid dmk_id {}", dmk_id));
+  if !is_valid_dmk_id(dmk_id) {
+    return Err(Error::InvalidDmkId);
+  }
 
   // Generate url and make the request
   let url = format!("https://cartoonmad.com/comic/{}.html", dmk_id);

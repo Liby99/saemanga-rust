@@ -35,6 +35,7 @@ enum_from_primitive! {
     // 1300 for dmk/manga related errors
     GenreInfoExtractionError = 1300,
     GenreNotFoundError,
+    InvalidDmkId,
     DmkFetchError,
     DmkEncodingError,
     DmkDomTraverseError,
@@ -86,6 +87,7 @@ impl Error {
       Error::IncorrectOldPassword => "Incorrect Old Password",
       Error::GenreInfoExtractionError => "Cannot Extract Genre Information",
       Error::GenreNotFoundError => "Unable to find Genre",
+      Error::InvalidDmkId => "Invalid dmk_id",
       Error::DmkFetchError => "Unable to Fetch Cartoonmad Webpage",
       Error::DmkEncodingError => "Unable to Decode Cartoonmad Webpage",
       Error::DmkDomTraverseError => "Unable to Find Data from Cartoonmad Webpage",

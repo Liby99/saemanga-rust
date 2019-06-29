@@ -2,9 +2,9 @@ import requests
 import sched
 import time
 
-from account import account
-from config import config
-from tasks import tasks
+import account
+import config
+import tasks
 
 def login(conf, acct):
   url = "http://{}:{}/user/login".format(conf["addr"], conf["port"])

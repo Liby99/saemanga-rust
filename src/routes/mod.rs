@@ -3,6 +3,7 @@ use rocket::response::Redirect;
 
 pub mod pages;
 pub mod ajax;
+pub mod tests;
 
 #[get("/")]
 fn root() -> Redirect {
@@ -10,7 +11,7 @@ fn root() -> Redirect {
 }
 
 pub fn routes() -> Vec<Route> {
-  [routes![root], pages::routes(), ajax::routes()].concat()
+  [routes![root], pages::routes(), ajax::routes(), tests::routes()].concat()
 }
 
 pub fn catchers() -> Vec<Catcher> {

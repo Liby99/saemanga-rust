@@ -4,6 +4,7 @@ import Controller from '../../library/controller';
 import EventPool from '../../library/event_pool';
 import Chinese from '../../library/chinese';
 import DiscoverManga, { DiscoverMangaData } from '../../templates/discover_manga';
+import { Discover } from './mod';
 
 type State = {
   result: DiscoverMangaData[],
@@ -80,14 +81,14 @@ export default class SearchResult extends Controller<State> {
 
   updateResult(callback: () => void) {
     const { result } = this.state;
-    this.$result.html(DiscoverManga.render(result));
+    DiscoverManga.mount(result, this.$result);
     callback();
   }
 
   update(callback: () => void) {
     const { result } = this.state;
     if (result.length) {
-      this.$result.html(DiscoverManga.render(result));
+      DiscoverManga.mount(result, this.$result);
       this.$outer.slideDown(200, callback);
     } else {
       this.$outer.slideUp(200, () => {

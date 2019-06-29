@@ -25,6 +25,9 @@ export default class Controller<State> {
     }
   }
 
+  /**
+   * Free for inherit
+   */
   protected initialState() : State {
     throw new Error("Component must have an initial state");
   }
@@ -47,7 +50,17 @@ export default class Controller<State> {
     this.update();
   }
 
+  /**
+   * Free for inherit
+   */
   protected update(_callback?: () => void) {
+    // Do nothing
+  }
+
+  /**
+   * Free for inherit
+   */
+  protected onDestroy() {
     // Do nothing
   }
 
@@ -74,5 +87,8 @@ export default class Controller<State> {
         EventPool.unlisten(evt, listener);
       }
     }
+
+    // Call custom destroy hook
+    this.onDestroy();
   }
 }

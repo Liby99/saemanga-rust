@@ -28,7 +28,7 @@ export default class FollowingList extends Controller<{}> {
     if (this.root.children().length === 0) {
       EventPool.emit("following.manage.finish");
       this.root.hide(0);
-      this.root.html(NotFollowingMangaTemplate.render({}));
+      NotFollowingMangaTemplate.mount({}, this.root);
       this.root.slideDown(300);
     }
   }

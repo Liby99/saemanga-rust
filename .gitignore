@@ -5,9 +5,9 @@
 **/*.rs.bk
 
 # Webpack, JavaScript related
-public
-templates
-node_modules
+/public
+/templates
+/node_modules
 
 # Dev Env related
 .vscode

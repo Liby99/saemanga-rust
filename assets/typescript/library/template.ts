@@ -15,4 +15,11 @@ export default class Template<Data> {
       return this.template(data);
     }
   }
+
+  /**
+   * Mount the rendered data to element
+   */
+  mount(data: Data | Data[], elem: JQuery<HTMLElement>) {
+    elem.html(this.render(data));
+  }
 }

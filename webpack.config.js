@@ -10,6 +10,7 @@ module.exports = {
   entry: {
     'index': './assets/typescript/index.ts',
     'admin': './assets/typescript/admin.ts',
+    'tests': './assets/typescript/tests/tests.ts',
   },
   output: {
     path: `${__dirname}/public/`,

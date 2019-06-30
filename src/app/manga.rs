@@ -147,6 +147,7 @@ impl Manga {
     coll.count(None, None).map_err(|_| Error::DatabaseError)
   }
 
+  /// Fetch latest manga of the given genres
   pub fn fetch_latest(conn: &Database, genres: Vec<&'static Genre>) -> Result<Vec<Self>, Error> {
 
     // Ver.3 Double Layer Parallel
@@ -200,10 +201,12 @@ impl Manga {
     // Ok(mangas)
   }
 
+  /// Fetch the latest manga of all the other genres
   pub fn fetch_all_genres(conn: &Database) -> Result<Vec<Self>, Error> {
     Self::fetch_latest(conn, Genre::all_genres())
   }
 
+  /// Fetch the latest manga of the "all" genre (basically the overall genre)
   pub fn fetch_overall(conn: &Database) -> Result<Vec<Self>, Error> {
     Self::fetch_latest(conn, vec![Genre::all()])
   }
@@ -222,6 +225,47 @@ impl Manga {
         Self::upsert(conn, &manga_data).ok()
       }).collect()
     }).flatten().collect())
+  }
+
+  pub fn fetch_oldest_updating(conn: &Database, amount: i64) -> Result<Vec<Self>, Error> {
+    let coll = Self::coll(&conn);
+
+    // Type definition of the database result for deserialization
+    #[derive(Deserialize)]
+    struct DatabaseResult {
+      dmk_id: String
+    };
+
+    // First get the oldest manga dmk_ids from the database
+    let dmk_ids = coll.find(Some(doc! {
+      "status": "updating",
+    }), Some(mongodb::coll::options::FindOptions {
+      sort: Some(doc! {
+        "update_date_time": 1,
+      }),
+      limit: Some(amount),
+      projection: Some(doc! {
+        "dmk_id": 1,
+      }),
+      ..Default::default()
+    })).map_err(|_| Error::DatabaseError)?.map(|result| match result {
+      Ok(doc) => bson::from_bson::<DatabaseResult>(mongodb::Bson::Document(doc)).map_err(|_| Error::DeserializeError).map(|r| r.dmk_id),
+      Err(_) => Err(Error::DatabaseError)
+    }).filter_map(Result::ok).collect::<Vec<_>>();
+
+    // Turn each dmk_id into a thread handle
+    let handles : Vec<FetchMangaHandle> = dmk_ids.into_iter().map(|dmk_id| {
+      thread::spawn(move || dmk::fetch_manga_data(&dmk_id))
+    }).collect();
+
+    // Join all the handle and upsert them into mongodb
+    Ok(handles.into_iter().filter_map(|handle| {
+      let manga_data = handle.join().ok().and_then(|res| match res {
+        Ok(manga) => Some(manga),
+        Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
+      })?;
+      Self::upsert(conn, &manga_data).ok()
+    }).collect())
   }
 
   pub fn get_latest_10(conn: &Database, genre: Option<&'static Genre>) -> Result<Vec<Self>, Error> {

@@ -138,4 +138,17 @@ impl Session {
       Err(_) => Err(Error::DatabaseError)
     }
   }
+
+  pub fn purge_expired(conn: &Database) -> Result<(), Error> {
+    let coll = Self::coll(&conn);
+    let now = bson::UtcDateTime::from(Utc::now());
+    match coll.delete_many(doc! {
+      "expire_date_time": {
+        "$lt": bson::to_bson(&now).map_err(|_| Error::SerializeError)?
+      }
+    }, None) {
+      Ok(_) => Ok(()),
+      Err(_) => Err(Error::DatabaseError)
+    }
+  }
 }

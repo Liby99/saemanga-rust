@@ -5,6 +5,7 @@ mod remove;
 mod change_password;
 mod test_password;
 mod setup;
+mod session;
 
 pub fn routes() -> Vec<Route> {
   routes![
@@ -17,5 +18,6 @@ pub fn routes() -> Vec<Route> {
     test_password::test_password_page,
     test_password::test_password_page_fail,
     test_password::test_password_submit,
+    session::purge,
   ]
 }

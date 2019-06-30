@@ -3,14 +3,20 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
+const isProd = process.env.NODE_ENV === 'production';
+
 module.exports = {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode: isProd ? 'production' : 'development',
   // devtool: 'source-map',
   cache: true,
   entry: {
     'index': './assets/typescript/index.ts',
     'admin': './assets/typescript/admin.ts',
-    'tests': './assets/typescript/tests/tests.ts',
+
+    // Testing specific files
+    ...(isProd ? {} : {
+      'tests': './assets/typescript/tests/tests.ts',
+    }),
   },
   output: {
     path: `${__dirname}/public/`,

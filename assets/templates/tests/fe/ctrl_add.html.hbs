@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <h2>Test Rendering Template with Controller</h2>
+    <p>By clicking the following button you should be able to get a new element rendered from a template</p>
+    <p>Note that the template will contain a controller being associated with the element.</p>
+    <p>So the counter controller should be able to load as well.</p>
+    <button ctrl="emitter" events="counter.add" target="counter-holder">Add Counter</button>
+    <div id="counter-holder" ctrl="add-counter">
+      {{!-- Template goes here --}}
+    </div>
+    <script src="/js/tests.js"></script>
+  </body>
+</html>

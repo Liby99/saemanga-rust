@@ -85,7 +85,7 @@ export default class Discover extends Controller<DiscoverState> {
   update(callback: () => void) {
     const { mangas, show } = this.state;
 
-    DiscoverManga.mount(mangas, this.$inner);
+    DiscoverManga.mountTo(mangas, this.$inner);
 
     if (show) {
       this.$outer.animate({ "opacity": 1 }, 150, callback);

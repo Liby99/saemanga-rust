@@ -33,7 +33,9 @@ export default class Registry {
   }
 
   static buildWithRoot(element: JQuery<HTMLElement>) {
-    element.find(`[${this.ATTR}]`).each((_, element) => this.buildController(element));
+    // Note: `addBack` means adding the `element` itself
+    const sel = `[${this.ATTR}]`;
+    element.find(sel).addBack(sel).each((_, element) => this.buildController(element));
   }
 
   static buildController(element: HTMLElement) {

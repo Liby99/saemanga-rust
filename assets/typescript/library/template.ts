@@ -1,4 +1,6 @@
+import $ from 'jquery';
 import Handlebars from 'handlebars';
+import Registry from './registry';
 
 export default class Template<Data> {
 
@@ -19,7 +21,17 @@ export default class Template<Data> {
   /**
    * Mount the rendered data to element
    */
-  mount(data: Data | Data[], elem: JQuery<HTMLElement>) {
-    elem.html(this.render(data));
+  mountTo(data: Data | Data[], root: JQuery<HTMLElement>) {
+    root.html(""); // Clear the root
+    this.appendTo(data, root); // Append to root
+  }
+
+  /**
+   * Append the rendered data to element
+   */
+  appendTo(data: Data | Data[], root: JQuery<HTMLElement>) {
+    const elem = $(this.render(data));
+    Registry.buildWithRoot(elem);
+    elem.appendTo(root);
   }
 }

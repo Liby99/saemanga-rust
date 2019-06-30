@@ -81,14 +81,14 @@ export default class SearchResult extends Controller<State> {
 
   updateResult(callback: () => void) {
     const { result } = this.state;
-    DiscoverManga.mount(result, this.$result);
+    DiscoverManga.mountTo(result, this.$result);
     callback();
   }
 
   update(callback: () => void) {
     const { result } = this.state;
     if (result.length) {
-      DiscoverManga.mount(result, this.$result);
+      DiscoverManga.mountTo(result, this.$result);
       this.$outer.slideDown(200, callback);
     } else {
       this.$outer.slideUp(200, () => {

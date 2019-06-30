@@ -2,7 +2,7 @@ use rocket::fairing::Fairing;
 use rocket_contrib::templates::{Template, handlebars};
 use handlebars::{Helper, Handlebars, Context, RenderContext, Output, HelperResult, JsonRender};
 
-fn concatenate_helper(h: &Helper, _: &Handlebars, _: &Context, _: &mut RenderContext, out: &mut Output) -> HelperResult {
+fn concatenate_helper(h: &Helper, _: &Handlebars, _: &Context, _: &mut RenderContext, out: &mut dyn Output) -> HelperResult {
   for param in h.params() {
     out.write(&param.value().render())?;
   }

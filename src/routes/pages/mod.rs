@@ -55,5 +55,8 @@ pub fn routes() -> Vec<Route> {
 }
 
 pub fn catchers() -> Vec<Catcher> {
-  catchers![]
+  catchers![
+    error::internal_error,
+    error::not_found,
+  ]
 }

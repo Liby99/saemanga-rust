@@ -1,4 +1,5 @@
 use rocket_contrib::templates::Template;
+use rocket::request::Request;
 use rocket::response::Redirect;
 use enum_primitive::FromPrimitive;
 
@@ -31,4 +32,22 @@ pub fn error(code: Option<i32>, redir: Option<String>) -> Result<Template, Redir
     None => ErrorData { code: -1, msg: "Error Not Specified", back: back.as_str() }
   };
   Ok(Template::render("error", &data))
+}
+
+#[catch(500)]
+pub fn internal_error() -> Template {
+  Template::render("error", ErrorData {
+    code: 500,
+    msg: "Internal Server Error",
+    back: "/"
+  })
+}
+
+#[catch(404)]
+pub fn not_found(req: &Request) -> Template {
+  Template::render("error", ErrorData {
+    code: 404,
+    msg: format!("Cannot find {}", req.uri()).as_str(),
+    back: "/"
+  })
 }

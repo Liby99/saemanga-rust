@@ -3,55 +3,39 @@ from typing import Dict, List, Callable
 import datetime
 import requests
 
+def task(name, cmd, interval):
+  """
+  Task constructor.
+  @param name: the name being printed in the log
+  @param cmd: the cmd to send to `/admin/` directory
+  @param interval: a number representing the time interval of the task
+  """
+
+  def action(conf, jar):
+    """
+    Action function. Sending a signal to server admin
+    """
+    print(f"[scheduler] Running scheduled task {name} [{datetime.datetime.now()}]")
+    fetch_url = f"http://{conf['addr']}:{conf['port']}/admin/{cmd}"
+    requests.post(url=fetch_url, cookies=jar)
+
+  return {
+    "action": action,
+    "interval": interval
+  }
+
 def tasks():
   return [
-    fetch_overall_latest_manga,
-    fetch_latest_manga_of_genres,
-    fetch_oldest_50_manga,
-    clear_session
+
+    # Fetching overall latest manga, per 30 minute
+    task("fetch_overall_latest_manga", "latest/fetch_overall", 1000 * 60 * 30),
+
+    # Fetching latest manga of genres, per 4 hours
+    task("fetch_latest_manga_of_genres", "latest/fetch_genres", 1000 * 60 * 60 * 4),
+
+    # Fetching the oldest updating 50 manga, per 1 hour
+    task("fetch_oldest_updating_50", "latest/fetch_oldest_updating", 1000 * 60 * 60),
+
+    # Purge the expired user session, per 1 day
+    task("purge_expired_session", "user/session/purge", 1000 * 60 * 60 * 24)
   ]
-
-def print_task(name):
-  print("Running scheduled task {} [{}]".format(name, datetime.datetime.now()))
-
-def fetch_overall_latest_manga():
-  def action(conf, jar):
-    print_task("fetch_overall_latest_manga")
-    fetch_url = "http://{}:{}/admin/latest/fetch_overall".format(conf["addr"], conf["port"])
-    requests.post(url=fetch_url, cookies=jar)
-
-  return {
-    "action": action,
-    "interval": 1000 * 60 * 30 # Per Half an hour
-  }
-
-def fetch_latest_manga_of_genres():
-  def action(conf, jar):
-    print_task("fetch_latest_manga_of_genres")
-    fetch_url = "http://{}:{}/admin/latest/fetch_genres".format(conf["addr"], conf["port"])
-    requests.post(url=fetch_url, cookies=jar)
-
-  return {
-    "action": action,
-    "interval": 1000 * 60 * 60 * 4 # Per 4 Hours
-  }
-
-def fetch_oldest_50_manga():
-  def action(conf, jar):
-    print_task("fetch_oldest_50_manga")
-    print("TODO: Not implemented")
-
-  return {
-    "action": action,
-    "interval": 1000 * 60 * 60 # Per Hour
-  }
-
-def clear_session():
-  def action(conf, jar):
-    print_task("clear_session")
-    print("TODO: Not implemented")
-
-  return {
-    "action": action,
-    "interval": 1000 * 60 * 60 * 24 # Per day
-  }

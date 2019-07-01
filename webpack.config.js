@@ -3,7 +3,7 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.SAEMANGA_ENV === 'production';
 
 module.exports = {
   mode: isProd ? 'production' : 'development',

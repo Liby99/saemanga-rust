@@ -2,12 +2,12 @@ import requests
 import sched
 import time
 
-import account
-import config
-import tasks
+from account import account
+from config import config
+from tasks import tasks
 
 def login(conf, acct):
-  url = "http://{}:{}/user/login".format(conf["addr"], conf["port"])
+  url = f"http://{conf['addr']}:{conf['port']}/user/login"
   login_response = requests.post(url=url, data=acct)
   return login_response.cookies["session"]
 
@@ -25,8 +25,7 @@ def main():
 
   scheduler = sched.scheduler(time.time, time.sleep)
 
-  for task_fn in tasks():
-    task = task_fn()
+  for task in tasks():
     periodic(scheduler, task["interval"], task["action"], (conf, jar))
 
   scheduler.run()

@@ -1,5 +1,3 @@
-# Config Files
-
 # Rust related
 /target
 **/*.rs.bk
@@ -8,6 +6,10 @@
 /public
 /templates
 /node_modules
+
+# Python related
+.mypy_cache
+__pycache__
 
 # Dev Env related
 .vscode

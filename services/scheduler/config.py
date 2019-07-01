@@ -1,6 +1,6 @@
-from typing import Dict
+from typing import Dict, Any
 
-def config(prod: bool) -> Dict[str, str]:
+def config(prod: bool) -> Dict[str, Any]:
   if prod:
     return {
       "addr": "localhost",

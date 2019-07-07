@@ -11,7 +11,22 @@ fn root() -> Redirect {
 }
 
 pub fn routes() -> Vec<Route> {
-  [routes![root], pages::routes(), ajax::routes(), tests::routes()].concat()
+  [
+    // Root route
+    routes![root],
+
+    // Basic routes
+    pages::routes(),
+    ajax::routes(),
+
+    // Testing routes
+    if cfg!(debug_assertions) {
+      [tests::routes()].concat()
+    } else {
+      // Prod routes
+      routes![]
+    },
+  ].concat()
 }
 
 pub fn catchers() -> Vec<Catcher> {

@@ -40,9 +40,6 @@ module.exports = (name, cmd) => {
       pool.open();
     }
 
-    // Debug print
-    process.stdout.write(`${"[build]".cyan} Building ${name}... `);
-
     // Execute the child process with cmd
     child_proc = exec(cmd, (err, stdout, stderr) => {
       if (err) {
@@ -63,5 +60,8 @@ module.exports = (name, cmd) => {
         done();
       }
     });
+
+    // Debug print
+    process.stdout.write(`${"[build]".cyan} Building ${name}... `);
   }
 }

@@ -13,8 +13,10 @@ module.exports = {
     'index': './assets/typescript/index.ts',
     'admin': './assets/typescript/admin.ts',
 
-    // Testing specific files
-    ...(isProd ? {} : {
+    ...(isProd ? {
+      // Production specific files
+    } : {
+      // Testing specific files
       'tests': './assets/typescript/tests/tests.ts',
     }),
   },

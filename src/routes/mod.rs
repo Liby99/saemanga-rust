@@ -1,9 +1,11 @@
 use rocket::{Route, Catcher};
 use rocket::response::Redirect;
 
-pub mod pages;
-pub mod ajax;
-pub mod tests;
+mod pages;
+mod ajax;
+
+#[cfg(debug_assertions)]
+mod tests;
 
 #[get("/")]
 fn root() -> Redirect {
@@ -19,13 +21,7 @@ pub fn routes() -> Vec<Route> {
     pages::routes(),
     ajax::routes(),
 
-    // Testing routes
-    if cfg!(debug_assertions) {
-      [tests::routes()].concat()
-    } else {
-      // Prod routes
-      routes![]
-    },
+    #[cfg(debug_assertions)] { tests::routes() },
   ].concat()
 }
 

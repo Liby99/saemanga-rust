@@ -75,14 +75,8 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
   let mut response = reqwest::get(url.as_str()).map_err(|_| Error::DmkFetchError)?;
   let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
 
-  println!("3");
-
-  println!("{}", html_text);
-
   // First go to scraper parse
-  let document = Html::parse_fragment(&html_text);
-
-  println!("4");
+  let document = Html::parse_document(&html_text);
 
   lazy_static!{
     static ref MAIN_TR_SEL : Selector = Selector::parse(
@@ -212,7 +206,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
     }
 
     // Parse the episode html text to dom
-    let epi_document = Html::parse_fragment(epi_html_text.as_str());
+    let epi_document = Html::parse_document(epi_html_text.as_str());
     let img_elem = epi_document.select(&IMG_SEL).next().ok_or(Error::DmkDomTraverseError)?;
     let img_src = img_elem.value().attr("src").ok_or(Error::DmkParseError)?;
     let full_img_url = format!("https://www.cartoonmad.com/comic/{}", img_src);
@@ -251,7 +245,7 @@ lazy_static! {
 fn fetch_manga_ids_with_url(url: &String) -> Result<Vec<(String, String)>, Error> {
   let mut response = reqwest::get(url.as_str()).map_err(|_| Error::DmkFetchError)?;
   let html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
-  let document = Html::parse_fragment(&html_text);
+  let document = Html::parse_document(&html_text);
 
   // Select the a elements that the hrefs include the dmk_id
   let a_elems = document.select(&MANGA_INDEX_A_SEL);

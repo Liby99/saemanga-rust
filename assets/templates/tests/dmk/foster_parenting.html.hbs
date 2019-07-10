@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    The foster parenting warning will happen when we are parsing something like this:
+    <pre>
+<table>
+  <form>
+    <tr></tr>
+  </form>
+</table>
+    </pre>
+    Because a <code>tr</code> tag could only appear within a <code>table</code>. But here we have a <code>form</code> standing in-between.
+  </body>
+</html>

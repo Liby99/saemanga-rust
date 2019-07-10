@@ -61,7 +61,9 @@ module.exports = (name, cmd) => {
       }
     });
 
-    // Debug print
-    process.stdout.write(`${"[build]".cyan} Building ${name}... `);
+    // Debug print. Delay the print because we first want to print "interrupted"
+    setTimeout(() => {
+      process.stdout.write(`${"[build]".cyan} Building ${name}... `);
+    }, 0);
   }
 }

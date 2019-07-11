@@ -1,7 +1,11 @@
 use rocket::Route;
 
-mod fe;
+mod front_end;
+mod dmk;
 
 pub fn routes() -> Vec<Route> {
-  [fe::routes()].concat()
+  [
+    front_end::routes(),
+    dmk::routes(),
+  ].concat()
 }

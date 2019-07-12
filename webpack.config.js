@@ -3,7 +3,7 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
-const isProd = process.env.SAEMANGA_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production';
 
 module.exports = {
   mode: isProd ? 'production' : 'development',
@@ -14,15 +14,15 @@ module.exports = {
     'admin': './assets/typescript/admin.ts',
 
     ...(isProd ? {
-      // Production specific files
+      // Production specific entries...
     } : {
-      // Testing specific files
+      // Testing specific entries...
       'tests': './assets/typescript/tests/tests.ts',
     }),
   },
   output: {
     path: `${__dirname}/public/`,
-    filename: 'js/[name].js'
+    filename: 'js/[name].js',
   },
   module: {
     rules: [{
@@ -31,8 +31,8 @@ module.exports = {
       use: {
         loader: 'ts-loader',
         options: {
-          transpileOnly: true
-        }
+          transpileOnly: true,
+        },
       }
     }, {
       test: /\.scss$/,
@@ -40,15 +40,15 @@ module.exports = {
         MiniCssExtractPlugin.loader,
         'css-loader',
         'sass-loader',
-      ]
+      ],
     }, {
       test: /images\/.+\.(svg|png|jpg|jpeg|gif|ico)/,
       use: [{
         loader: "file-loader",
         options: {
           name: 'img/[name].[ext]'
-        }
-      }]
+        },
+      }],
     }, {
       test: /\.(svg|woff|woff2|ttf|eot)$/,
       exclude: /images/,
@@ -56,18 +56,18 @@ module.exports = {
         loader: "file-loader",
         options: {
           publicPath: '../',
-          name: 'fonts/[name].[ext]'
-        }
-      }]
+          name: 'fonts/[name].[ext]',
+        },
+      }],
     }, {
       test: /\.html\.hbs$/,
       use: [{
         loader: "handlebars-loader",
         options: {
           rootRelative: ""
-        }
+        },
       }],
-    }]
+    }],
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -80,5 +80,5 @@ module.exports = {
   },
   performance: {
     hints: false
-  }
+  },
 };

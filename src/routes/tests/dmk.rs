@@ -59,7 +59,7 @@ fn fetch_dmk_home() -> Template {
   let complete_html_text = format!("<!DOCTYPE html>{}", html_text);
 
   // Then parse it to dom tree
-  let document = Html::parse_document(&complete_html_text);
+  let _document = Html::parse_document(&complete_html_text);
 
   // Render the template
   Template::render("tests/dmk/fetch_dmk_home", FetchDmkHomeTemplateData {
@@ -80,7 +80,7 @@ fn foster_parenting() -> Template {
   let complete_html_text = format!("<!DOCTYPE html>{}", html_text);
 
   // Then parse it to dom tree
-  let document = Html::parse_document(&complete_html_text);
+  let _document = Html::parse_document(&complete_html_text);
 
   // Render the template
   Template::render("tests/dmk/foster_parenting", ())

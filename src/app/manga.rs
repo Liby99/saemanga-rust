@@ -1,7 +1,7 @@
 use std::thread;
 
 use mongodb::oid::ObjectId;
-use mongodb::{bson, doc};
+use mongodb::{bson, doc, Document};
 use chrono::Utc;
 
 use crate::util::Collection;
@@ -211,20 +211,39 @@ impl Manga {
     Self::fetch_latest(conn, vec![Genre::all()])
   }
 
-  pub fn fetch_ended(conn: &Database) -> Result<Vec<Self>, Error> {
+  pub fn fetch_ended(conn: &Database) -> Result<(), Error> {
+    let coll = Self::coll(&conn);
     let ids : Vec<(String, String)> = dmk::fetch_ended()?;
-    Ok(ids.chunks(50).map(|chunk: &[(String, String)]| -> Vec<Self> { // A single chunk has size of 50
+    for chunk in ids.chunks(50) { // A single chunk has size of 50
+
+      // Handles getting the information of each manga of the chunk
       let handles : Vec<FetchMangaHandle> = chunk.to_owned().into_iter().map(|manga| {
         thread::spawn(move || dmk::fetch_manga_data(&manga.0))
       }).collect();
-      handles.into_iter().filter_map(|handle| {
-        let manga_data = handle.join().ok().and_then(|res| match res {
-          Ok(manga) => Some(manga),
+
+      // Join all the handles and transform the manga into Documents
+      let mangas : Vec<Document> = handles.into_iter().filter_map(|handle| {
+        handle.join().ok().and_then(|res| match res {
+          Ok(manga_data) => {
+            match Self::new(&manga_data).and_then(|manga| Self::to_doc(&manga)) {
+              Ok(manga_doc) => Some(manga_doc),
+              Err(err) => { println!("Error {}: {}", err.code(), err.msg()); return None }
+            }
+          },
           Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
-        })?;
-        Self::upsert(conn, &manga_data).ok()
-      }).collect()
-    }).flatten().collect())
+        })
+      }).collect();
+
+      // Add all the mangas in this chunk
+      match coll.insert_many(mangas, None) {
+        Ok(_) => (),
+        Err(_) => {
+          let err = Error::DatabaseError;
+          println!("Error {}: {}", err.code(), err.msg());
+        }
+      }
+    }
+    Ok(())
   }
 
   pub fn fetch_oldest_updating(conn: &Database, amount: i64) -> Result<Vec<Self>, Error> {

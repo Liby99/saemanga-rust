@@ -10,6 +10,12 @@ use crate::util::Collection;
 use crate::util::Database;
 use crate::util::Error;
 
+pub fn encrypt_password(password: &String) -> String {
+  let mut hasher = Sha256::new();
+  hasher.input_str(&password.as_str());
+  hasher.result_str()
+}
+
 #[collection("user")]
 #[derive(Serialize, Deserialize)]
 pub struct User {
@@ -27,7 +33,7 @@ impl User {
   pub fn new(username: &String, password: &String) -> Result<Self, Error> {
     if Self::is_valid_password(&password) {
       if Self::is_valid_username(&username) {
-        let hashed_pwd = Self::encrypt_password(&password);
+        let hashed_pwd = encrypt_password(&password);
         let now = mongodb::UtcDateTime::from(Utc::now());
         Ok(User {
           id: ObjectId::new().map_err(|_| Error::CannotCreateObjectId)?,
@@ -76,14 +82,8 @@ impl User {
     PASSWORD_REG.is_match(&password.as_str())
   }
 
-  pub fn encrypt_password(password: &String) -> String {
-    let mut hasher = Sha256::new();
-    hasher.input_str(&password.as_str());
-    hasher.result_str()
-  }
-
   pub fn is_password_match(&self, password: &String) -> bool {
-    let hashed_pwd = Self::encrypt_password(password);
+    let hashed_pwd = encrypt_password(password);
     hashed_pwd == self.password
   }
 
@@ -152,7 +152,7 @@ impl User {
         "_id": id.clone()
       }, doc! {
         "$set": {
-          "password": Self::encrypt_password(&new_password),
+          "password": encrypt_password(&new_password),
         },
       }, None) {
         Ok(result) => match result.matched_count {

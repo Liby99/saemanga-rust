@@ -8,3 +8,4 @@ export { default as LightModeSelect } from "./light_mode_select";
 export { default as HandModeSelect } from "./hand_mode_select";
 export { default as Zoom } from "./zoom";
 export { default as Panel } from "./panel";
+export { default as Migrate } from "./migrate";

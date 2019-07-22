@@ -21,6 +21,7 @@ import {
   HandModeSelect,
   Zoom,
   Panel,
+  Migrate,
 } from './controllers/common/mod';
 import {
   Emitter,
@@ -57,6 +58,7 @@ $(document).ready(() => {
   Registry.register("hand-mode-select", HandModeSelect);
   Registry.register("zoom", Zoom);
   Registry.register("panel", Panel);
+  Registry.register("migrate", Migrate);
   Registry.register("emitter", Emitter);
 
   // Then register all the index related components

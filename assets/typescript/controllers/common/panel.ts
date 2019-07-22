@@ -7,6 +7,8 @@ type PanelState = {
 export default class Panel extends Controller<PanelState> {
 
   name: string;
+  noPanelMaskClose: boolean;
+  noCloseButton: boolean;
 
   $mask: JQuery<HTMLElement>;
   $outer: JQuery<HTMLElement>;
@@ -14,6 +16,10 @@ export default class Panel extends Controller<PanelState> {
 
   constructor(root: JQuery<HTMLElement>) {
     super(root);
+
+    const props = (root.attr("props") || "").split(" ");
+    this.noPanelMaskClose = props.indexOf("no-panel-mask-close") >= 0;
+    this.noCloseButton = props.indexOf("no-close-button") >= 0;
 
     // Constants
     this.name = root.attr("name") || "";
@@ -23,8 +29,11 @@ export default class Panel extends Controller<PanelState> {
     this.$outer = root.find(".panel-outer");
     this.$closeButton = root.find(".panel-head > a");
 
+    // If no close button then hide the close button
+    this.noCloseButton && this.$closeButton.attr("hidden", "hidden");
+
     // Events
-    this.$mask.click(() => this.close());
+    this.noPanelMaskClose || this.$mask.click(() => this.close());
     this.$outer.click((event) => event.stopPropagation());
     this.$closeButton.click(() => this.close());
 

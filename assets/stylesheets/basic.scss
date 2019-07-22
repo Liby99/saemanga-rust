@@ -200,7 +200,6 @@ input:focus, input:active {
 
 button.btn {
   background-color: transparent;
-  width: 100%;
   cursor: pointer;
 }
 
@@ -231,7 +230,8 @@ button.btn {
 }
 
 .btn.full {
-  display: block;
+  display: block !important;
+  width: 100%;
 }
 
 .btn.big {

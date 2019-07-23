@@ -3,6 +3,7 @@ name = "saemanga"
 version = "0.1.0"
 authors = ["Liby Lee <liby99@icloud.com>"]
 edition = "2018"
+default-run = "saemanga"
 
 [dependencies]
 rocket = "0.4.0"

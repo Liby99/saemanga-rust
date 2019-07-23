@@ -1,0 +1,16 @@
+{
+  "apps": [{
+    "name": "saemanga-rust-server",
+    "cwd": ".",
+    "script": "target/release/saemanga",
+    "interpreter": "none",
+    "watch": false
+  }, {
+    "name": "saemanga-rust-scheduler",
+    "cwd": ".",
+    "interpreter": "python3",
+    "script": "services/scheduler/main.py",
+    "args": "--delay --prod",
+    "watch": false
+  }]
+}

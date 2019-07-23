@@ -10,7 +10,8 @@
     "build": "npx gulp build",
     "build-webpack-prod": "NODE_ENV=production npx webpack",
     "start": "cargo run",
-    "lint": "npx eslint assets/typescript/**/*.ts --fix"
+    "lint": "npx eslint assets/typescript/**/*.ts --fix",
+    "prod": "pm2 start process_prod.json"
   },
   "repository": {
     "type": "git",

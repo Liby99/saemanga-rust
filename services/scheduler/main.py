@@ -1,11 +1,38 @@
-import sched, time, sys, requests
+from typing import Dict, List, Callable
+import sched, time, sys, requests, datetime
 
 from account import account
 from config import config
-from tasks import tasks
 
 DELAY = False
 PROD = False
+
+def tasks():
+  return [
+
+    # Fetching overall latest manga, per 30 minute
+    task("fetch_overall_latest_manga", "latest/fetch_overall", 1000 * 60 * 30),
+
+    # Fetching latest manga of genres, per 4 hours
+    task("fetch_latest_manga_of_genres", "latest/fetch_genres", 1000 * 60 * 60 * 4),
+
+    # Fetching the oldest updating 50 manga, per 1 hour
+    task("fetch_oldest_updating_50", "latest/fetch_oldest_updating", 1000 * 60 * 60),
+
+    # Purge the expired user session, per 1 day
+    task("purge_expired_session", "user/session/purge", 1000 * 60 * 60 * 24)
+  ]
+
+def task(name, cmd, interval):
+  def action(conf, jar):
+    print(f"[scheduler] Running scheduled task {name} [{datetime.datetime.now()}]")
+    fetch_url = f"http://{conf['addr']}:{conf['port']}/admin/{cmd}"
+    requests.post(url=fetch_url, cookies=jar)
+
+  return {
+    "action": action,
+    "interval": interval
+  }
 
 def parse_args():
   global DELAY
@@ -28,9 +55,8 @@ def periodic(scheduler, interval, action, actionargs=()):
 
 def main():
   conf = config(PROD)
-  acct = account()
 
-  session = login(conf, acct)
+  session = login(conf, account)
   jar = requests.cookies.RequestsCookieJar()
   jar.set("session", session, path="/")
 

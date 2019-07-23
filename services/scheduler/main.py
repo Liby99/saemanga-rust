@@ -1,32 +1,60 @@
-import requests
+"""
+The main entry point of scheduler.
+Usage:
+
+> python3 main.py [--delay] [--prod]
+
+Parameters:
+
+--delay: delay 1000 seconds after launch. Good for prod env waiting for server
+--prod: use production host and port
+"""
+
 import sched
 import time
 import sys
+import requests
 
 from account import account
 from config import config
 from tasks import tasks
 
-args = sys.argv[1:]
-delay = False
-prod = False
-for arg in args:
-  if arg == "--delay":
-    delay = True
-  if arg == "--prod":
-    prod = True
+DELAY = False
+PROD = False
+
+def parse_args():
+  """
+  Parse the command line arguments
+  """
+  global DELAY
+  global PROD
+  args = sys.argv[1:]
+  for arg in args:
+    if arg == "--delay":
+      DELAY = True
+    if arg == "--prod":
+      PROD = True
 
 def login(conf, acct):
+  """
+  Login the website with config and get the session id with the acctount info
+  """
   url = f"http://{conf['addr']}:{conf['port']}/user/login"
   login_response = requests.post(url=url, data=acct)
   return login_response.cookies["session"]
 
 def periodic(scheduler, interval, action, actionargs=()):
+  """
+  Do periodic action
+  """
   scheduler.enter(interval, 1, periodic, (scheduler, interval, action, actionargs))
   action(*actionargs)
 
 def main():
-  conf = config(prod)
+  """
+  Main entry point
+  """
+  conf = config(PROD)
   acct = account()
 
   session = login(conf, acct)
@@ -41,6 +69,7 @@ def main():
   scheduler.run()
 
 if __name__ == "__main__":
-  if delay:
+  parse_args()
+  if DELAY:
     time.sleep(1000)
   main()

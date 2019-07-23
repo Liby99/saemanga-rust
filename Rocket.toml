@@ -4,6 +4,7 @@ template_dir = "assets/templates"
 [production]
 address = "127.0.0.1"
 template_dir = "templates"
+secret_key = "r/gcsNirCnEy+xb3/ZkpjWh2RDwQZ/66sDdiqT1qeFE="
 port = 8200
 
 [global.databases.mongodb]

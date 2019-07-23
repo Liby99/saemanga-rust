@@ -8,7 +8,9 @@
   "scripts": {
     "dev": "npx gulp dev",
     "build": "npx gulp build",
+    "build-prod": "npm run build-webpack-prod && npm run build-cargo-prod",
     "build-webpack-prod": "NODE_ENV=production npx webpack",
+    "build-cargo-prod": "cargo build --release",
     "start": "cargo run",
     "lint": "npx eslint assets/typescript/**/*.ts --fix",
     "prod": "pm2 start process_prod.json"

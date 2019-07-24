@@ -8,6 +8,10 @@ type State = {
   actualWidth: number,
 };
 
+function getWindowWidth() : number {
+  return $(window).width() || 0;
+}
+
 export default class Main extends Controller<State> {
 
   static ABSOLUTE_MIN_WIDTH : number = 320;
@@ -29,7 +33,7 @@ export default class Main extends Controller<State> {
     $(window).resize(() => {
 
       // Filter out all the events that width does not change
-      if (($(window).width() || 0) !== this.windowWidth) {
+      if (getWindowWidth() !== this.windowWidth) {
         this.updateFrame()
       }
     });
@@ -53,17 +57,16 @@ export default class Main extends Controller<State> {
   updateFrame() {
 
     // First update the frame
-    const windowWidth = $(window).width() || 0;
-    this.windowWidth = windowWidth;
-    this.baseWidth = Math.min(Main.ABSOLUTE_DEFAULT_WIDTH, windowWidth);
+    this.windowWidth = getWindowWidth();
+    this.baseWidth = Math.min(Main.ABSOLUTE_DEFAULT_WIDTH, this.windowWidth);
 
     // Max width is the window width
-    this.maxWidth = windowWidth;
+    this.maxWidth = this.windowWidth;
 
     // Min width need to be absolutely > 320
     // It has to be < 768
     // And we pick windowWidth / 2 for the middle
-    this.minWidth = Math.max(Main.ABSOLUTE_MIN_WIDTH, Math.min(windowWidth / 2.0, Main.ABSOLUTE_DEFAULT_WIDTH));
+    this.minWidth = Math.max(Main.ABSOLUTE_MIN_WIDTH, Math.min(this.windowWidth / 2.0, Main.ABSOLUTE_DEFAULT_WIDTH));
 
     // Clamp actual width
     const { width } = this.state;

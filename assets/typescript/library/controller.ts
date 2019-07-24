@@ -23,6 +23,8 @@ export default class Controller<State> {
       this.observer = new MutationObserver((ms) => this.onMutation(ms));
       this.observer.observe(this.parent, Controller.observeConfig);
     }
+
+    this.initialUpdate();
   }
 
   /**
@@ -30,6 +32,10 @@ export default class Controller<State> {
    */
   protected initialState() : State {
     throw new Error("Component must have an initial state");
+  }
+
+  protected initialUpdate() {
+    // Do nothing
   }
 
   protected listen(evt: string, callback: Function) {

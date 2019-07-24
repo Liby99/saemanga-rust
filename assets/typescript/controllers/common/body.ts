@@ -3,6 +3,7 @@ import Controller from '../../library/controller';
 type BodyState = {
   isLeftHandMode: boolean,
   isNightMode: boolean,
+  isFullWidth: boolean,
 };
 
 export default class Body extends Controller<BodyState> {
@@ -22,12 +23,18 @@ export default class Body extends Controller<BodyState> {
         case "night": this.setNightLightMode(); break;
       }
     });
+
+    this.listen("setting.scale.update", (result: { isMax: boolean }) => {
+      const { isMax } = result;
+      this.setState({ isFullWidth: isMax });
+    });
   }
 
   initialState() : BodyState {
     return {
       isLeftHandMode: this.root.hasClass("left"),
       isNightMode: this.root.hasClass("night"),
+      isFullWidth: false,
     };
   }
 
@@ -48,7 +55,7 @@ export default class Body extends Controller<BodyState> {
   }
 
   update() {
-    const { isLeftHandMode, isNightMode } = this.state;
+    const { isLeftHandMode, isNightMode, isFullWidth } = this.state;
 
     // Deal with hand mode
     if (isLeftHandMode) {
@@ -62,6 +69,12 @@ export default class Body extends Controller<BodyState> {
       this.root.addClass("night");
     } else {
       this.root.removeClass("night");
+    }
+
+    if (isFullWidth) {
+      this.root.addClass("full-width");
+    } else {
+      this.root.removeClass("full-width");
     }
   }
 }

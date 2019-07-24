@@ -17,6 +17,8 @@ export default class Main extends Controller<State> {
   maxWidth: number = 0;
   minWidth: number = 0;
 
+  windowWidth: number = 0;
+
   constructor(root: JQuery<HTMLElement>) {
     super(root);
 
@@ -24,7 +26,13 @@ export default class Main extends Controller<State> {
     this.updateFrame();
 
     // Listen to resize event to refresh the frame
-    $(window).resize(() => this.updateFrame());
+    $(window).resize(() => {
+
+      // Filter out all the events that width does not change
+      if (($(window).width() || 0) !== this.windowWidth) {
+        this.updateFrame()
+      }
+    });
 
     // Also listen to set scale event
     EventPool.listen("setting.scale.set", (scale: number) => {
@@ -46,6 +54,7 @@ export default class Main extends Controller<State> {
 
     // First update the frame
     const windowWidth = $(window).width() || 0;
+    this.windowWidth = windowWidth;
     this.baseWidth = Math.min(Main.ABSOLUTE_DEFAULT_WIDTH, windowWidth);
 
     // Max width is the window width

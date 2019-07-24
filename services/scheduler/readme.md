@@ -11,5 +11,5 @@ $ vim account.py # And put in the username password
 ## How To Run
 
 ``` bash
-$ py3 main.py
+$ python3 main.py
 ```

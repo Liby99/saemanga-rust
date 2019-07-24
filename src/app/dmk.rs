@@ -117,7 +117,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
     let author : String = {
       lazy_static!{ static ref AUTHOR_SEL : Selector = Selector::parse("tr:nth-child(5) > td").unwrap(); }
       let text = info_tbody.select(&AUTHOR_SEL).next().ok_or(Error::DmkDomTraverseError)?.text().collect::<Vec<_>>();
-      String::from(text[0].trim().split_whitespace().nth(1).ok_or(Error::DmkParseError)?)
+      String::from(text[0].trim().split_whitespace().nth(1).unwrap_or("Unknown")) // Allow empty author
     };
 
     // Extract tag information

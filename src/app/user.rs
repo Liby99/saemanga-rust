@@ -21,6 +21,7 @@ pub fn encrypt_password(password: &String) -> String {
 pub struct User {
   #[serde(rename="_id")]
   id: ObjectId,
+  display_name: String,
   username: String,
   password: String,
   is_admin: bool,
@@ -37,6 +38,7 @@ impl User {
         let now = mongodb::UtcDateTime::from(Utc::now());
         Ok(User {
           id: ObjectId::new().map_err(|_| Error::CannotCreateObjectId)?,
+          display_name: username.clone(),
           username: username.to_lowercase(), // Always use lower case to store username
           password: hashed_pwd,
           is_admin: false,
@@ -54,6 +56,10 @@ impl User {
 
   pub fn id(&self) -> &ObjectId {
     &self.id
+  }
+
+  pub fn display_name(&self) -> &String {
+    &self.display_name
   }
 
   pub fn username(&self) -> &String {

@@ -5,7 +5,7 @@
       <span>
         {{#if user}}
           <span>欢迎回来，</span>
-          <a href="javascript:void(0);">{{user.username}}</a>
+          <a href="javascript:void(0);">{{user.display_name}}</a>
         {{else}}
           <span>欢迎光临，</span>
           <a href="javascript:void(0);" ctrl="emitter" events="login.focus">点此登陆</a>

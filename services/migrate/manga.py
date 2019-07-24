@@ -5,7 +5,7 @@ from util import print_progress
 
 def migrate_mangas(old_db, new_db):
 
-  print("Migrating Mangas")
+  print(">>> Migrating Mangas")
 
   old_manga_coll = old_db["manga"]
   new_manga_coll = new_db["manga"]
@@ -16,16 +16,16 @@ def migrate_mangas(old_db, new_db):
   skipped_count = 0
   failed_dmk_ids = []
   manga_migrates = {}
-  threads = []
+  threads = [] # List[Tuple[Manga, Thread]]
 
   # Spawn all the threads
   for old_manga in old_mangas:
     thread = migrate_manga(old_manga, new_manga_coll)
-    threads.append(thread)
+    threads.append((old_manga, thread))
     print_progress(len(threads), total_manga_count, prefix="Spawning threads...")
 
   # Join all the threads and get the result
-  for thread in threads:
+  for (old_manga, thread) in threads:
     result = thread.wait()
     processed_count += 1
     if result["failed"]:

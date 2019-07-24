@@ -70,5 +70,5 @@ def main():
 if __name__ == "__main__":
   parse_args()
   if DELAY:
-    time.sleep(1000)
+    time.sleep(1)
   main()

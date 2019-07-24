@@ -1,0 +1,1 @@
+<USERNAME>@<HOST>:~/<PATH>/<TO>/saemanga-rust

@@ -10,10 +10,20 @@
 # Also please first do the front-end compilation in PRODUCTION mode and then
 # do the upload
 
-echo "Server address? (e.g. user@server.com:~/path/to/saemanga-rust)"
+# Get the file containing server_address
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+FILE="${DIR}/server_address.txt"
 
-read addr
+# Get the upload address
+if test -f "$FILE"; then
+  addr=`cat ${FILE}`
+else
+  echo "Server address? (e.g. user@server.com:~/path/to/saemanga-rust)"
+  read addr
+fi
+echo "Uploading to ${addr}..."
 
+# Start the rsync
 rsync -ar \
   --include='/Cargo.lock' \
   --include='/Cargo.toml' \

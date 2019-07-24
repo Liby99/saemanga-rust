@@ -227,7 +227,10 @@ impl Manga {
           Ok(manga_data) => {
             match Self::new(&manga_data).and_then(|manga| Self::to_doc(&manga)) {
               Ok(manga_doc) => Some(manga_doc),
-              Err(err) => { println!("Error {}: {}", err.code(), err.msg()); return None }
+              Err(err) => {
+                println!("Error {}: {} when fetching {}", err.code(), err.msg(), manga_data.dmk_id());
+                return None
+              }
             }
           },
           Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cp account_dummy.py account.py
+cp dummy/account.py account.py
 vim account.py

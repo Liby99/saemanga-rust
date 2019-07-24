@@ -31,6 +31,7 @@ enum_from_primitive! {
     UsernameOrPasswordError,
     IncorrectOldPassword,
     NotAuthenticated,
+    UserNotQualifiedForMigrate,
 
     // 1300 for dmk/manga related errors
     GenreInfoExtractionError = 1300,
@@ -85,6 +86,7 @@ impl Error {
       Error::SessionExpired => "Session Expred",
       Error::UsernameOrPasswordError => "Wrong Username or Password",
       Error::IncorrectOldPassword => "Incorrect Old Password",
+      Error::UserNotQualifiedForMigrate => "User NOT Qualified for Migrate",
       Error::GenreInfoExtractionError => "Cannot Extract Genre Information",
       Error::GenreNotFoundError => "Unable to find Genre",
       Error::InvalidDmkId => "Invalid dmk_id",

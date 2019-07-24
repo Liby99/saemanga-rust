@@ -6,3 +6,4 @@ pub mod follow;
 pub mod user_setting;
 pub mod session;
 pub mod user;
+pub mod temp_password;

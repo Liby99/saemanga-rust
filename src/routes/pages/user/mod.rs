@@ -4,6 +4,7 @@ mod login;
 mod register;
 mod change_password;
 mod logout;
+mod migrate;
 
 pub fn routes() -> Vec<Route> {
   routes![
@@ -11,5 +12,6 @@ pub fn routes() -> Vec<Route> {
     register::register,
     change_password::change_password,
     logout::logout,
+    migrate::migrate,
   ]
 }

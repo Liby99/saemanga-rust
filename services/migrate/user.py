@@ -6,8 +6,6 @@ from util import print_progress
 
 def migrate_users(old_db, new_db):
 
-  print(">>> Migrating Users")
-
   old_user_coll = old_db["user"]
   new_user_coll = new_db["user"]
   old_users = old_user_coll.find()

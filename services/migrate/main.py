@@ -23,9 +23,9 @@ def main():
   new_db = cli[conn["new_database"]]
 
   if user_only:
-    migrate_users(old_db, new_db) # old_user._id -> new_user._id
+    migrate_users(old_db, new_db)
   elif manga_only:
-    migrate_mangas(old_db, new_db) # old_manga._id -> { new_manga._id, new_manga.dmk_id }
+    migrate_mangas(old_db, new_db)
   else:
     user_migrates = migrate_users(old_db, new_db) # old_user._id -> new_user._id
     manga_migrates = migrate_mangas(old_db, new_db) # old_manga._id -> { new_manga._id, new_manga.dmk_id }

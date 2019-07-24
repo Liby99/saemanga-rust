@@ -5,13 +5,11 @@ from util import print_progress
 
 def migrate_mangas(old_db, new_db):
 
-  print(">>> Migrating Mangas")
-
   old_manga_coll = old_db["manga"]
   new_manga_coll = new_db["manga"]
   old_mangas = old_manga_coll.find()
   total_manga_count = old_manga_coll.count_documents({})
-  completed_count = 0
+  migrated_count = 0
   processed_count = 0
   skipped_count = 0
   failed_dmk_ids = []
@@ -48,12 +46,13 @@ def migrate_mangas(old_db, new_db):
       else:
         if result["existed"]:
           skipped_count += 1
-        completed_count += 1
+        else:
+          migrated_count += 1
         manga_migrates[old_manga["_id"]] = result
-      print_progress(completed_count, total_manga_count, prefix="Migrating mangas...")
+      print_progress(processed_count, total_manga_count, prefix="Migrating mangas...")
 
   failed_count = len(failed_dmk_ids)
-  print(f"Total: {total_manga_count}, Completed: {completed_count}, Skipped: {skipped_count}, Failed: {failed_count}")
+  print(f"Total: {total_manga_count}, Completed: {migrated_count}, Skipped: {skipped_count}, Failed: {failed_count}")
   if failed_count > 0:
     print(f"Failed dmk ids: {failed_dmk_ids}")
   return manga_migrates

@@ -12,16 +12,19 @@
 
 # Get the file containing server_address
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-FILE="${DIR}/server_address.txt"
+ADDR_FILE="${DIR}/server_address.txt"
+DIR_FILE="${DIR}/server_directory.txt"
 
 # Get the upload address
-if test -f "$FILE"; then
-  addr=`cat ${FILE}`
+if [[ -f ${ADDR_FILE} && -f ${DIR_FILE} ]]; then
+  ADDR=`cat ${ADDR_FILE}`
+  DIRECTORY=`cat ${DIR_FILE}`
+  LOCATION="${ADDR}:${DIRECTORY}"
 else
   echo "Server address? (e.g. user@server.com:~/path/to/saemanga-rust)"
-  read addr
+  read LOCATION
 fi
-echo "Uploading to ${addr}..."
+echo "Uploading to ${LOCATION}..."
 
 # Start the rsync
 rsync -ar \
@@ -32,8 +35,9 @@ rsync -ar \
   --include='/process_prod.json' \
   --include='/lib/***' \
   --include='/public/***' \
-  --include='/services/***' \
+  --include='/scripts/***' \
+  --include='/services/scheduler/***' \
   --include='/src/***' \
   --include='/templates/***' \
   --exclude='*' \
-  ./ $addr
+  ./ $LOCATION

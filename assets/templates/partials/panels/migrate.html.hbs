@@ -1,11 +1,14 @@
 {{#*inline "body"}}
 
-<span id="migrate-ctrl-container" ctrl="migrate"></span>
-
-<form id="migrate-form" action="/user/migrate?redir={{redir}}" method="post">
+<form id="migrate-form" action="/user/migrate?redir={{redir}}" method="post" ctrl="migrate">
   <p>
-    冴え漫画更新到4.0版本了！在这个过程中，我们重置了用户的密码，并采取了更安全的加密措施。我们发现了您是冴え漫画的老用户，我们需要您来重新设置您的密码！
+    冴え漫画更新到4.0版本了！在这个过程中，我们重置了用户的密码，并采取了更安全的加密措施。因为您是冴え漫画的老用户，需要您来重新设置一个密码！
+  </p>
+  <p>
     请在下方的输入框中输入您希望的新密码，我们将会自动为您完成登陆。在这之后，如果您想在其他设备上登陆的话，请重新按照正常途径使用用户名和密码登陆～
+  </p>
+  <p>
+    你的用户名是：<span id="migrate-username"></span>
   </p>
   <input id="password-new" type="password" name="new_password" placeholder="新密码" required />
   <br />
@@ -14,4 +17,4 @@
 
 {{/inline}}
 
-{{~> layout/panel name="migrate" title="迁移账户信息" index="254" props="no-panel-mask-close"}}
+{{~> layout/panel name="migrate" title="迁移账户信息" index="254" props="no-panel-mask-close no-close-button"}}

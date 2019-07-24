@@ -12,11 +12,14 @@ export default class Migrate extends Controller<{}> {
   constructor(root: JQuery<HTMLElement>) {
     super(root);
 
+    const $migrateUsername = root.find("#migrate-username");
+
     setTimeout(() => {
 
       // First check if there's username
       const username = Cookie.get("username");
       if (username) {
+        $migrateUsername.text(username);
 
         // Then go to server and check if we can do migration
         Axios.post("/ajax/user/can_migrate").then((response: AxiosResponse<CanMigrateResponse>) => {
@@ -26,7 +29,7 @@ export default class Migrate extends Controller<{}> {
           }
         })
       }
-    }, 1000);
+    }, 200);
   }
 
   initialState() : {} {

@@ -18,6 +18,8 @@ rsync -ar \
   --include='/Cargo.lock' \
   --include='/Cargo.toml' \
   --include='/Rocket.toml' \
+  --include='/package.json' \
+  --include='/process_prod.json' \
   --include='/lib/***' \
   --include='/public/***' \
   --include='/services/***' \

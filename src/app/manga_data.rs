@@ -258,7 +258,7 @@ impl MangaData {
   }
 
   pub fn saemanga_full_url(&self) -> String {
-    format!("http://beta.saemanga.com/manga/{}", self.dmk_id)
+    format!("http://saemanga.com/manga/{}", self.dmk_id)
   }
 
   pub fn saemanga_url(&self) -> String {

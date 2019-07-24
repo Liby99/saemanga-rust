@@ -1,4 +1,4 @@
-import datetime, subprocess, threading, json
+import datetime, subprocess, threading, json, math
 
 from async_call import Async
 from util import print_progress
@@ -16,26 +16,41 @@ def migrate_mangas(old_db, new_db):
   skipped_count = 0
   failed_dmk_ids = []
   manga_migrates = {}
-  threads = [] # List[Tuple[Manga, Thread]]
 
-  # Spawn all the threads
+  # Generate the batches
+  batch_size = 50
+  batches = []
+  count = 0
   for old_manga in old_mangas:
-    thread = migrate_manga(old_manga, new_manga_coll)
-    threads.append((old_manga, thread))
-    print_progress(len(threads), total_manga_count, prefix="Spawning threads...")
+    if count == 0:
+      batches.append([])
+    batches[-1].append(old_manga)
+    count += 1
+    if count == batch_size:
+      count = 0
 
-  # Join all the threads and get the result
-  for (old_manga, thread) in threads:
-    result = thread.wait()
-    processed_count += 1
-    if result["failed"]:
-      failed_dmk_ids.append(old_manga["dmk_id"])
-    else:
-      if result["existed"]:
-        skipped_count += 1
-      completed_count += 1
-      manga_migrates[old_manga["_id"]] = result
-    print_progress(completed_count, total_manga_count, prefix="Migrating mangas...")
+  # Fetch in batches
+  for batch in batches:
+
+    # Generate the threads
+    threads = [] # List[Tuple[Manga, Thread]]
+    for old_manga in batch:
+      thread = migrate_manga(old_manga, new_manga_coll)
+      threads.append((old_manga, thread))
+      # print_progress(len(threads), total_manga_count, prefix="Spawning threads...")
+
+    # Join all the threads and get the result
+    for (old_manga, thread) in threads:
+      result = thread.wait()
+      processed_count += 1
+      if result["failed"]:
+        failed_dmk_ids.append(old_manga["dmk_id"])
+      else:
+        if result["existed"]:
+          skipped_count += 1
+        completed_count += 1
+        manga_migrates[old_manga["_id"]] = result
+      print_progress(completed_count, total_manga_count, prefix="Migrating mangas...")
 
   failed_count = len(failed_dmk_ids)
   print(f"Total: {total_manga_count}, Completed: {completed_count}, Skipped: {skipped_count}, Failed: {failed_count}")
@@ -56,7 +71,6 @@ def migrate_manga(old_manga, new_manga_coll):
       result = new_manga_coll.insert_one(new_manga)
       return { "_id": result.inserted_id, "dmk_id": dmk_id, "existed": False, "failed": False }
     except Exception as err:
-      print(err)
       return { "dmk_id": dmk_id, "failed": True }
 
 def fetch_new_manga(old_manga):

@@ -41,7 +41,7 @@ impl From<UserSetting> for SettingData {
 
 #[derive(Serialize)]
 struct UserData {
-  username: String,
+  display_name: String,
   follows: Vec<FollowData>,
 }
 
@@ -95,7 +95,7 @@ pub fn index(user: Option<&User>, conn: Database, setting: UserSetting) -> Resul
     }).collect(),
     user: match user {
       Some(user) => Some(UserData {
-        username: user.username().clone(),
+        display_name: user.display_name().clone(),
         follows: Follow::get_by_user(&conn, &user).map_err(|err| err.redirect(None))?.into_iter().map(|agg_follow| {
           let AggregateFollow { follow, manga } = agg_follow;
           let data = manga.data();

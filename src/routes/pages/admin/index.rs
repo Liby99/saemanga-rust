@@ -37,7 +37,7 @@ pub fn index(conn: Database, admin: AdminUser) -> Result<Template, Redirect> {
   });
   match users_res {
     Ok(users) => Ok(Template::render("admin/index", &AdminData {
-      admin_username: admin.user().username(),
+      admin_username: admin.user().display_name(),
       users: users
     })),
     Err(err) => Err(err.redirect_to_admin())

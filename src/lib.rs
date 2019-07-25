@@ -1,6 +1,5 @@
 #![feature(try_trait)]
 #![feature(result_map_or_else)]
-#![feature(type_alias_enum_variants)]
 #![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use] extern crate enum_primitive;

@@ -142,6 +142,14 @@ pub fn manga_without_user(conn: Database, dmk_id: String) -> Redirect {
   }
 }
 
+#[get("/manga.html?<id>&<epi>")]
+pub fn old_manga(id: String, epi: Option<String>) -> Redirect {
+  match epi {
+    Some(epi) => Redirect::to(format!("/manga/{}/{}", id, epi)),
+    None => Redirect::to(format!("/manga/{}", id))
+  }
+}
+
 fn render_page(
   user: Option<&User>,
   setting: UserSetting,

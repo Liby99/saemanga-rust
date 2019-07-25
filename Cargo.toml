@@ -6,7 +6,6 @@ edition = "2018"
 default-run = "saemanga"
 
 [dependencies]
-rocket = "0.4.0"
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
@@ -25,7 +24,8 @@ devise = "0.2"
 quote = "0.6"
 time = "0.1"
 
-# Scraper has bug so...
+# These repos have bugs so...
+rocket = { git = "https://github.com/liby99/rocket" }
 scraper = { git = "https://github.com/liby99/scraper" }
 
 # My own libraries
@@ -33,6 +33,6 @@ collection = { path = "lib/collection" }
 cookie_value = { path = "lib/cookie_value" }
 
 [dependencies.rocket_contrib]
-version = "*"
+git = "https://github.com/liby99/rocket"
 default-features = false
 features = ["json", "handlebars_templates", "mongodb_pool", "serve"]

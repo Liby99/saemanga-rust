@@ -36,7 +36,7 @@ rsync -ar \
   --include='/lib/***' \
   --include='/public/***' \
   --include='/scripts/***' \
-  --include='/services/scheduler/***' \
+  --include='/services/***' \
   --include='/src/***' \
   --include='/templates/***' \
   --exclude='*' \

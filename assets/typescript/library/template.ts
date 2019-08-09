@@ -12,7 +12,7 @@ export default class Template<Data> {
 
   render(data: Data | Data[]) : string {
     if (Array.isArray(data)) {
-      return data.map(d => this.template(d)).join();
+      return data.map(d => this.template(d)).join('');
     } else {
       return this.template(data);
     }

@@ -256,6 +256,7 @@ pub fn fetch_latest_manga() -> Result<Vec<(String, String)>, Error> {
   fetch_manga_ids_with_url(&String::from("https://cartoonmad.com/"))
 }
 
+/// (String, String): (DmkId, Title)
 pub fn fetch_latest_manga_with_genre(genre: &'static Genre) -> Result<Vec<(String, String)>, Error> {
   fetch_manga_ids_with_url(&genre.dmk_url())
 }

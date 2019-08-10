@@ -11,7 +11,7 @@
     "build-prod": "npm run build-webpack-prod && npm run build-template-prod && npm run build-cargo-prod",
     "build-webpack-prod": "NODE_ENV=production npx webpack",
     "build-template-prod": "npx gulp build-templates",
-    "build-cargo-prod": "cargo build --release",
+    "build-cargo-prod": "cargo build --release --bin saemanga",
     "start": "cargo run",
     "lint": "npx eslint assets/typescript/**/*.ts --fix",
     "prod": "pm2 start process_prod.json"

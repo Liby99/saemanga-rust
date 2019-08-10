@@ -1,4 +1,5 @@
 use std::thread;
+use std::thread::JoinHandle;
 
 use mongodb::oid::ObjectId;
 use mongodb::{bson, doc, Document};
@@ -13,7 +14,6 @@ use super::genre::Genre;
 use super::dmk;
 
 // Typedef
-type FetchGenreHandle = thread::JoinHandle<Result<Vec<MangaData>, Error>>;
 type FetchMangaHandle = thread::JoinHandle<Result<MangaData, Error>>;
 
 #[collection("manga")]
@@ -150,32 +150,56 @@ impl Manga {
   /// Fetch latest manga of the given genres
   pub fn fetch_latest(conn: &Database, genres: Vec<&'static Genre>) -> Result<Vec<Self>, Error> {
 
-    // Ver.3 Double Layer Parallel
-    let genre_handles : Vec<FetchGenreHandle> = genres.into_iter().map(|genre| {
-      thread::spawn(move || -> Result<Vec<MangaData>, Error> {
+    // Ver.4 IDs -> Chunked Parallel Fetch & DB insert
+    let genre_handles: Vec<JoinHandle<Result<Vec<String>, Error>>> = genres.into_iter().map(|genre| {
+      thread::spawn(move || -> Result<Vec<String>, Error> {
         let ids = dmk::fetch_latest_manga_with_genre(genre)?;
-        let manga_handles : Vec<FetchMangaHandle> = ids.into_iter().take(20).map(|manga| {
-          thread::spawn(move || dmk::fetch_manga_data(&manga.0))
-        }).collect();
-        Ok(manga_handles.into_iter().filter_map(|handle| {
-          handle.join().ok().and_then(|res| match res {
-            Ok(manga) => Some(manga),
-            Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
-          })
-        }).collect())
+        Ok(ids.into_iter().map(|(dmk_id, _title)| dmk_id).take(10).collect())
       })
     }).collect();
-
-    let genre_mangas : Vec<Self> = genre_handles.into_iter().filter_map(|handle| -> Option<Vec<Self>> {
-      handle.join().ok().and_then(|res| match res {
-        Ok(genre_mangas) => Some(genre_mangas.into_iter().filter_map(|data: MangaData| -> Option<Self> {
-          Manga::upsert(conn, &data).ok()
-        }).collect()),
-        Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
-      })
+    let dmk_ids: Vec<String> = genre_handles.into_iter().filter_map(|handle| -> Option<Vec<String>> {
+      handle.join().ok().and_then(|res| res.ok())
     }).flatten().collect();
+    let chunks: Vec<_> = dmk_ids.chunks(20).map(|c| c.to_owned()).collect();
+    Ok(chunks.into_iter().map(|chunked_dmk_ids| -> Vec<Self> {
+      let manga_handles: Vec<JoinHandle<Result<MangaData, Error>>> = chunked_dmk_ids.into_iter().map(|dmk_id: String| {
+        thread::spawn(move || -> Result<MangaData, Error> {
+          dmk::fetch_manga_data(&dmk_id)
+        })
+      }).collect();
+      manga_handles.into_iter().filter_map(|handle| -> Option<Self> {
+        handle.join().ok().and_then(|res: Result<MangaData, Error>| -> Option<Self> {
+          res.and_then(|data| Self::upsert(conn, &data)).ok()
+        })
+      }).collect()
+    }).flatten().collect())
 
-    Ok(genre_mangas)
+    // Ver.3 Double Layer Parallel
+    // let genre_handles : Vec<FetchGenreHandle> = genres.into_iter().map(|genre| {
+    //   thread::spawn(move || -> Result<Vec<MangaData>, Error> {
+    //     let ids = dmk::fetch_latest_manga_with_genre(genre)?;
+    //     let manga_handles : Vec<FetchMangaHandle> = ids.into_iter().take(20).map(|manga| {
+    //       thread::spawn(move || dmk::fetch_manga_data(&manga.0))
+    //     }).collect();
+    //     Ok(manga_handles.into_iter().filter_map(|handle| {
+    //       handle.join().ok().and_then(|res| match res {
+    //         Ok(manga) => Some(manga),
+    //         Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
+    //       })
+    //     }).collect())
+    //   })
+    // }).collect();
+
+    // let genre_mangas : Vec<Self> = genre_handles.into_iter().filter_map(|handle| -> Option<Vec<Self>> {
+    //   handle.join().ok().and_then(|res| match res {
+    //     Ok(genre_mangas) => Some(genre_mangas.into_iter().filter_map(|data: MangaData| -> Option<Self> {
+    //       Manga::upsert(conn, &data).ok()
+    //     }).collect()),
+    //     Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
+    //   })
+    // }).flatten().collect();
+
+    // Ok(genre_mangas)
 
     // Ver.1, Async on fetching part
     // let latest_manga_ids : Vec<String> = dmk::fetch_latest_manga()?;
@@ -214,7 +238,7 @@ impl Manga {
   pub fn fetch_ended(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
     let ids : Vec<(String, String)> = dmk::fetch_ended()?;
-    for chunk in ids.chunks(50) { // A single chunk has size of 50
+    for chunk in ids.chunks(20) { // A single chunk has size of 20
 
       // Handles getting the information of each manga of the chunk
       let handles : Vec<FetchMangaHandle> = chunk.to_owned().into_iter().map(|manga| {

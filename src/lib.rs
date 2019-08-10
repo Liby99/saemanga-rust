@@ -1,4 +1,5 @@
 #![feature(try_trait)]
+#![feature(type_alias_enum_variants)]
 #![feature(result_map_or_else)]
 #![feature(proc_macro_hygiene, decl_macro)]
 

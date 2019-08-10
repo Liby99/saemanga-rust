@@ -93,6 +93,10 @@
   left: -100px;
 }
 
+#share-url-button:focus {
+  outline: none !important;
+}
+
 #copied-tag {
   opacity: 1;
 }
@@ -106,13 +110,18 @@
   color: var(--white);
 }
 
-#copied-tag .tag i {
+#copied-tag .tag:after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 6px solid var(--black-background);
+  border-right: 6px solid transparent;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
   position: absolute;
-  display: inline-block;
-  color: var(--black-background);
+  // margin-top: -15px; ????
   margin-left: 12px;
-  line-height: 24px;
-  font-size: 16px;
+  margin-top: 6px; // works in localhost
 }
 
 #copied-tag.hidden {

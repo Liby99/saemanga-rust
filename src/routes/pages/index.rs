@@ -1,5 +1,6 @@
 use rocket_contrib::templates::Template;
 use rocket::response::Redirect;
+use rocket::Route;
 
 use crate::util::Database;
 
@@ -8,6 +9,13 @@ use crate::app::follow::{Follow, AggregateFollow};
 use crate::app::manga::Manga;
 use crate::app::genre::Genre;
 use crate::app::user_setting::*;
+
+pub fn routes() -> Vec<Route> {
+  routes![
+    index,
+    old_index,
+  ]
+}
 
 #[derive(Serialize)]
 struct TemplateData {
@@ -124,4 +132,9 @@ pub fn index(user: Option<&User>, conn: Database, setting: UserSetting) -> Resul
 
   // Render the data
   Ok(Template::render("index", &data))
+}
+
+#[get("/index.html")]
+pub fn old_index() -> Redirect {
+  Redirect::to("/index")
 }

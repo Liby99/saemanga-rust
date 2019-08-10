@@ -40,24 +40,14 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserSetting {
 
 pub fn routes() -> Vec<Route> {
   [
-    routes![
-      index::index,
-      manga::manga,
-      manga::manga_without_user,
-      manga::manga_with_epi,
-      manga::manga_with_epi_without_user,
-      manga::unfollow,
-      manga::old_manga,
-      error::error,
-    ],
+    index::routes(),
+    manga::routes(),
+    error::routes(),
     user::routes(),
     admin::routes(),
   ].concat()
 }
 
 pub fn catchers() -> Vec<Catcher> {
-  catchers![
-    error::internal_error,
-    error::not_found,
-  ]
+  error::catchers()
 }

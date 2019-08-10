@@ -8,7 +8,7 @@ const htmlmin = require('gulp-htmlmin');
 const watch = require('gulp-watch');
 const buildTask = require('./scripts/gulp_build_task');
 
-gulp.task("build-cargo", buildTask('cargo', 'cargo build --color always'));
+gulp.task("build-cargo", buildTask('cargo', 'cargo build --bin saemanga --color always'));
 
 gulp.task("build-webpack", buildTask('webpack', 'npx webpack --colors'));
 

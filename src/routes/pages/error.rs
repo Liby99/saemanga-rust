@@ -1,9 +1,23 @@
 use rocket_contrib::templates::Template;
 use rocket::request::Request;
 use rocket::response::Redirect;
+use rocket::{Route, Catcher};
 use enum_primitive::FromPrimitive;
 
 use crate::util::Error;
+
+pub fn routes() -> Vec<Route> {
+  routes![
+    error
+  ]
+}
+
+pub fn catchers() -> Vec<Catcher> {
+  catchers![
+    internal_error,
+    not_found,
+  ]
+}
 
 impl Error {
   pub fn redirect<'a>(&self, redir: Option<&'a str>) -> Redirect {

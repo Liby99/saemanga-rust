@@ -1,12 +1,26 @@
 use rocket_contrib::templates::Template;
 use rocket::response::Redirect;
+use rocket::Route;
 
 use crate::util::{Error, Database};
 use crate::app::user::User;
 use crate::app::follow::Follow;
 use crate::app::manga::Manga;
 use crate::app::manga_data::{MangaData, MangaEpisode};
+use crate::app::dmk;
 use crate::app::user_setting::*;
+
+pub fn routes() -> Vec<Route> {
+  routes![
+    manga,
+    old_manga,
+    manga_without_user,
+    manga_with_epi,
+    manga_with_epi_without_user,
+    unfollow,
+    update,
+  ]
+}
 
 #[derive(Serialize)]
 struct NeighborEpisodeData {
@@ -121,7 +135,7 @@ impl From<UserSetting> for SettingData {
 }
 
 #[get("/manga/<dmk_id>")]
-pub fn manga(user: &User, conn: Database, dmk_id: String) -> Redirect {
+fn manga(user: &User, conn: Database, dmk_id: String) -> Redirect {
   match Follow::get_or_upsert(&conn, user, &dmk_id, None) {
     Ok((follow, _)) => {
       Redirect::to(format!("/manga/{}/{}", dmk_id, follow.max_episode()))
@@ -131,7 +145,7 @@ pub fn manga(user: &User, conn: Database, dmk_id: String) -> Redirect {
 }
 
 #[get("/manga/<dmk_id>", rank=2)]
-pub fn manga_without_user(conn: Database, dmk_id: String) -> Redirect {
+fn manga_without_user(conn: Database, dmk_id: String) -> Redirect {
   match Manga::get_or_fetch_by_dmk_id(&conn, &dmk_id) {
     Ok(manga) => {
       let data = manga.data();
@@ -143,7 +157,7 @@ pub fn manga_without_user(conn: Database, dmk_id: String) -> Redirect {
 }
 
 #[get("/manga.html?<id>&<epi>")]
-pub fn old_manga(id: String, epi: Option<String>) -> Redirect {
+fn old_manga(id: String, epi: Option<String>) -> Redirect {
   match epi {
     Some(epi) => Redirect::to(format!("/manga/{}/{}", id, epi)),
     None => Redirect::to(format!("/manga/{}", id))
@@ -180,7 +194,7 @@ fn render_page(
 }
 
 #[get("/manga/<dmk_id>/<epi>")]
-pub fn manga_with_epi(
+fn manga_with_epi(
   conn: Database,
   user: &User,
   setting: UserSetting,
@@ -195,7 +209,7 @@ pub fn manga_with_epi(
 }
 
 #[get("/manga/<dmk_id>/<epi>", rank=2)]
-pub fn manga_with_epi_without_user(
+fn manga_with_epi_without_user(
   conn: Database,
   setting: UserSetting,
   dmk_id: String,
@@ -206,9 +220,21 @@ pub fn manga_with_epi_without_user(
 }
 
 #[get("/manga/unfollow?<dmk_id>")]
-pub fn unfollow<'a>(conn: Database, user: &User, dmk_id: String) -> Redirect {
+fn unfollow(conn: Database, user: &User, dmk_id: String) -> Redirect {
   match Follow::unfollow(&conn, user, &dmk_id) {
     Ok(_) => Redirect::to("/index"),
     Err(err) => err.redirect(None)
+  }
+}
+
+#[get("/manga/update?<dmk_id>")]
+fn update(conn: Database, dmk_id: String) -> Redirect {
+  let redir = format!("/manga/{}", dmk_id);
+  match dmk::fetch_manga_data(&dmk_id).and_then(|manga| {
+    println!("{:?}", manga);
+    Manga::upsert(&conn, &manga)
+  }) {
+    Ok(_) => Redirect::to(redir),
+    Err(err) => err.redirect(Some(&redir))
   }
 }

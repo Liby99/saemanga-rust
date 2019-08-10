@@ -39,15 +39,19 @@ a, a:visited {
   color: var(--pink);
 }
 
-a.black {
+.black, a.black {
   color: var(--deep-text);
 }
 
-a.red {
+.red, a.red {
   color: var(--red);
 }
 
-.pink {
+.yellow, a.yellow {
+  color: var(--yellow);
+}
+
+.pink, a.pink {
   color: var(--pink);
 }
 

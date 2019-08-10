@@ -153,7 +153,13 @@ impl Manga {
     // Ver.4 IDs -> Chunked Parallel Fetch & DB insert
     let genre_handles: Vec<JoinHandle<Result<Vec<String>, Error>>> = genres.into_iter().map(|genre| {
       thread::spawn(move || -> Result<Vec<String>, Error> {
-        let ids = dmk::fetch_latest_manga_with_genre(genre)?;
+        let ids = match dmk::fetch_latest_manga_with_genre(genre) {
+          Ok(ids) => ids,
+          Err(err) => {
+            println!("[fetch_latest] Error getting genre {}: {}", genre.id, err.msg());
+            return Err(err);
+          }
+        };
         Ok(ids.into_iter().map(|(dmk_id, _title)| dmk_id).take(10).collect())
       })
     }).collect();
@@ -164,12 +170,26 @@ impl Manga {
     Ok(chunks.into_iter().map(|chunked_dmk_ids| -> Vec<Self> {
       let manga_handles: Vec<JoinHandle<Result<MangaData, Error>>> = chunked_dmk_ids.into_iter().map(|dmk_id: String| {
         thread::spawn(move || -> Result<MangaData, Error> {
-          dmk::fetch_manga_data(&dmk_id)
+          match dmk::fetch_manga_data(&dmk_id) {
+            Ok(data) => Ok(data),
+            Err(err) => {
+              println!("[fetch_latest] Error when fetching manga {}: {}", dmk_id, err.msg());
+              Err(err)
+            }
+          }
         })
       }).collect();
       manga_handles.into_iter().filter_map(|handle| -> Option<Self> {
         handle.join().ok().and_then(|res: Result<MangaData, Error>| -> Option<Self> {
-          res.and_then(|data| Self::upsert(conn, &data)).ok()
+          res.and_then(|data| {
+            match Self::upsert(conn, &data) {
+              Ok(manga) => Ok(manga),
+              Err(err) => {
+                println!("[fetch_latest] Error when inserting manga {}: {}", data.dmk_id(), err.msg());
+                Err(err)
+              }
+            }
+          }).ok()
         })
       }).collect()
     }).flatten().collect())

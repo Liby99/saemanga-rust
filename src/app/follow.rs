@@ -2,6 +2,7 @@ use std::cmp;
 
 use mongodb::oid::ObjectId;
 use mongodb::{bson, doc};
+use mongodb::ordered::OrderedDocument;
 use chrono::Utc;
 
 use crate::util::Collection;
@@ -36,6 +37,61 @@ pub struct AggregateFollow {
   pub manga: Manga,
 }
 
+fn aggregate_pipeline(user_id: &ObjectId) -> Vec<OrderedDocument> {
+  vec![
+    doc! {
+      "$match": {
+        "user_id": user_id.clone(),
+      }
+    },
+    doc! {
+      "$replaceRoot": {
+        "newRoot": {
+          "follow": "$$ROOT",
+        }
+      }
+    },
+    doc! {
+      "$lookup": {
+        "from": "manga",
+        "localField": "follow.manga_dmk_id",
+        "foreignField": "dmk_id",
+        "as": "manga",
+      }
+    },
+    doc! {
+      "$unwind": "$manga",
+    },
+    doc! {
+      "$addFields": {
+        "latest_episode": { "$slice": ["$manga.episodes", -1] },
+        "up_to_date_int": { "$cond": { "if": "$follow.is_up_to_date", "then": 1, "else": 0 } }
+      }
+    },
+    doc! {
+      "$unwind": "$latest_episode"
+    },
+    doc! {
+      "$addFields": {
+        "priority": { "$multiply": [ "$up_to_date_int", { "$subtract": [ "$latest_episode.episode", "$follow.max_episode" ] } ] }
+      }
+    },
+    doc! {
+      "$sort": {
+        "priority": -1,
+        "follow.update_date_time": -1
+      }
+    },
+    doc! {
+      "$project": {
+        "priority": 0,
+        "latest_episode": 0,
+        "up_to_date_int": 0,
+      }
+    }
+  ]
+}
+
 impl Follow {
   pub fn new(user: &User, manga: &Manga) -> Result<Self, Error> {
     let now = mongodb::UtcDateTime::from(Utc::now());
@@ -67,58 +123,7 @@ impl Follow {
 
   pub fn get_by_user(conn: &Database, user: &User) -> Result<Vec<AggregateFollow>, Error> {
     let coll = Self::coll(&conn);
-    let cursor = coll.aggregate(vec![
-      doc! {
-        "$match": {
-          "user_id": user.id().clone(),
-        }
-      },
-      doc! {
-        "$replaceRoot": {
-          "newRoot": {
-            "follow": "$$ROOT",
-          }
-        }
-      },
-      doc! {
-        "$lookup": {
-          "from": "manga",
-          "localField": "follow.manga_dmk_id",
-          "foreignField": "dmk_id",
-          "as": "manga",
-        }
-      },
-      doc! {
-        "$unwind": "$manga",
-      },
-      doc! {
-        "$addFields": {
-          "latest_episode": { "$slice": ["$manga.episodes", -1] },
-          "up_to_date_int": { "$cond": { "if": "$follow.is_up_to_date", "then": 1, "else": 0 } }
-        }
-      },
-      doc! {
-        "$unwind": "$latest_episode"
-      },
-      doc! {
-        "$addFields": {
-          "priority": { "$multiply": [ "$up_to_date_int", { "$subtract": [ "$latest_episode.episode", "$follow.max_episode" ] } ] }
-        }
-      },
-      doc! {
-        "$sort": {
-          "priority": -1,
-          "follow.update_date_time": -1
-        }
-      },
-      doc! {
-        "$project": {
-          "priority": 0,
-          "latest_episode": 0,
-          "up_to_date_int": 0,
-        }
-      }
-    ], None).map_err(|err| {
+    let cursor = coll.aggregate(aggregate_pipeline(user.id()), None).map_err(|err| {
       println!("{:?}", err);
       Error::DatabaseError
     })?;

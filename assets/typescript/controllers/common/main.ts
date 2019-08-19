@@ -3,6 +3,8 @@ import $ from 'jquery';
 import Controller from '../../library/controller';
 import EventPool from '../../library/event_pool';
 
+const THRESHOLD = 5;
+
 type State = {
   width: number,
   actualWidth: number,
@@ -33,8 +35,8 @@ export default class Main extends Controller<State> {
     $(window).resize(() => {
 
       // Filter out all the events that width does not change
-      if (getWindowWidth() !== this.windowWidth) {
-        this.updateFrame()
+      if (getWindowWidth() !== this.windowWidth && getWindowWidth() > THRESHOLD) {
+        this.updateFrame();
       }
     });
 

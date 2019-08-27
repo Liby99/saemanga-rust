@@ -35,7 +35,8 @@ export default class Main extends Controller<State> {
     $(window).resize(() => {
 
       // Filter out all the events that width does not change
-      if (getWindowWidth() !== this.windowWidth && getWindowWidth() > THRESHOLD) {
+      const width = getWindowWidth();
+      if (width !== this.windowWidth && width > THRESHOLD) {
         this.updateFrame();
       }
     });

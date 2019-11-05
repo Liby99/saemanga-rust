@@ -62,6 +62,7 @@ impl MangaEpisode {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "version")]
 pub enum DmkIdBase {
+  V11 { dmk_id_gen: String },
   V10 { dmk_id_web: String, dmk_id_home: String },
   V09 { dmk_id_home: String },
   V08 { dmk_id_home: String },
@@ -70,11 +71,19 @@ pub enum DmkIdBase {
   V05 { dmk_id_web: String, dmk_id_gen: String },
 }
 
+fn parse_v11_image_url(url: &String) -> Option<DmkIdBase> {
+  lazy_static! { static ref IMG_RE_11 : Regex = Regex::new(r"cartoonmad\.com/(\d+)/\d+/\d+/\d+\.jpg").unwrap(); }
+  match IMG_RE_11.captures(url.as_str()) {
+    Some(cap) => Some(DmkIdBase::V11 { dmk_id_gen: cap[1].to_string() }),
+    None => None,
+  }
+}
+
 fn parse_v10_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_10 : Regex = Regex::new(r"(web\d*)\.cartoonmad\.com/(home\d+)/(\d+)/\d+/\d+\.jpg").unwrap(); }
   match IMG_RE_10.captures(url.as_str()) {
     Some(cap) => Some(DmkIdBase::V10 { dmk_id_web: cap[1].to_string(), dmk_id_home: cap[2].to_string() }),
-    None => None
+    None => None,
   }
 }
 
@@ -82,7 +91,7 @@ fn parse_v09_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_09 : Regex = Regex::new(r"(home\d+)/(\d+)/\d+/\d+\.jpg").unwrap(); }
   match IMG_RE_09.captures(url.as_str()) {
     Some(cap) => Some(DmkIdBase::V09 { dmk_id_home: cap[1].to_string() }),
-    None => None
+    None => None,
   }
 }
 
@@ -90,7 +99,7 @@ fn parse_v08_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_08 : Regex = Regex::new(r"^/([\w\d]+)/(\d+)/\d+/\d+\.jpg$").unwrap(); }
   match IMG_RE_08.captures(url.as_str()) {
     Some(cap) => Some(DmkIdBase::V08 { dmk_id_home: cap[1].to_string() }),
-    None => None
+    None => None,
   }
 }
 
@@ -98,7 +107,7 @@ fn parse_v07_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_07 : Regex = Regex::new(r"^/home1/([\d\w]+)/(\d+)/\d+/\d+\.jpg$").unwrap(); }
   match IMG_RE_07.captures(url.as_str()) {
     Some(cap) => Some(DmkIdBase::V07 { dmk_id_gen: cap[1].to_string() }),
-    None => None
+    None => None,
   }
 }
 
@@ -106,7 +115,7 @@ fn parse_v06_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_06 : Regex = Regex::new(r"^/cartoonimg/([\d\w]+)/(\d+)/\d+/\d+\.jpg$").unwrap(); }
   match IMG_RE_06.captures(url.as_str()) {
     Some(cap) => Some(DmkIdBase::V06 { dmk_id_gen: cap[1].to_string() }),
-    None => None
+    None => None,
   }
 }
 
@@ -114,14 +123,14 @@ fn parse_v05_image_url(url: &String) -> Option<DmkIdBase> {
   lazy_static! { static ref IMG_RE_05 : Regex = Regex::new(r"^https?://(web\d?)\.cartoonmad\.com/([\w|\d]+)/").unwrap(); }
   match IMG_RE_05.captures(url.as_str()) {
     Some(cap) => Some(DmkIdBase::V05 { dmk_id_web: cap[1].to_string(), dmk_id_gen: cap[2].to_string() }),
-    None => None
+    None => None,
   }
 }
 
 impl DmkIdBase {
   pub fn from_dmk_image_url(url: &String) -> Result<Self, Error> {
     let functions : Vec<&dyn Fn(&String) -> Option<Self>> = vec![
-      &parse_v10_image_url, &parse_v09_image_url, &parse_v08_image_url,
+      &parse_v11_image_url, &parse_v10_image_url, &parse_v09_image_url, &parse_v08_image_url,
       &parse_v07_image_url, &parse_v06_image_url, &parse_v05_image_url,
     ];
     for f in functions {
@@ -135,6 +144,7 @@ impl DmkIdBase {
 
   pub fn dmk_image_url_base(&self) -> String {
     match self {
+      DmkIdBase::V11 { dmk_id_gen } => format!("http://cartoonmad.com/{}", dmk_id_gen),
       DmkIdBase::V10 { dmk_id_web, dmk_id_home } => format!("http://{}.cartoonmad.com/{}", dmk_id_web, dmk_id_home),
       DmkIdBase::V09 { dmk_id_home } => format!("http://cartoonmad.com/{}", dmk_id_home),
       DmkIdBase::V08 { dmk_id_home } => format!("http://cartoonmad.com/{}", dmk_id_home),
@@ -159,7 +169,7 @@ pub struct MangaData {
 }
 
 pub fn dmk_cover_url(dmk_id: &String) -> String {
-  format!("http://cartoonmad.com/cartoonimgs/coimg/{}.jpg", dmk_id)
+  format!("http://cartoonmad.com/cartoonimg/coimg/{}.jpg", dmk_id)
 }
 
 pub fn saemanga_url(dmk_id: &String) -> String {

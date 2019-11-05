@@ -1,1 +1,1 @@
-pub static TEMP_PASSWORD : &'static str = "<YOUR_TEMP_PASSWORD_HERE>"
+pub static TEMP_PASSWORD : &'static str = "<YOUR_TEMP_PASSWORD_HERE>";

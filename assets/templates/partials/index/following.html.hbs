@@ -48,7 +48,7 @@
           {{#if (and (not is_liked) ../setting.is_liked_only)}}hidden="hidden"{{/if}}
         >
           <div class="cover" style="background-image: url('{{manga.cover_url}}')">
-            <span class="badge {{#unless has_update}}hidden{{/unless}}"></span>
+            <span class="badge {{#unless (and has_update is_up_to_date)}}hidden{{/unless}}"></span>
             <span class="remove btn circle grey solid">
               <i class="fa fa-times"></i>
             </span>

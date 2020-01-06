@@ -57,6 +57,7 @@ struct UserData {
 struct FollowData {
   is_liked: bool,
   has_update: bool,
+  is_up_to_date: bool,
   max_read_episode: i32,
   manga: MangaData,
 }
@@ -110,7 +111,8 @@ pub fn index(user: Option<&User>, conn: Database, setting: UserSetting) -> Resul
           let latest_episode = data.latest_episode();
           FollowData {
             is_liked: follow.is_liked(),
-            has_update: follow.is_up_to_date() && follow.max_episode() < data.latest_episode().episode(),
+            has_update: follow.max_episode() < data.latest_episode().episode(),
+            is_up_to_date: follow.is_up_to_date(),
             max_read_episode: follow.max_episode(),
             manga: MangaData {
               title: data.title().clone(),

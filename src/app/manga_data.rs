@@ -130,8 +130,13 @@ fn parse_v05_image_url(url: &String) -> Option<DmkIdBase> {
 impl DmkIdBase {
   pub fn from_dmk_image_url(url: &String) -> Result<Self, Error> {
     let functions : Vec<&dyn Fn(&String) -> Option<Self>> = vec![
-      &parse_v11_image_url, &parse_v10_image_url, &parse_v09_image_url, &parse_v08_image_url,
-      &parse_v07_image_url, &parse_v06_image_url, &parse_v05_image_url,
+      &parse_v11_image_url,
+      &parse_v10_image_url,
+      &parse_v09_image_url,
+      &parse_v08_image_url,
+      &parse_v07_image_url,
+      &parse_v06_image_url,
+      &parse_v05_image_url,
     ];
     for f in functions {
       match f(url) {

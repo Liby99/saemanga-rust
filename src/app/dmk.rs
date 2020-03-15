@@ -193,8 +193,13 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
   // Get the image information
   let dmk_id_base : DmkIdBase = {
 
-    // Get episode webpage
-    let epi_url = format!("https://www.cartoonmad.com{}", &episodes[0].dmk_directory());
+    // Get the no ads directory from the original directory by changing a character
+    let mut ad_dir = episodes[0].dmk_directory().clone();
+    lazy_static! { static ref EPISODE_RE : Regex = Regex::new(r"(?P<b>\d{8})(\d)(?P<a>\d{6})").unwrap(); }
+    let no_ad_dir = EPISODE_RE.replace_all(ad_dir.as_mut_str(), "$b4$a");
+
+    // Get episode webpage using the no_ad_dir
+    let epi_url = format!("https://www.cartoonmad.com{}", &no_ad_dir);
     let mut response = reqwest::get(epi_url.as_str()).map_err(|_| Error::DmkFetchError)?;
     let epi_html_text = response.text_with_charset("big5").map_err(|_| Error::DmkEncodingError)?;
 

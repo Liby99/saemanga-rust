@@ -231,10 +231,12 @@ fn unfollow(conn: Database, user: &User, dmk_id: String) -> Redirect {
 fn update(conn: Database, dmk_id: String) -> Redirect {
   let redir = format!("/manga/{}", dmk_id);
   match dmk::fetch_manga_data(&dmk_id).and_then(|manga| {
-    println!("{:?}", manga);
     Manga::upsert(&conn, &manga)
   }) {
     Ok(_) => Redirect::to(redir),
-    Err(err) => err.redirect(Some(&redir))
+    Err(err) => {
+      println!("{:?}", err);
+      err.redirect(Some(&redir))
+    }
   }
 }

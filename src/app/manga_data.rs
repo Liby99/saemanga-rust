@@ -72,9 +72,9 @@ pub enum DmkIdBase {
 }
 
 fn parse_v11_image_url(url: &String) -> Option<DmkIdBase> {
-  lazy_static! { static ref IMG_RE_11 : Regex = Regex::new(r"cartoonmad\.com/(\d+)/\d+/\d+/\d+\.jpg").unwrap(); }
+  lazy_static! { static ref IMG_RE_11 : Regex = Regex::new(r"://(www\.?)cartoonmad\.com/(\d+)/\d+/\d+/\d+\.jpg").unwrap(); }
   match IMG_RE_11.captures(url.as_str()) {
-    Some(cap) => Some(DmkIdBase::V11 { dmk_id_gen: cap[1].to_string() }),
+    Some(cap) => Some(DmkIdBase::V11 { dmk_id_gen: cap[2].to_string() }),
     None => None,
   }
 }
@@ -120,7 +120,7 @@ fn parse_v06_image_url(url: &String) -> Option<DmkIdBase> {
 }
 
 fn parse_v05_image_url(url: &String) -> Option<DmkIdBase> {
-  lazy_static! { static ref IMG_RE_05 : Regex = Regex::new(r"^https?://(web\d?)\.cartoonmad\.com/([\w|\d]+)/").unwrap(); }
+  lazy_static! { static ref IMG_RE_05 : Regex = Regex::new(r"(web\d?)\.cartoonmad\.com/([\w|\d]+)/").unwrap(); }
   match IMG_RE_05.captures(url.as_str()) {
     Some(cap) => Some(DmkIdBase::V05 { dmk_id_web: cap[1].to_string(), dmk_id_gen: cap[2].to_string() }),
     None => None,

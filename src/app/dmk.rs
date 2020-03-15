@@ -196,7 +196,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
     // Get the no ads directory from the original directory by changing a character
     let mut ad_dir = episodes[0].dmk_directory().clone();
     lazy_static! { static ref EPISODE_RE : Regex = Regex::new(r"(?P<b>\d{8})(\d)(?P<a>\d{6})").unwrap(); }
-    let no_ad_dir = EPISODE_RE.replace_all(ad_dir.as_mut_str(), "$b4$a");
+    let no_ad_dir = EPISODE_RE.replace_all(ad_dir.as_mut_str(), "${b}4${a}");
 
     // Get episode webpage using the no_ad_dir
     let epi_url = format!("https://www.cartoonmad.com{}", &no_ad_dir);
@@ -206,13 +206,13 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
     // Make the selector lazy static
     lazy_static!{
       static ref IMG_SEL : Selector = Selector::parse(
-        "body > table > tbody > tr:nth-child(5) > td > table > tbody > tr:first-child > td:first-child > a > img"
+        "body > table > tbody > tr:nth-child(4) > td > table > tbody > tr:first-child > td:first-child > a > img"
       ).unwrap();
     }
 
     // Parse the episode html text to dom
     let epi_document = Html::parse_document(epi_html_text.as_str());
-    let img_elem = epi_document.select(&IMG_SEL).next().ok_or(Error::DmkDomTraverseError)?;
+    let img_elem = epi_document.select(&IMG_SEL).next().ok_or(Error::DmkImgDomTraverseError)?;
     let img_src = img_elem.value().attr("src").ok_or(Error::DmkParseError)?;
     let full_img_url = format!("https://www.cartoonmad.com/comic/{}", img_src);
 

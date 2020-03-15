@@ -1,6 +1,6 @@
 {
   "name": "saemanga-rust",
-  "version": "1.0.0",
+  "version": "4.1.1",
   "description": "My manga website finally comes with a rust implementation. This is not in production yet but will be soon integrated. So, I'm happy to announce that this is the 4.0 version of saemanga.com!",
   "directories": {
     "test": "tests"

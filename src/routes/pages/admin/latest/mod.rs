@@ -4,6 +4,7 @@ mod fetch_overall;
 mod fetch_genres;
 mod fetch_ended;
 mod fetch_oldest_updating;
+mod fetch_loved;
 
 pub fn routes() -> Vec<Route> {
   routes![
@@ -11,5 +12,6 @@ pub fn routes() -> Vec<Route> {
     fetch_genres::fetch_genres,
     fetch_ended::fetch_ended,
     fetch_oldest_updating::fetch_oldest_updating,
+    fetch_loved::fetch_loved,
   ]
 }

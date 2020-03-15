@@ -15,7 +15,7 @@
         <th>ID</th>
         <th>Username</th>
         <th>#Visit</th>
-        <th>Register Time</th>
+        <th>Last Visit Time</th>
         <th>Change Password</th>
         <th>Test Password</th>
         <th>Remove User</th>
@@ -28,7 +28,7 @@
         <td>{{id}}</td>
         <td>{{username}}</td>
         <td>{{visit_count}}</td>
-        <td>{{register_date_time}}</td>
+        <td>{{last_visit_date_time}}</td>
         <td>
           <a href="/admin/user/change_password/{{id}}">Change Password</a>
         </td>
@@ -81,6 +81,7 @@
     <button formaction="/admin/latest/fetch_genres" formmethod="post">Fetch Latest Manga of All Genres</button>
     <button formaction="/admin/latest/fetch_ended" formmethod="post">Fetch Ended Manga</button>
     <button formaction="/admin/latest/fetch_oldest_updating" formmethod="post">Fetch Oldest Updating 50</button>
+    <button formaction="/admin/latest/fetch_loved" formmethod="post">Fetch Loved 50</button>
   </form>
   <hr />
   <h2>Manga Collection Setup</h2>

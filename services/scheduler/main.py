@@ -19,6 +19,9 @@ def tasks():
     # Fetching the oldest updating 50 manga, per 1 hour
     task("fetch_oldest_updating_50", "latest/fetch_oldest_updating", 60 * 60),
 
+    # Fetching the loved mangas, per 1 day
+    task("fetch_loved_50", "latest/fetch_loved", 60 * 60 * 24),
+
     # Purge the expired user session, per 1 day
     task("purge_expired_session", "user/session/purge", 60 * 60 * 24)
   ]

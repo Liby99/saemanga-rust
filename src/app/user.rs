@@ -70,6 +70,10 @@ impl User {
     &self.register_date_time
   }
 
+  pub fn last_visit_date_time(&self) -> &bson::UtcDateTime {
+    &self.last_visit_date_time
+  }
+
   pub fn visit_count(&self) -> i32 {
     self.visit_count
   }

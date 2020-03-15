@@ -10,6 +10,7 @@ use crate::util::Database;
 use crate::util::Error;
 
 use super::manga_data::MangaData;
+use super::follow::Follow;
 use super::genre::Genre;
 use super::dmk;
 
@@ -299,6 +300,7 @@ impl Manga {
     // Type definition of the database result for deserialization
     #[derive(Deserialize)]
     struct DatabaseResult {
+      #[serde(rename="_id")]
       dmk_id: String
     };
 
@@ -315,6 +317,71 @@ impl Manga {
       }),
       ..Default::default()
     })).map_err(|_| Error::DatabaseError)?.map(|result| match result {
+      Ok(doc) => bson::from_bson::<DatabaseResult>(mongodb::Bson::Document(doc)).map_err(|_| Error::DeserializeError).map(|r| r.dmk_id),
+      Err(_) => Err(Error::DatabaseError)
+    }).filter_map(Result::ok).collect::<Vec<_>>();
+
+    // Turn each dmk_id into a thread handle
+    let handles : Vec<FetchMangaHandle> = dmk_ids.into_iter().map(|dmk_id| {
+      thread::spawn(move || dmk::fetch_manga_data(&dmk_id))
+    }).collect();
+
+    // Join all the handle and upsert them into mongodb
+    Ok(handles.into_iter().filter_map(|handle| {
+      let manga_data = handle.join().ok().and_then(|res| match res {
+        Ok(manga) => Some(manga),
+        Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
+      })?;
+      Self::upsert(conn, &manga_data).ok()
+    }).collect())
+  }
+
+  pub fn fetch_loved(conn: &Database, amount: i64) -> Result<Vec<Self>, Error> {
+    let follow_coll = Follow::coll(&conn);
+
+    // Type definition of the database result for deserialization
+    #[derive(Deserialize)]
+    struct DatabaseResult {
+      dmk_id: String
+    };
+
+    // First get the oldest manga dmk_ids from the database
+    let dmk_ids = follow_coll.aggregate(vec![
+      doc! {
+        "$match": {
+          "is_liked": true
+        }
+      },
+      doc! {
+        "$group": {
+          "dmk_id": "$manga_dmk_id"
+        }
+      },
+      doc! {
+        "$lookup": {
+          "from": "manga",
+          "localField": "_id",
+          "foreignField": "dmk_id",
+          "as": "manga"
+        }
+      },
+      doc! {
+        "$unwind": "$manga"
+      },
+      doc! {
+        "$project": {
+          "manga.update_date_time": 1
+        }
+      },
+      doc! {
+        "$sort": {
+          "manga.update_date_time": 1
+        }
+      },
+      doc! {
+        "$limit": amount
+      }
+    ], None).map_err(|_| Error::DatabaseError)?.map(|result| match result {
       Ok(doc) => bson::from_bson::<DatabaseResult>(mongodb::Bson::Document(doc)).map_err(|_| Error::DeserializeError).map(|r| r.dmk_id),
       Err(_) => Err(Error::DatabaseError)
     }).filter_map(Result::ok).collect::<Vec<_>>();

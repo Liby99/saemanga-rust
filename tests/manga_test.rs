@@ -17,6 +17,8 @@ fn test_parse_dmk_image_url_2() {
   let url = String::from("https://www.cartoonmad.com/home75466/4897/008/002.jpg");
   assert_eq!(
     DmkIdBase::from_dmk_image_url(&url),
-    Ok(DmkIdBase::V09 { dmk_id_home: String::from("home75466") })
+    Ok(DmkIdBase::V09 {
+      dmk_id_home: String::from("home75466")
+    })
   );
 }

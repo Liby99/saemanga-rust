@@ -1,10 +1,10 @@
-use rocket_contrib::templates::Template;
 use rocket::request::Form;
 use rocket::response::Redirect;
+use rocket_contrib::templates::Template;
 
-use crate::util::Database;
-use crate::app::user::User;
 use super::super::AdminUser;
+use crate::app::user::User;
+use crate::util::Database;
 
 #[derive(Serialize)]
 struct PageData<'a> {
@@ -14,7 +14,11 @@ struct PageData<'a> {
 }
 
 #[get("/admin/user/test_password/<id>")]
-pub fn test_password_page(admin: AdminUser, conn: Database, id: String) -> Result<Template, Redirect> {
+pub fn test_password_page(
+  admin: AdminUser,
+  conn: Database,
+  id: String,
+) -> Result<Template, Redirect> {
   match User::get_by_id(&conn, &id) {
     Ok(user) => {
       let data = PageData {
@@ -23,12 +27,12 @@ pub fn test_password_page(admin: AdminUser, conn: Database, id: String) -> Resul
         username: user.username(),
       };
       Ok(Template::render("admin/user/test_password", &data))
-    },
-    Err(err) => Err(err.redirect_to_admin())
+    }
+    Err(err) => Err(err.redirect_to_admin()),
   }
 }
 
-#[get("/admin/user/test_password/<_id>", rank=2)]
+#[get("/admin/user/test_password/<_id>", rank = 2)]
 pub fn test_password_page_fail(_id: String) -> Redirect {
   Redirect::to("/admin/login")
 }
@@ -45,13 +49,20 @@ struct TestPasswordResult {
   passed: bool,
 }
 
-#[post("/admin/user/test_password", data="<data>")]
-pub fn test_password_submit(_user: AdminUser, conn: Database, data: Form<TestPasswordForm>) -> Result<Template, Redirect> {
+#[post("/admin/user/test_password", data = "<data>")]
+pub fn test_password_submit(
+  _user: AdminUser,
+  conn: Database,
+  data: Form<TestPasswordForm>,
+) -> Result<Template, Redirect> {
   match User::get_by_id(&conn, &data.id) {
-    Ok(user) => Ok(Template::render("admin/user/test_password_result", TestPasswordResult {
-      id: data.id.clone(),
-      passed: User::is_password_match(&user, &data.password)
-    })),
-    Err(err) => Err(err.redirect_to_admin())
+    Ok(user) => Ok(Template::render(
+      "admin/user/test_password_result",
+      TestPasswordResult {
+        id: data.id.clone(),
+        passed: User::is_password_match(&user, &data.password),
+      },
+    )),
+    Err(err) => Err(err.redirect_to_admin()),
   }
 }

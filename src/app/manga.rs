@@ -1,18 +1,18 @@
 use std::thread;
 use std::thread::JoinHandle;
 
+use chrono::Utc;
 use mongodb::oid::ObjectId;
 use mongodb::{bson, doc, Document};
-use chrono::Utc;
 
 use crate::util::Collection;
 use crate::util::Database;
 use crate::util::Error;
 
-use super::manga_data::MangaData;
+use super::dmk;
 use super::follow::Follow;
 use super::genre::Genre;
-use super::dmk;
+use super::manga_data::MangaData;
 
 // Typedef
 type FetchMangaHandle = thread::JoinHandle<Result<MangaData, Error>>;
@@ -20,7 +20,7 @@ type FetchMangaHandle = thread::JoinHandle<Result<MangaData, Error>>;
 #[collection("manga")]
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Manga {
-  #[serde(rename="_id")]
+  #[serde(rename = "_id")]
   id: ObjectId,
 
   // Book keeping fields
@@ -40,7 +40,7 @@ impl Manga {
       add_date_time: now,
       update_date_time: now,
       refresh_date_time: now,
-      data: data.clone()
+      data: data.clone(),
     })
   }
 
@@ -69,8 +69,8 @@ impl Manga {
       Some(manga) => Ok(manga),
       None => match dmk::fetch_manga_data(dmk_id) {
         Ok(data) => Self::insert(conn, &data),
-        Err(err) => Err(err)
-      }
+        Err(err) => Err(err),
+      },
     })
   }
 
@@ -80,9 +80,9 @@ impl Manga {
     match coll.insert_one(wrapped.to_doc()?, None) {
       Ok(result) => match result.inserted_id {
         Some(_) => Ok(wrapped),
-        None => Err(Error::MangaExistedError)
+        None => Err(Error::MangaExistedError),
       },
-      Err(_) => Err(Error::DatabaseError)
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 
@@ -94,50 +94,61 @@ impl Manga {
           Self::touch(conn, dmk_id)
         } else {
           let coll = Self::coll(&conn);
-          match coll.find_one_and_update(doc! {
-            "dmk_id": dmk_id
-          }, doc! {
-            "$set": bson::to_bson(&data).map_err(|_| Error::SerializeError)?,
-            "$currentDate": {
-              "refresh_date_time": true,
-              "update_date_time": true,
-            }
-          }, None) {
+          match coll.find_one_and_update(
+            doc! {
+              "dmk_id": dmk_id
+            },
+            doc! {
+              "$set": bson::to_bson(&data).map_err(|_| Error::SerializeError)?,
+              "$currentDate": {
+                "refresh_date_time": true,
+                "update_date_time": true,
+              }
+            },
+            None,
+          ) {
             Ok(result) => match result {
               Some(doc) => Self::from_doc(doc),
-              None => Err(Error::MangaNotFoundError)
+              None => Err(Error::MangaNotFoundError),
             },
-            Err(_) => Err(Error::DatabaseError)
+            Err(_) => Err(Error::DatabaseError),
           }
         }
-      },
-      None => Self::insert(conn, data)
+      }
+      None => Self::insert(conn, data),
     }
   }
 
   pub fn touch(conn: &Database, dmk_id: &String) -> Result<Self, Error> {
     let coll = Self::coll(&conn);
-    match coll.find_one_and_update(doc! {
-      "dmk_id": dmk_id
-    }, doc! {
-      "$currentDate": { "refresh_date_time": true }
-    }, None) {
+    match coll.find_one_and_update(
+      doc! {
+        "dmk_id": dmk_id
+      },
+      doc! {
+        "$currentDate": { "refresh_date_time": true }
+      },
+      None,
+    ) {
       Ok(result) => match result {
         Some(doc) => Self::from_doc(doc),
-        None => Err(Error::MangaNotFoundError)
-      }
-      Err(_) => Err(Error::DatabaseError)
+        None => Err(Error::MangaNotFoundError),
+      },
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 
   pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
-    match coll.create_index(doc! {
-      "dmk_id": 1
-    }, Some(mongodb::coll::options::IndexOptions {
-      unique: Some(true),
-      ..Default::default()
-    })) {
+    match coll.create_index(
+      doc! {
+        "dmk_id": 1
+      },
+      Some(mongodb::coll::options::IndexOptions {
+        unique: Some(true),
+        ..Default::default()
+      }),
+    ) {
       Ok(_) => Ok(()),
       Err(_) => Err(Error::DatabaseError),
     }
@@ -150,50 +161,87 @@ impl Manga {
 
   /// Fetch latest manga of the given genres
   pub fn fetch_latest(conn: &Database, genres: Vec<&'static Genre>) -> Result<Vec<Self>, Error> {
-
     // Ver.4 IDs -> Chunked Parallel Fetch & DB insert
-    let genre_handles: Vec<JoinHandle<Result<Vec<String>, Error>>> = genres.into_iter().map(|genre| {
-      thread::spawn(move || -> Result<Vec<String>, Error> {
-        let ids = match dmk::fetch_latest_manga_with_genre(genre) {
-          Ok(ids) => ids,
-          Err(err) => {
-            println!("[fetch_latest] Error getting genre {}: {}", genre.id, err.msg());
-            return Err(err);
-          }
-        };
-        Ok(ids.into_iter().map(|(dmk_id, _title)| dmk_id).take(10).collect())
-      })
-    }).collect();
-    let dmk_ids: Vec<String> = genre_handles.into_iter().filter_map(|handle| -> Option<Vec<String>> {
-      handle.join().ok().and_then(|res| res.ok())
-    }).flatten().collect();
-    let chunks: Vec<_> = dmk_ids.chunks(20).map(|c| c.to_owned()).collect();
-    Ok(chunks.into_iter().map(|chunked_dmk_ids| -> Vec<Self> {
-      let manga_handles: Vec<JoinHandle<Result<MangaData, Error>>> = chunked_dmk_ids.into_iter().map(|dmk_id: String| {
-        thread::spawn(move || -> Result<MangaData, Error> {
-          match dmk::fetch_manga_data(&dmk_id) {
-            Ok(data) => Ok(data),
+    let genre_handles: Vec<JoinHandle<Result<Vec<String>, Error>>> = genres
+      .into_iter()
+      .map(|genre| {
+        thread::spawn(move || -> Result<Vec<String>, Error> {
+          let ids = match dmk::fetch_latest_manga_with_genre(genre) {
+            Ok(ids) => ids,
             Err(err) => {
-              println!("[fetch_latest] Error when fetching manga {}: {}", dmk_id, err.msg());
-              Err(err)
+              println!(
+                "[fetch_latest] Error getting genre {}: {}",
+                genre.id,
+                err.msg()
+              );
+              return Err(err);
             }
-          }
+          };
+          Ok(
+            ids
+              .into_iter()
+              .map(|(dmk_id, _title)| dmk_id)
+              .take(10)
+              .collect(),
+          )
         })
-      }).collect();
-      manga_handles.into_iter().filter_map(|handle| -> Option<Self> {
-        handle.join().ok().and_then(|res: Result<MangaData, Error>| -> Option<Self> {
-          res.and_then(|data| {
-            match Self::upsert(conn, &data) {
-              Ok(manga) => Ok(manga),
-              Err(err) => {
-                println!("[fetch_latest] Error when inserting manga {}: {}", data.dmk_id(), err.msg());
-                Err(err)
-              }
-            }
-          }).ok()
+      })
+      .collect();
+    let dmk_ids: Vec<String> = genre_handles
+      .into_iter()
+      .filter_map(|handle| -> Option<Vec<String>> { handle.join().ok().and_then(|res| res.ok()) })
+      .flatten()
+      .collect();
+    let chunks: Vec<_> = dmk_ids.chunks(20).map(|c| c.to_owned()).collect();
+    Ok(
+      chunks
+        .into_iter()
+        .map(|chunked_dmk_ids| -> Vec<Self> {
+          let manga_handles: Vec<JoinHandle<Result<MangaData, Error>>> = chunked_dmk_ids
+            .into_iter()
+            .map(|dmk_id: String| {
+              thread::spawn(move || -> Result<MangaData, Error> {
+                match dmk::fetch_manga_data(&dmk_id) {
+                  Ok(data) => Ok(data),
+                  Err(err) => {
+                    println!(
+                      "[fetch_latest] Error when fetching manga {}: {}",
+                      dmk_id,
+                      err.msg()
+                    );
+                    Err(err)
+                  }
+                }
+              })
+            })
+            .collect();
+          manga_handles
+            .into_iter()
+            .filter_map(|handle| -> Option<Self> {
+              handle
+                .join()
+                .ok()
+                .and_then(|res: Result<MangaData, Error>| -> Option<Self> {
+                  res
+                    .and_then(|data| match Self::upsert(conn, &data) {
+                      Ok(manga) => Ok(manga),
+                      Err(err) => {
+                        println!(
+                          "[fetch_latest] Error when inserting manga {}: {}",
+                          data.dmk_id(),
+                          err.msg()
+                        );
+                        Err(err)
+                      }
+                    })
+                    .ok()
+                })
+            })
+            .collect()
         })
-      }).collect()
-    }).flatten().collect())
+        .flatten()
+        .collect(),
+    )
   }
 
   /// Fetch the latest manga of all the other genres
@@ -208,29 +256,41 @@ impl Manga {
 
   pub fn fetch_ended(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
-    let ids : Vec<(String, String)> = dmk::fetch_ended()?;
-    for chunk in ids.chunks(20) { // A single chunk has size of 20
+    let ids: Vec<(String, String)> = dmk::fetch_ended()?;
+    for chunk in ids.chunks(20) {
+      // A single chunk has size of 20
 
       // Handles getting the information of each manga of the chunk
-      let handles : Vec<FetchMangaHandle> = chunk.to_owned().into_iter().map(|manga| {
-        thread::spawn(move || dmk::fetch_manga_data(&manga.0))
-      }).collect();
+      let handles: Vec<FetchMangaHandle> = chunk
+        .to_owned()
+        .into_iter()
+        .map(|manga| thread::spawn(move || dmk::fetch_manga_data(&manga.0)))
+        .collect();
 
       // Join all the handles and transform the manga into Documents
-      let mangas : Vec<Document> = handles.into_iter().filter_map(|handle| {
-        handle.join().ok().and_then(|res| match res {
-          Ok(manga_data) => {
-            match Self::new(&manga_data).and_then(|manga| Self::to_doc(&manga)) {
+      let mangas: Vec<Document> = handles
+        .into_iter()
+        .filter_map(|handle| {
+          handle.join().ok().and_then(|res| match res {
+            Ok(manga_data) => match Self::new(&manga_data).and_then(|manga| Self::to_doc(&manga)) {
               Ok(manga_doc) => Some(manga_doc),
               Err(err) => {
-                println!("Error {}: {} when fetching {}", err.code(), err.msg(), manga_data.dmk_id());
-                return None
+                println!(
+                  "Error {}: {} when fetching {}",
+                  err.code(),
+                  err.msg(),
+                  manga_data.dmk_id()
+                );
+                return None;
               }
+            },
+            Err(err) => {
+              println!("Error {}: {}", err.code(), err.msg());
+              None
             }
-          },
-          Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
+          })
         })
-      }).collect();
+        .collect();
 
       // Add all the mangas in this chunk
       match coll.insert_many(mangas, None) {
@@ -250,39 +310,58 @@ impl Manga {
     // Type definition of the database result for deserialization
     #[derive(Deserialize)]
     struct DatabaseResult {
-      dmk_id: String
+      dmk_id: String,
     };
 
     // First get the oldest manga dmk_ids from the database
-    let dmk_ids = coll.find(Some(doc! {
-      "status": "updating",
-    }), Some(mongodb::coll::options::FindOptions {
-      sort: Some(doc! {
-        "refresh_date_time": 1,
-      }),
-      limit: Some(amount),
-      projection: Some(doc! {
-        "dmk_id": 1,
-      }),
-      ..Default::default()
-    })).map_err(|_| Error::DatabaseError)?.map(|result| match result {
-      Ok(doc) => bson::from_bson::<DatabaseResult>(mongodb::Bson::Document(doc)).map_err(|_| Error::DeserializeError).map(|r| r.dmk_id),
-      Err(_) => Err(Error::DatabaseError)
-    }).filter_map(Result::ok).collect::<Vec<_>>();
+    let dmk_ids = coll
+      .find(
+        Some(doc! {
+          "status": "updating",
+        }),
+        Some(mongodb::coll::options::FindOptions {
+          sort: Some(doc! {
+            "refresh_date_time": 1,
+          }),
+          limit: Some(amount),
+          projection: Some(doc! {
+            "dmk_id": 1,
+          }),
+          ..Default::default()
+        }),
+      )
+      .map_err(|_| Error::DatabaseError)?
+      .map(|result| match result {
+        Ok(doc) => bson::from_bson::<DatabaseResult>(mongodb::Bson::Document(doc))
+          .map_err(|_| Error::DeserializeError)
+          .map(|r| r.dmk_id),
+        Err(_) => Err(Error::DatabaseError),
+      })
+      .filter_map(Result::ok)
+      .collect::<Vec<_>>();
 
     // Turn each dmk_id into a thread handle
-    let handles : Vec<FetchMangaHandle> = dmk_ids.into_iter().map(|dmk_id| {
-      thread::spawn(move || dmk::fetch_manga_data(&dmk_id))
-    }).collect();
+    let handles: Vec<FetchMangaHandle> = dmk_ids
+      .into_iter()
+      .map(|dmk_id| thread::spawn(move || dmk::fetch_manga_data(&dmk_id)))
+      .collect();
 
     // Join all the handle and upsert them into mongodb
-    Ok(handles.into_iter().filter_map(|handle| {
-      let manga_data = handle.join().ok().and_then(|res| match res {
-        Ok(manga) => Some(manga),
-        Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
-      })?;
-      Self::upsert(conn, &manga_data).ok()
-    }).collect())
+    Ok(
+      handles
+        .into_iter()
+        .filter_map(|handle| {
+          let manga_data = handle.join().ok().and_then(|res| match res {
+            Ok(manga) => Some(manga),
+            Err(err) => {
+              println!("Error {}: {}", err.code(), err.msg());
+              None
+            }
+          })?;
+          Self::upsert(conn, &manga_data).ok()
+        })
+        .collect(),
+    )
   }
 
   pub fn fetch_loved(conn: &Database, amount: i64) -> Result<Vec<Self>, Error> {
@@ -291,92 +370,119 @@ impl Manga {
     // Type definition of the database result for deserialization
     #[derive(Deserialize)]
     struct DatabaseResult {
-      #[serde(rename="_id")]
-      dmk_id: String
+      #[serde(rename = "_id")]
+      dmk_id: String,
     };
 
     // First get the oldest manga dmk_ids from the database
-    let dmk_ids = follow_coll.aggregate(vec![
-      doc! {
-        "$match": {
-          "is_liked": true
-        }
-      },
-      doc! {
-        "$group": {
-          "_id": "$manga_dmk_id"
-        }
-      },
-      doc! {
-        "$lookup": {
-          "from": "manga",
-          "localField": "_id",
-          "foreignField": "dmk_id",
-          "as": "manga"
-        }
-      },
-      doc! {
-        "$unwind": "$manga"
-      },
-      doc! {
-        "$match": {
-          "manga.status": "updating"
-        }
-      },
-      doc! {
-        "$sort": {
-          "manga.refresh_date_time": 1
-        }
-      },
-      doc! {
-        "$limit": amount
-      },
-      doc! {
-        "$project": {
-          "manga": 0
-        }
-      }
-    ], None).map_err(|err| {
-      println!("[Fetch Loved] Aggregation error: {:?}", err);
-      Error::DatabaseError
-    })?.map(|result| match result {
-      Ok(doc) => bson::from_bson::<DatabaseResult>(mongodb::Bson::Document(doc)).map_err(|_| Error::DeserializeError).map(|r| r.dmk_id),
-      Err(_) => Err(Error::DatabaseError)
-    }).filter_map(Result::ok).collect::<Vec<_>>();
+    let dmk_ids = follow_coll
+      .aggregate(
+        vec![
+          doc! {
+            "$match": {
+              "is_liked": true
+            }
+          },
+          doc! {
+            "$group": {
+              "_id": "$manga_dmk_id"
+            }
+          },
+          doc! {
+            "$lookup": {
+              "from": "manga",
+              "localField": "_id",
+              "foreignField": "dmk_id",
+              "as": "manga"
+            }
+          },
+          doc! {
+            "$unwind": "$manga"
+          },
+          doc! {
+            "$match": {
+              "manga.status": "updating"
+            }
+          },
+          doc! {
+            "$sort": {
+              "manga.refresh_date_time": 1
+            }
+          },
+          doc! {
+            "$limit": amount
+          },
+          doc! {
+            "$project": {
+              "manga": 0
+            }
+          },
+        ],
+        None,
+      )
+      .map_err(|err| {
+        println!("[Fetch Loved] Aggregation error: {:?}", err);
+        Error::DatabaseError
+      })?
+      .map(|result| match result {
+        Ok(doc) => bson::from_bson::<DatabaseResult>(mongodb::Bson::Document(doc))
+          .map_err(|_| Error::DeserializeError)
+          .map(|r| r.dmk_id),
+        Err(_) => Err(Error::DatabaseError),
+      })
+      .filter_map(Result::ok)
+      .collect::<Vec<_>>();
 
     // Turn each dmk_id into a thread handle
-    let handles : Vec<FetchMangaHandle> = dmk_ids.into_iter().map(|dmk_id| {
-      thread::spawn(move || dmk::fetch_manga_data(&dmk_id))
-    }).collect();
+    let handles: Vec<FetchMangaHandle> = dmk_ids
+      .into_iter()
+      .map(|dmk_id| thread::spawn(move || dmk::fetch_manga_data(&dmk_id)))
+      .collect();
 
     // Join all the handle and upsert them into mongodb
-    Ok(handles.into_iter().filter_map(|handle| {
-      let manga_data = handle.join().ok().and_then(|res| match res {
-        Ok(manga) => Some(manga),
-        Err(err) => { println!("Error {}: {}", err.code(), err.msg()); None }
-      })?;
-      Self::upsert(conn, &manga_data).ok()
-    }).collect())
+    Ok(
+      handles
+        .into_iter()
+        .filter_map(|handle| {
+          let manga_data = handle.join().ok().and_then(|res| match res {
+            Ok(manga) => Some(manga),
+            Err(err) => {
+              println!("Error {}: {}", err.code(), err.msg());
+              None
+            }
+          })?;
+          Self::upsert(conn, &manga_data).ok()
+        })
+        .collect(),
+    )
   }
 
   pub fn get_latest_10(conn: &Database, genre: Option<&'static Genre>) -> Result<Vec<Self>, Error> {
-    Self::get(conn, match genre {
-      Some(genre) => Some(doc!{ "genre": genre.id }),
-      None => None,
-    }, Some(mongodb::coll::options::FindOptions {
-      sort: Some(doc! {
-        "update_date_time": -1,
+    Self::get(
+      conn,
+      match genre {
+        Some(genre) => Some(doc! { "genre": genre.id }),
+        None => None,
+      },
+      Some(mongodb::coll::options::FindOptions {
+        sort: Some(doc! {
+          "update_date_time": -1,
+        }),
+        limit: Some(10),
+        ..Default::default()
       }),
-      limit: Some(10),
-      ..Default::default()
-    }))
+    )
   }
 
   pub fn search(conn: &Database, text: &String) -> Result<Vec<Self>, Error> {
-    Self::get(conn, Some(doc! {
-      "title": {
-        "$regex": format!(".*{}.*", text)
-      }
-    }), None)
+    Self::get(
+      conn,
+      Some(doc! {
+        "title": {
+          "$regex": format!(".*{}.*", text)
+        }
+      }),
+      None,
+    )
   }
 }

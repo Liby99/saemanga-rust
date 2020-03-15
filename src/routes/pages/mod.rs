@@ -1,18 +1,18 @@
+use rocket::request::{self, FromRequest, Request};
 use rocket::Outcome;
-use rocket::request::{self, Request, FromRequest};
-use rocket::{Route, Catcher};
+use rocket::{Catcher, Route};
 
+use crate::app::session::Session;
+use crate::app::user::User;
+use crate::app::user_setting::UserSetting;
 use crate::util::Database;
 use crate::util::Error;
-use crate::app::user::User;
-use crate::app::session::Session;
-use crate::app::user_setting::UserSetting;
 
+mod admin;
+mod error;
 mod index;
 mod manga;
-mod error;
 mod user;
-mod admin;
 
 impl<'a, 'r> FromRequest<'a, 'r> for &'a User {
   type Error = Error;
@@ -25,7 +25,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for &'a User {
     });
     match user_result {
       Some(user) => Outcome::Success(&user),
-      None => Outcome::Forward(())
+      None => Outcome::Forward(()),
     }
   }
 }
@@ -45,7 +45,8 @@ pub fn routes() -> Vec<Route> {
     error::routes(),
     user::routes(),
     admin::routes(),
-  ].concat()
+  ]
+  .concat()
 }
 
 pub fn catchers() -> Vec<Catcher> {

@@ -1,13 +1,13 @@
-mod database;
-mod template;
-mod static_files;
 mod collection;
-mod error;
 mod cookie_value;
+mod database;
+mod error;
+mod static_files;
+mod template;
 
-pub use database::{database, Database};
-pub use template::template;
-pub use static_files::static_files;
-pub use error::Error;
 pub use self::collection::Collection;
 pub use self::cookie_value::CookieValue;
+pub use database::{database, Database};
+pub use error::Error;
+pub use static_files::static_files;
+pub use template::template;

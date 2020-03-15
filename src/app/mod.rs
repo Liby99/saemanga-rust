@@ -1,9 +1,9 @@
-pub mod genre;
 pub mod dmk;
-pub mod manga_data;
-pub mod manga;
 pub mod follow;
-pub mod user_setting;
+pub mod genre;
+pub mod manga;
+pub mod manga_data;
 pub mod session;
-pub mod user;
 pub mod temp_password;
+pub mod user;
+pub mod user_setting;

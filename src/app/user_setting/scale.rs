@@ -14,7 +14,7 @@ impl Scale {
 impl CookieValue for Scale {
   type Data = Self;
 
-  const KEY : &'static str = "scale";
+  const KEY: &'static str = "scale";
 
   fn from_str(s: &str) -> Result<Self::Data, Error> {
     match s.parse::<f32>() {

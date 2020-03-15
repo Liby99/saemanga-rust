@@ -1,11 +1,11 @@
 use rocket::Route;
 
+mod change_password;
 mod create;
 mod remove;
-mod change_password;
-mod test_password;
-mod setup;
 mod session;
+mod setup;
+mod test_password;
 
 pub fn routes() -> Vec<Route> {
   routes![

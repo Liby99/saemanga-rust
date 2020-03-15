@@ -1,7 +1,7 @@
+use chrono::Utc;
 use mongodb::oid::ObjectId;
 use mongodb::{bson, doc};
 use rocket::http::{Cookie, Cookies};
-use chrono::Utc;
 use time::{self, Duration};
 
 use super::user::User;
@@ -12,7 +12,7 @@ use crate::util::Error;
 #[collection("session")]
 #[derive(Serialize, Deserialize)]
 pub struct Session {
-  #[serde(rename="_id")]
+  #[serde(rename = "_id")]
   session_id: mongodb::oid::ObjectId,
   user_id: mongodb::oid::ObjectId,
   start_date_time: bson::UtcDateTime,
@@ -61,8 +61,8 @@ impl Session {
       Some(session_id) => {
         cookies.remove(Cookie::named(Self::key()));
         Self::remove(conn, &session_id)
-      },
-      None => Err(Error::NoSession)
+      }
+      None => Err(Error::NoSession),
     }
   }
 
@@ -88,11 +88,20 @@ impl Session {
   }
 
   pub fn get_by_session_id(conn: &Database, session_id: &String) -> Result<Self, Error> {
-    Self::get_one(conn, Some(doc! {
-      "_id": ObjectId::with_string(session_id.as_str()).map_err(|_| Error::CannotParseObjectId)?
-    }), None).and_then(|res| {
+    Self::get_one(
+      conn,
+      Some(doc! {
+        "_id": ObjectId::with_string(session_id.as_str()).map_err(|_| Error::CannotParseObjectId)?
+      }),
+      None,
+    )
+    .and_then(|res| {
       res.ok_or(Error::SessionNotFound).and_then(|session| {
-        if session.expired() { Err(Error::SessionExpired) } else { Ok(session) }
+        if session.expired() {
+          Err(Error::SessionExpired)
+        } else {
+          Ok(session)
+        }
       })
     })
   }
@@ -100,17 +109,25 @@ impl Session {
   pub fn get_by_session_id_and_touch(conn: &Database, session_id: &String) -> Result<Self, Error> {
     let coll = Self::coll(conn);
     let expire = bson::UtcDateTime::from(Utc::now() + Duration::days(30));
-    match coll.find_one_and_update(doc! {
-      "_id": ObjectId::with_string(session_id.as_str()).map_err(|_| Error::CannotParseObjectId)?
-    }, doc! {
-      "$currentDate": { "last_login_date_time": true },
-      "$set": { "expire_date_time": bson::to_bson(&expire).map_err(|_| Error::SerializeError)? }
-    }, None) {
+    match coll.find_one_and_update(
+      doc! {
+        "_id": ObjectId::with_string(session_id.as_str()).map_err(|_| Error::CannotParseObjectId)?
+      },
+      doc! {
+        "$currentDate": { "last_login_date_time": true },
+        "$set": { "expire_date_time": bson::to_bson(&expire).map_err(|_| Error::SerializeError)? }
+      },
+      None,
+    ) {
       Ok(result) => match result {
         Some(doc) => {
           let session = Self::from_doc(doc)?;
-          if session.expired() { Err(Error::SessionExpired) } else { Ok(session) }
-        },
+          if session.expired() {
+            Err(Error::SessionExpired)
+          } else {
+            Ok(session)
+          }
+        }
         None => Err(Error::SessionNotFound),
       },
       Err(_) => Err(Error::DatabaseError),
@@ -122,33 +139,39 @@ impl Session {
     let session = Self::new(user)?;
     match coll.insert_one(session.to_doc()?, None) {
       Ok(_) => Ok(session),
-      Err(_) => Err(Error::DatabaseError)
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 
   pub fn remove(conn: &Database, session_id: &String) -> Result<(), Error> {
     let coll = Self::coll(&conn);
-    match coll.delete_one(doc! {
-      "_id": ObjectId::with_string(session_id.as_str()).map_err(|_| Error::CannotParseObjectId)?
-    }, None) {
+    match coll.delete_one(
+      doc! {
+        "_id": ObjectId::with_string(session_id.as_str()).map_err(|_| Error::CannotParseObjectId)?
+      },
+      None,
+    ) {
       Ok(result) => match result.deleted_count {
         1 => Ok(()),
-        _ => Err(Error::SessionNotFound)
+        _ => Err(Error::SessionNotFound),
       },
-      Err(_) => Err(Error::DatabaseError)
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 
   pub fn purge_expired(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
     let now = bson::UtcDateTime::from(Utc::now());
-    match coll.delete_many(doc! {
-      "expire_date_time": {
-        "$lt": bson::to_bson(&now).map_err(|_| Error::SerializeError)?
-      }
-    }, None) {
+    match coll.delete_many(
+      doc! {
+        "expire_date_time": {
+          "$lt": bson::to_bson(&now).map_err(|_| Error::SerializeError)?
+        }
+      },
+      None,
+    ) {
       Ok(_) => Ok(()),
-      Err(_) => Err(Error::DatabaseError)
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 }

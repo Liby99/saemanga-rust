@@ -1,9 +1,9 @@
+use mongodb::{bson, doc, Bson};
 use saemanga;
 use saemanga::app::dmk;
+use saemanga::app::manga::*;
 use saemanga::app::manga_data::*;
 use saemanga::app::user::*;
-use saemanga::app::manga::*;
-use mongodb::{Bson, bson, doc};
 
 #[test]
 fn dmk_id_base_deser_test() {
@@ -17,9 +17,9 @@ fn dmk_id_base_deser_test() {
 
 #[test]
 fn dmk_id_base_ser_test() {
-  let dib : DmkIdBase = DmkIdBase::V10 {
+  let dib: DmkIdBase = DmkIdBase::V10 {
     dmk_id_web: String::from("web3"),
-    dmk_id_home: String::from("home19534")
+    dmk_id_home: String::from("home19534"),
   };
   let bs = bson::to_bson(&dib);
   println!("{:?}", bs);
@@ -80,7 +80,7 @@ fn user_ser_test() {
   let user_res = User::new(&username, &password);
   match user_res {
     Ok(user) => println!("{:?}", bson::to_bson(&user)),
-    Err(err) => println!("User Construction Error: {:?}", err)
+    Err(err) => println!("User Construction Error: {:?}", err),
   }
 }
 
@@ -90,10 +90,10 @@ fn manga_wrapper_ser_test() {
     Ok(manga) => match Manga::new(&manga) {
       Ok(wrapped) => match bson::to_bson(&wrapped) {
         Ok(doc) => println!("Serialized: {:?}", doc),
-        Err(err) => println!("Unable to serialize: {:?}", err)
+        Err(err) => println!("Unable to serialize: {:?}", err),
       },
-      Err(err) => println!("Manga wrapping error: {:?}", err)
+      Err(err) => println!("Manga wrapping error: {:?}", err),
     },
-    Err(err) => println!("Fetch manga 1234 failed: {:?}", err)
+    Err(err) => println!("Fetch manga 1234 failed: {:?}", err),
   }
 }

@@ -1,14 +1,14 @@
-use rocket::http::{Cookies};
+use rocket::http::Cookies;
 
 use crate::util::CookieValue;
 
-mod light_mode;
 mod hand_mode;
+mod light_mode;
 mod liked_only_mode;
 mod scale;
 
-pub use light_mode::LightMode;
 pub use hand_mode::HandMode;
+pub use light_mode::LightMode;
 pub use liked_only_mode::LikedOnlyMode;
 pub use scale::Scale;
 
@@ -26,7 +26,7 @@ impl UserSetting {
       light_mode: LightMode::from_cookies(cookies),
       hand_mode: HandMode::from_cookies(cookies),
       liked_only_mode: LikedOnlyMode::from_cookies(cookies),
-      scale: Scale::from_cookies(cookies)
+      scale: Scale::from_cookies(cookies),
     }
   }
 }

@@ -1,19 +1,19 @@
-use rocket::Route;
+use rocket::http::Status;
+use rocket::request::{self, FromRequest, Request};
 use rocket::response::Redirect;
 use rocket::Outcome;
-use rocket::http::Status;
-use rocket::request::{self, Request, FromRequest};
+use rocket::Route;
 
-use crate::util::Error;
 use crate::app::user::User;
+use crate::util::Error;
 
-mod index;
-mod login;
 mod error;
-mod user;
-mod manga;
-mod latest;
 mod follow;
+mod index;
+mod latest;
+mod login;
+mod manga;
+mod user;
 
 pub struct AdminUser<'a>(&'a User);
 
@@ -54,5 +54,6 @@ pub fn routes() -> Vec<Route> {
     manga::routes(),
     latest::routes(),
     follow::routes(),
-  ].concat()
+  ]
+  .concat()
 }

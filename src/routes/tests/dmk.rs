@@ -1,24 +1,19 @@
+use lazy_static::lazy_static;
 use rocket::Route;
 use rocket_contrib::templates::Template;
-use lazy_static::lazy_static;
-use scraper::{Selector, Html};
+use scraper::{Html, Selector};
 
 pub fn routes() -> Vec<Route> {
-  routes![
-    fetch_google,
-    fetch_dmk_home,
-    foster_parenting,
-  ]
+  routes![fetch_google, fetch_dmk_home, foster_parenting,]
 }
 
 #[derive(Serialize)]
 struct FetchGoogleTemplateData<'a> {
-  text: &'a str
+  text: &'a str,
 }
 
 #[get("/tests/dmk/fetch_google")]
 fn fetch_google() -> Template {
-
   // First fetch google and get html text string
   let url = "https://google.com";
   let mut response = reqwest::get(url).unwrap();
@@ -29,25 +24,26 @@ fn fetch_google() -> Template {
 
   // Use selector to get some element
   lazy_static! {
-    static ref BODY_SEL : Selector = Selector::parse("body").unwrap();
+    static ref BODY_SEL: Selector = Selector::parse("body").unwrap();
   }
   let body = document.select(&BODY_SEL).next().unwrap();
 
   lazy_static! {
-    static ref LOGO_SEL : Selector = Selector::parse("#hplogo").unwrap();
+    static ref LOGO_SEL: Selector = Selector::parse("#hplogo").unwrap();
   }
   let logo = body.select(&LOGO_SEL).next().unwrap();
   let logo_src = logo.value().attr("src").unwrap();
 
   // Render the template
-  Template::render("tests/dmk/fetch_google", FetchGoogleTemplateData {
-    text: logo_src
-  })
+  Template::render(
+    "tests/dmk/fetch_google",
+    FetchGoogleTemplateData { text: logo_src },
+  )
 }
 
 #[derive(Serialize)]
 struct FetchDmkHomeTemplateData<'a> {
-  text: &'a String
+  text: &'a String,
 }
 
 #[get("/tests/dmk/fetch_dmk_home")]
@@ -62,9 +58,12 @@ fn fetch_dmk_home() -> Template {
   let _document = Html::parse_document(&complete_html_text);
 
   // Render the template
-  Template::render("tests/dmk/fetch_dmk_home", FetchDmkHomeTemplateData {
-    text: &complete_html_text
-  })
+  Template::render(
+    "tests/dmk/fetch_dmk_home",
+    FetchDmkHomeTemplateData {
+      text: &complete_html_text,
+    },
+  )
 }
 
 #[get("/tests/dmk/foster_parenting")]

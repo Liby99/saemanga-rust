@@ -1,8 +1,14 @@
+use handlebars::{Context, Handlebars, Helper, HelperResult, JsonRender, Output, RenderContext};
 use rocket::fairing::Fairing;
-use rocket_contrib::templates::{Template, handlebars};
-use handlebars::{Helper, Handlebars, Context, RenderContext, Output, HelperResult, JsonRender};
+use rocket_contrib::templates::{handlebars, Template};
 
-fn concatenate_helper(h: &Helper, _: &Handlebars, _: &Context, _: &mut RenderContext, out: &mut dyn Output) -> HelperResult {
+fn concatenate_helper(
+  h: &Helper,
+  _: &Handlebars,
+  _: &Context,
+  _: &mut RenderContext,
+  out: &mut dyn Output,
+) -> HelperResult {
   for param in h.params() {
     out.write(&param.value().render())?;
   }
@@ -11,6 +17,8 @@ fn concatenate_helper(h: &Helper, _: &Handlebars, _: &Context, _: &mut RenderCon
 
 pub fn template() -> impl Fairing {
   Template::custom(|engines| {
-    engines.handlebars.register_helper("concat", Box::new(concatenate_helper));
+    engines
+      .handlebars
+      .register_helper("concat", Box::new(concatenate_helper));
   })
 }

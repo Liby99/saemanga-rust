@@ -1,6 +1,6 @@
-use rocket::fairing::Fairing;
-use mongodb::{ThreadedClient};
 use mongodb::db::ThreadedDatabase;
+use mongodb::ThreadedClient;
+use rocket::fairing::Fairing;
 
 #[database("mongodb")]
 pub struct Database(mongodb::db::Database);

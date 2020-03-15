@@ -5,7 +5,7 @@ use super::Error;
 pub trait CookieValue {
   type Data;
 
-  const KEY : &'static str;
+  const KEY: &'static str;
 
   // FromStr
   fn from_str(s: &str) -> Result<Self::Data, Error>;

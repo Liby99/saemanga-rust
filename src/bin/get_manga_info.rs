@@ -13,11 +13,11 @@ fn main() {
       Ok(manga_data) => match Manga::new(&manga_data) {
         Ok(manga) => match serde_json::to_string(&manga) {
           Ok(json_str) => println!("{}", json_str),
-          Err(err) => println!("{:?}", err)
+          Err(err) => println!("{:?}", err),
         },
-        Err(err) => println!("{:?}", err)
+        Err(err) => println!("{:?}", err),
       },
-      Err(err) => println!("{:?}", err)
+      Err(err) => println!("{:?}", err),
     }
   }
 }

@@ -1,8 +1,8 @@
-use rocket::{Route, Catcher};
 use rocket::response::Redirect;
+use rocket::{Catcher, Route};
 
-mod pages;
 mod ajax;
+mod pages;
 
 #[cfg(debug_assertions)]
 mod tests;
@@ -16,13 +16,15 @@ pub fn routes() -> Vec<Route> {
   [
     // Root route
     routes![root],
-
     // Basic routes
     pages::routes(),
     ajax::routes(),
-
-    #[cfg(debug_assertions)] { tests::routes() },
-  ].concat()
+    #[cfg(debug_assertions)]
+    {
+      tests::routes()
+    },
+  ]
+  .concat()
 }
 
 pub fn catchers() -> Vec<Catcher> {

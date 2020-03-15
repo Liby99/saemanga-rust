@@ -2,8 +2,8 @@ use rocket::Route;
 
 mod index;
 mod manga;
-mod user;
 mod setting;
+mod user;
 
 pub fn routes() -> Vec<Route> {
   [
@@ -11,5 +11,6 @@ pub fn routes() -> Vec<Route> {
     manga::routes(),
     user::routes(),
     setting::routes(),
-  ].concat()
+  ]
+  .concat()
 }

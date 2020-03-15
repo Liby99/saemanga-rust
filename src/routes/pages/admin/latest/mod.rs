@@ -1,10 +1,10 @@
 use rocket::Route;
 
-mod fetch_overall;
-mod fetch_genres;
 mod fetch_ended;
-mod fetch_oldest_updating;
+mod fetch_genres;
 mod fetch_loved;
+mod fetch_oldest_updating;
+mod fetch_overall;
 
 pub fn routes() -> Vec<Route> {
   routes![

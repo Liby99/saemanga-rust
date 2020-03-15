@@ -1,10 +1,10 @@
-use rocket::Route;
 use rocket::http::Cookies;
+use rocket::Route;
 use rocket_contrib::json::Json;
 
-use crate::util::Database;
 use crate::app::temp_password::TEMP_PASSWORD;
 use crate::app::user::User;
+use crate::util::Database;
 
 pub fn routes() -> Vec<Route> {
   routes![
@@ -25,10 +25,10 @@ fn can_migrate_route(conn: Database, cookies: Cookies) -> Json<CanMigrateRespons
         let username = cookie.value();
         match User::get_by_username(&conn, &String::from(username)) {
           Ok(user) => user.is_password_match(&String::from(TEMP_PASSWORD)),
-          Err(_) => false
+          Err(_) => false,
         }
-      },
-      None => false
-    }
+      }
+      None => false,
+    },
   })
 }

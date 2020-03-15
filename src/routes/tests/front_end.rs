@@ -12,8 +12,5 @@ fn ctrl_add() -> Template {
 }
 
 pub fn routes() -> Vec<Route> {
-  routes![
-    ctrl_rm,
-    ctrl_add,
-  ]
+  routes![ctrl_rm, ctrl_add,]
 }

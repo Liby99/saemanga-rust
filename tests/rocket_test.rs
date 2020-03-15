@@ -1,16 +1,19 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-#[macro_use] extern crate rocket;
-#[macro_use] extern crate rocket_contrib;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate rocket;
+#[macro_use]
+extern crate rocket_contrib;
+#[macro_use]
+extern crate serde_derive;
 
-use rocket::response::Redirect;
-use rocket::http::{Cookies, Cookie};
-use rocket_contrib::templates::{Template};
-use rocket_contrib::databases::mongodb;
-use mongodb::{bson, doc};
-use mongodb::{ThreadedClient};
 use mongodb::db::ThreadedDatabase;
+use mongodb::ThreadedClient;
+use mongodb::{bson, doc};
+use rocket::http::{Cookie, Cookies};
+use rocket::response::Redirect;
+use rocket_contrib::databases::mongodb;
+use rocket_contrib::templates::Template;
 
 use saemanga::app::user_setting::UserSetting;
 
@@ -30,9 +33,7 @@ struct IndexTemplateContext {
 #[get("/")]
 fn index(cookies: Cookies) -> Template {
   println!("{:?}", UserSetting::from_cookies(&cookies));
-  Template::render("index", &IndexTemplateContext {
-    name: "Liby"
-  })
+  Template::render("index", &IndexTemplateContext { name: "Liby" })
 }
 
 #[get("/")]
@@ -45,25 +46,33 @@ fn db_fetch_test(conn: SaemangaDatabase) -> &'static str {
   let client = &conn.client;
   let db = client.db("saemanga");
   let coll = db.collection("test");
-  let mut cursor = coll.find(Some(doc!{}), None).ok().expect("Failed to execute find.");
+  let mut cursor = coll
+    .find(Some(doc! {}), None)
+    .ok()
+    .expect("Failed to execute find.");
   let item = cursor.next();
   match item {
     Some(Ok(doc)) => {
       println!("{:?}", doc);
       "Get!"
-    },
-    _ => "Uh..."
+    }
+    _ => "Uh...",
   }
 }
 
 #[get("/db-insert")]
 fn db_insert_test(conn: SaemangaDatabase) -> String {
   let coll = &conn.client.db("saemanga").collection("test");
-  coll.insert_one(doc! {
-    "a": 1,
-    "b": 3.0,
-    "name": "Liby"
-  }, None).unwrap();
+  coll
+    .insert_one(
+      doc! {
+        "a": 1,
+        "b": 3.0,
+        "name": "Liby"
+      },
+      None,
+    )
+    .unwrap();
   String::from("Inserted...?")
 }
 
@@ -77,7 +86,7 @@ fn set_cookie_zero(mut cookies: Cookies) -> String {
 fn get_counter(cookies: Cookies) -> String {
   match cookies.get("counter") {
     Some(c) => format!("Current counter is {}", c.value()),
-    None => String::from("Cookie counter not found")
+    None => String::from("Cookie counter not found"),
   }
 }
 
@@ -89,15 +98,22 @@ fn cookie_add_one(mut cookies: Cookies) -> String {
       match v.parse::<i32>() {
         Ok(old_int_value) => {
           let new_int_value: i32 = old_int_value + 1;
-          cookies.add(Cookie::build("counter", new_int_value.to_string()).path("/").finish());
-          format!("Incrementing counter {} to {}", old_int_value, new_int_value)
-        },
+          cookies.add(
+            Cookie::build("counter", new_int_value.to_string())
+              .path("/")
+              .finish(),
+          );
+          format!(
+            "Incrementing counter {} to {}",
+            old_int_value, new_int_value
+          )
+        }
         _ => {
           cookies.add(Cookie::new("counter", "1"));
           format!("Invalid counter {}. Setting it to 1", v)
         }
       }
-    },
+    }
     _ => {
       cookies.add(Cookie::build("counter", "1").path("/").finish());
       format!("Counter not found. Setting it to 1")
@@ -113,13 +129,16 @@ fn rocket_test() {
     .attach(SaemangaDatabase::fairing())
     .mount("/", routes![root])
     .mount("/index", routes![index])
-    .mount("/test", routes![
-      db_fetch_test,
-      db_insert_test,
-      get_counter,
-      set_cookie_zero,
-      cookie_add_one
-    ])
+    .mount(
+      "/test",
+      routes![
+        db_fetch_test,
+        db_insert_test,
+        get_counter,
+        set_cookie_zero,
+        cookie_add_one
+      ],
+    )
     .mount("/hello-world", routes![hello_world])
     .launch();
 }

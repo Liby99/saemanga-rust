@@ -1,10 +1,10 @@
-use lazy_static::lazy_static;
-use regex::Regex;
-use mongodb::oid::ObjectId;
-use mongodb::{bson, doc};
+use chrono::Utc;
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
-use chrono::Utc;
+use lazy_static::lazy_static;
+use mongodb::oid::ObjectId;
+use mongodb::{bson, doc};
+use regex::Regex;
 
 use crate::util::Collection;
 use crate::util::Database;
@@ -19,7 +19,7 @@ pub fn encrypt_password(password: &String) -> String {
 #[collection("user")]
 #[derive(Serialize, Deserialize)]
 pub struct User {
-  #[serde(rename="_id")]
+  #[serde(rename = "_id")]
   id: ObjectId,
   display_name: String,
   username: String,
@@ -83,12 +83,16 @@ impl User {
   }
 
   pub fn is_valid_username(username: &String) -> bool {
-    lazy_static!{ static ref USERNAME_REG : Regex = Regex::new(r"^[A-Za-z0-9\-_\[\]]{4,16}$").unwrap(); }
+    lazy_static! {
+      static ref USERNAME_REG: Regex = Regex::new(r"^[A-Za-z0-9\-_\[\]]{4,16}$").unwrap();
+    }
     USERNAME_REG.is_match(&username.as_str())
   }
 
   pub fn is_valid_password(password: &String) -> bool {
-    lazy_static!{ static ref PASSWORD_REG : Regex = Regex::new(r"^[A-Za-z0-9\-_\.#*@]{8,32}$").unwrap(); }
+    lazy_static! {
+      static ref PASSWORD_REG: Regex = Regex::new(r"^[A-Za-z0-9\-_\.#*@]{8,32}$").unwrap();
+    }
     PASSWORD_REG.is_match(&password.as_str())
   }
 
@@ -98,9 +102,14 @@ impl User {
   }
 
   pub fn get_by_oid(conn: &Database, id: &ObjectId) -> Result<Self, Error> {
-    Self::get_one(&conn, Some(doc! {
-      "_id": id.clone(),
-    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
+    Self::get_one(
+      &conn,
+      Some(doc! {
+        "_id": id.clone(),
+      }),
+      None,
+    )
+    .and_then(|res| res.ok_or(Error::UserNotFoundError))
   }
 
   pub fn get_by_id(conn: &Database, id: &String) -> Result<Self, Error> {
@@ -109,9 +118,14 @@ impl User {
   }
 
   pub fn get_by_username(conn: &Database, username: &String) -> Result<Self, Error> {
-    Self::get_one(&conn, Some(doc! {
-      "username": username.to_lowercase(),
-    }), None).and_then(|res| res.ok_or(Error::UserNotFoundError))
+    Self::get_one(
+      &conn,
+      Some(doc! {
+        "username": username.to_lowercase(),
+      }),
+      None,
+    )
+    .and_then(|res| res.ok_or(Error::UserNotFoundError))
   }
 
   pub fn insert(conn: &Database, username: &String, password: &String) -> Result<Self, Error> {
@@ -120,63 +134,82 @@ impl User {
     match coll.insert_one(user.to_doc()?, None) {
       Ok(result) => match result.inserted_id {
         Some(_) => Ok(user),
-        None => Err(Error::UserExistedError)
+        None => Err(Error::UserExistedError),
       },
-      Err(_) => Err(Error::DatabaseError)
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 
   pub fn remove(conn: &Database, id: &String) -> Result<(), Error> {
     let coll = Self::coll(&conn);
-    match coll.delete_one(doc! {
-      "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
-    }, None) {
+    match coll.delete_one(
+      doc! {
+        "_id": ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?
+      },
+      None,
+    ) {
       Ok(result) => match result.deleted_count {
         1 => Ok(()),
-        _ => Err(Error::UserNotFoundError)
+        _ => Err(Error::UserNotFoundError),
       },
-      Err(_) => Err(Error::DatabaseError)
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 
   pub fn get_by_oid_and_touch(conn: &Database, id: &ObjectId) -> Result<Self, Error> {
     let coll = Self::coll(&conn);
-    match coll.find_one_and_update(doc! {
-      "_id": id.clone(),
-    }, doc! {
-      "$inc": { "visit_count": 1 },
-      "$currentDate": { "last_visit_date_time": true },
-    }, None) {
+    match coll.find_one_and_update(
+      doc! {
+        "_id": id.clone(),
+      },
+      doc! {
+        "$inc": { "visit_count": 1 },
+        "$currentDate": { "last_visit_date_time": true },
+      },
+      None,
+    ) {
       Ok(result) => match result {
         Some(doc) => Self::from_doc(doc),
-        None => Err(Error::UserNotFoundError)
+        None => Err(Error::UserNotFoundError),
       },
-      Err(_) => Err(Error::DatabaseError)
+      Err(_) => Err(Error::DatabaseError),
     }
   }
 
-  pub fn change_password_by_oid(conn: &Database, id: &ObjectId, new_password: &String) -> Result<(), Error> {
+  pub fn change_password_by_oid(
+    conn: &Database,
+    id: &ObjectId,
+    new_password: &String,
+  ) -> Result<(), Error> {
     if Self::is_valid_password(new_password) {
       let coll = Self::coll(&conn);
-      match coll.update_one(doc! {
-        "_id": id.clone()
-      }, doc! {
-        "$set": {
-          "password": encrypt_password(&new_password),
+      match coll.update_one(
+        doc! {
+          "_id": id.clone()
         },
-      }, None) {
+        doc! {
+          "$set": {
+            "password": encrypt_password(&new_password),
+          },
+        },
+        None,
+      ) {
         Ok(result) => match result.matched_count {
           1 => Ok(()),
-          _ => Err(Error::UserNotFoundError)
+          _ => Err(Error::UserNotFoundError),
         },
-        Err(_) => Err(Error::DatabaseError)
+        Err(_) => Err(Error::DatabaseError),
       }
     } else {
       Err(Error::InvalidPassword)
     }
   }
 
-  pub fn change_password_by_id(conn: &Database, id: &String, new_password: &String) -> Result<(), Error> {
+  pub fn change_password_by_id(
+    conn: &Database,
+    id: &String,
+    new_password: &String,
+  ) -> Result<(), Error> {
     let oid = ObjectId::with_string(id.as_str()).map_err(|_| Error::CannotParseObjectId)?;
     Self::change_password_by_oid(conn, &oid, new_password)
   }
@@ -187,12 +220,15 @@ impl User {
 
   pub fn setup_collection_index(conn: &Database) -> Result<(), Error> {
     let coll = Self::coll(&conn);
-    match coll.create_index(doc! {
-      "username": 1,
-    }, Some(mongodb::coll::options::IndexOptions {
-      unique: Some(true),
-      ..Default::default()
-    })) {
+    match coll.create_index(
+      doc! {
+        "username": 1,
+      },
+      Some(mongodb::coll::options::IndexOptions {
+        unique: Some(true),
+        ..Default::default()
+      }),
+    ) {
       Ok(_) => Ok(()),
       Err(_) => Err(Error::DatabaseError),
     }

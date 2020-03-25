@@ -18,6 +18,13 @@ use crate::app::genre::*;
 use crate::app::manga_data::*;
 use crate::util::Error;
 
+fn is_http_url(url: &str) -> bool {
+  lazy_static! {
+    static ref HTTP_URL_RE: Regex = Regex::new(r"&https?://").unwrap();
+  }
+  HTTP_URL_RE.is_match(url)
+}
+
 fn extract_num_pages(font: &String) -> Option<i32> {
   lazy_static! {
     static ref NUM_PAGES_RE: Regex = Regex::new(r"(\d+)").unwrap();
@@ -254,15 +261,18 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
 
   // Get the image information
   let dmk_id_base: DmkIdBase = {
-    // Get the no ads directory from the original directory by changing a character
-    let mut ad_dir = episodes[0].dmk_directory().clone();
-    lazy_static! {
-      static ref EPISODE_RE: Regex = Regex::new(r"(?P<b>\d{8})(\d)(?P<a>\d{6})").unwrap();
-    }
-    let no_ad_dir = EPISODE_RE.replace_all(ad_dir.as_mut_str(), "${b}4${a}");
 
-    // Get episode webpage using the no_ad_dir
-    let epi_url = format!("https://www.cartoonmad.com{}", &no_ad_dir);
+    // Deprecated since dmk no longer uses ad page
+
+    // Get the no ads directory from the original directory by changing a character
+    // let mut ad_dir = episodes[0].dmk_directory().clone();
+    // lazy_static! {
+    //   static ref EPISODE_RE: Regex = Regex::new(r"(?P<b>\d{8})(\d)(?P<a>\d{6})").unwrap();
+    // }
+    // // Get episode webpage using the no_ad_dir
+    // let no_ad_dir = EPISODE_RE.replace_all(ad_dir.as_mut_str(), "${b}4${a}");
+
+    let epi_url = format!("https://www.cartoonmad.com{}", episodes[0].dmk_directory());
     let mut response = reqwest::get(epi_url.as_str()).map_err(|_| Error::DmkFetchError)?;
     let epi_html_text = response
       .text_with_charset("big5")
@@ -283,7 +293,11 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
       .next()
       .ok_or(Error::DmkImgDomTraverseError)?;
     let img_src = img_elem.value().attr("src").ok_or(Error::DmkParseError)?;
-    let full_img_url = format!("https://www.cartoonmad.com/comic/{}", img_src);
+    let full_img_url = if is_http_url(&img_src) {
+      format!("https://www.cartoonmad.com/comic/{}", img_src)
+    } else {
+      String::from(img_src)
+    };
 
     // Request the image url and get the response header
     let client = reqwest::Client::builder()

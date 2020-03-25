@@ -20,7 +20,7 @@ use crate::util::Error;
 
 fn is_http_url(url: &str) -> bool {
   lazy_static! {
-    static ref HTTP_URL_RE: Regex = Regex::new(r"&https?://").unwrap();
+    static ref HTTP_URL_RE: Regex = Regex::new(r"^https?://").unwrap();
   }
   HTTP_URL_RE.is_match(url)
 }
@@ -281,7 +281,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
     // Make the selector lazy static
     lazy_static! {
       static ref IMG_SEL: Selector = Selector::parse(
-        "body > table > tbody > tr:nth-child(4) > td > table > tbody > tr:first-child > td:first-child > a > img"
+        "body > table > tbody > tr > td > table > tbody > tr:first-child > td:first-child > a > img"
       )
       .unwrap();
     }
@@ -294,9 +294,9 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
       .ok_or(Error::DmkImgDomTraverseError)?;
     let img_src = img_elem.value().attr("src").ok_or(Error::DmkParseError)?;
     let full_img_url = if is_http_url(&img_src) {
-      format!("https://www.cartoonmad.com/comic/{}", img_src)
-    } else {
       String::from(img_src)
+    } else {
+      format!("https://www.cartoonmad.com/comic/{}", img_src)
     };
 
     // Request the image url and get the response header

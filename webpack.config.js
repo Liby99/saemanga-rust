@@ -2,6 +2,7 @@
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -74,6 +75,12 @@ module.exports = {
       filename: "css/[name].css"
     }),
     new ForkTsCheckerWebpackPlugin(),
+    new CopyWebpackPlugin([
+      {
+        from: 'assets/images',
+        to: 'img'
+      }
+    ]),
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json']

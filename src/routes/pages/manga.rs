@@ -17,6 +17,11 @@ pub fn routes() -> Vec<Route> {
     manga_without_user,
     manga_with_epi,
     manga_with_epi_without_user,
+
+    // Specials
+    manga_456,
+    manga_456_without_user,
+
     unfollow,
     update,
   ]
@@ -229,6 +234,55 @@ fn manga_with_epi_without_user(
 ) -> Result<Template, Redirect> {
   let manga = Manga::get_or_fetch_by_dmk_id(&conn, &dmk_id).map_err(|err| err.redirect(None))?;
   render_page(None, setting, None, &manga, epi)
+}
+
+fn render_manga_456(user: Option<&User>, setting: UserSetting) -> Result<Template, Redirect> {
+  Ok(Template::render(
+    "manga",
+    PageData {
+      url: String::from("/comic/456/1"),
+      user: user,
+      follow: None,
+      manga: PageMangaData {
+        dmk_id: &String::from("456"),
+        cover_url: String::from("/img/manga/456/cover.png"),
+        saemanga_full_url: String::from("/manga/456/1"),
+        title: &String::from("先輩のおカワイイこと"),
+        description: &String::from("先輩、誕生日おめでとう！"),
+        author: &String::from("Ribiribiri"),
+        tags: &vec![String::from("少女")],
+        genre: String::from("少女"),
+        is_ended: false,
+        has_books: false,
+        books: vec![],
+        episodes: vec![
+          PageEpisodeData {
+            episode: 1,
+            is_curr_episode: true,
+            saemanga_url: String::from("/comic/456/1"),
+          }
+        ],
+      },
+      episode: EpisodeData {
+        episode: 1,
+        is_book: false,
+        pages: vec![String::from("/img/manga/456/1/1.png")],
+        next: None,
+        prev: None,
+      },
+      setting: SettingData::from(setting),
+    },
+  ))
+}
+
+#[get("/comic/456/1")]
+fn manga_456(user: &User, setting: UserSetting) -> Result<Template, Redirect> {
+  render_manga_456(Some(user), setting)
+}
+
+#[get("/comic/456/1", rank = 2)]
+fn manga_456_without_user(setting: UserSetting) -> Result<Template, Redirect> {
+  render_manga_456(None, setting)
 }
 
 #[get("/manga/unfollow?<dmk_id>")]

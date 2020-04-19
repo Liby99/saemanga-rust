@@ -21,7 +21,9 @@ fn test_fetch_manga_5893() {
   };
 }
 
+/// Deprecated warning: DMK no longer stores ended manga
 #[test]
+#[ignore]
 fn test_fetch_manga_kaikan_shirei() {
   let dmk_id = String::from("1237");
   match fetch_manga_data(&dmk_id) {

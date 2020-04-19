@@ -17,11 +17,9 @@ pub fn routes() -> Vec<Route> {
     manga_without_user,
     manga_with_epi,
     manga_with_epi_without_user,
-
     // Specials
     manga_456,
     manga_456_without_user,
-
     unfollow,
     update,
   ]
@@ -255,13 +253,11 @@ fn render_manga_456(user: Option<&User>, setting: UserSetting) -> Result<Templat
         is_ended: false,
         has_books: false,
         books: vec![],
-        episodes: vec![
-          PageEpisodeData {
-            episode: 1,
-            is_curr_episode: true,
-            saemanga_url: String::from("/comic/456/1"),
-          }
-        ],
+        episodes: vec![PageEpisodeData {
+          episode: 1,
+          is_curr_episode: true,
+          saemanga_url: String::from("/comic/456/1"),
+        }],
       },
       episode: EpisodeData {
         episode: 1,

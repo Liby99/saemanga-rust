@@ -197,13 +197,16 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
       }
 
       // Get the status
-      let img_elem = info_tbody
-        .select(&STATUS_IMG_SEL)
-        .next()
-        .ok_or(Error::DmkDomTraverseError)?;
-      let img_src = img_elem.value().attr("src").ok_or(Error::DmkParseError)?;
-      match img_src.find('9') {
-        Some(_) => MangaStatus::Ended,
+      match info_tbody.select(&STATUS_IMG_SEL).next() {
+        Some(img_elem) => {
+          let img_src = img_elem.value().attr("src").ok_or(Error::DmkParseError)?;
+          match img_src.find('9') {
+            Some(_) => MangaStatus::Ended,
+            None => MangaStatus::Updating,
+          }
+        }
+
+        // Allow no status information
         None => MangaStatus::Updating,
       }
     };
@@ -261,7 +264,6 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
 
   // Get the image information
   let dmk_id_base: DmkIdBase = {
-
     // Deprecated since dmk no longer uses ad page
 
     // Get the no ads directory from the original directory by changing a character
@@ -288,6 +290,7 @@ pub fn fetch_manga_data(dmk_id: &String) -> Result<MangaData, Error> {
 
     // Parse the episode html text to dom
     let epi_document = Html::parse_document(epi_html_text.as_str());
+    println!("10");
     let img_elem = epi_document
       .select(&IMG_SEL)
       .next()
@@ -423,6 +426,7 @@ pub fn fetch_ended() -> Result<Vec<(String, String)>, Error> {
   let first_page_ids = get_manga_ids_from_a_elems(a_elems)?;
 
   // Then get the last page count
+  println!("11");
   let pagi_elem = document
     .select(&LAST_PAGINATION_SEL)
     .next()

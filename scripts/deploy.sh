@@ -12,7 +12,7 @@ if [[ -f ${ADDR_FILE} && -f ${DIR_FILE} ]]; then
   DIRECTORY=`cat ${DIR_FILE}`
 
   # First build the project locally
-  npm run build-prod
+  # npm run build-prod # NO NEED
 
   # Upload the files to the server
   ${UPLOAD_SCRIPT}
